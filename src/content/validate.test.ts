@@ -93,6 +93,12 @@ describe("parseArticle", () => {
     expect(!bad.ok && bad.issues.join("\n")).toMatch(/"ghost" is not in content\/people.yaml/);
   });
 
+  it("rejects bold that cannot close before Korean text", () => {
+    const bad = parse(mdx('그는 **"에이전트의 10년"**이라고 부릅니다.'));
+    expect(!bad.ok && bad.issues.join("\n")).toMatch(/literal asterisks/);
+    expect(parse(mdx('그는 "**에이전트의 10년**"이라고 부릅니다.')).ok).toBe(true);
+  });
+
   it("rejects slug that differs from directory name", () => {
     const r = parse(mdx("body"), "other-dir");
     expect(!r.ok && r.issues.join("\n")).toMatch(/must equal directory name/);

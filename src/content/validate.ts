@@ -61,6 +61,20 @@ export function parseArticle({ dirName, raw, kit, people }: ArticleInput): Parse
     issues.push(`mdx: ${(e as Error).message}`);
   }
 
+  // CommonMark will not close `**` right after punctuation when a letter follows, so
+  // `**"인용"**이라고` renders literal asterisks. Common in Korean. A parsed text node that
+  // still contains "**" is exactly that failure.
+  const bodyOffset = raw.split("\n").length - content.split("\n").length;
+  if (tree) {
+    visit(tree, "text", (node) => {
+      if (!node.value.includes("**")) return;
+      const line = (node.position?.start.line ?? 0) + bodyOffset;
+      issues.push(
+        `line ${line}: "**" did not become bold and will show as literal asterisks. Move punctuation outside the markers: "**...**"이라고`,
+      );
+    });
+  }
+
   if (tree && meta.success) {
     const sources = new Map(meta.data.sources.map((s) => [s.id, s]));
     visit(tree, (node) => {
