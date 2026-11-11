@@ -6,6 +6,17 @@ category: people
 people: [boris-cherny]
 tags: ["claude-code", "workflow", "verification", "claude-md"]
 difficulty: practical
+apply:
+  goal: "Claude가 스스로 결과를 검증하는 루프와 팀 공용 CLAUDE.md를 갖춥니다."
+  changes:
+    - "CLAUDE.md에 빌드·테스트 명령과 '끝내기 전 반드시 실행할 명령' 추가"
+    - "포매터가 있다면 .claude/settings.json에 편집 후 자동 포맷 훅(PostToolUse) 제안"
+    - "자주 하는 작업 1~2개를 .claude/commands/ 슬래시 명령으로 추가"
+  doesNotDo:
+    - "권한 확인을 통째로 끄는 설정은 넣지 않습니다."
+    - "애플리케이션 코드는 수정하지 않습니다."
+  fitsWhen: "Claude Code를 쓰고, 테스트·타입 체크·린트 중 하나라도 있는 프로젝트"
+  time: "20~40분"
 draft: true
 publishedAt: 2026-11-11
 keyIdeas:

@@ -54,6 +54,14 @@ export const ArticleMeta = z
     sources: z.array(Source).min(1),
     keyIdeas: z.array(z.string().min(1)).min(1).max(7),
     difficulty: z.enum(["intro", "practical", "deep"]),
+    /** What running the kit does to a reader's repo, shown before they run it. */
+    apply: z.object({
+      goal: z.string().min(1).max(120),
+      changes: z.array(z.string().min(1)).min(2).max(5),
+      doesNotDo: z.array(z.string().min(1)).min(1).max(3),
+      fitsWhen: z.string().min(1),
+      time: z.string().min(1),
+    }),
     draft: z.boolean().default(false),
     publishedAt: z.coerce.date(),
     updatedAt: z.coerce.date().optional(),
