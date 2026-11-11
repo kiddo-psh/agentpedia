@@ -64,7 +64,9 @@ function all(): Article[] {
   return (cache ??= loadAllArticles());
 }
 
-const includeDraftsByDefault = () => process.env.NODE_ENV !== "production";
+/** Drafts show in dev, or in a production build run with SHOW_DRAFTS=1 (preview deploys). */
+const includeDraftsByDefault = () =>
+  process.env.NODE_ENV !== "production" || process.env.SHOW_DRAFTS === "1";
 
 export function listArticles(filter: {
   category?: Category;
