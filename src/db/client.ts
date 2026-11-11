@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import path from "node:path";
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import * as schema from "./schema";
@@ -19,6 +20,8 @@ async function connect(): Promise<Db> {
   const { PGlite } = await import("@electric-sql/pglite");
   const { drizzle } = await import("drizzle-orm/pglite");
   const { migrate } = await import("drizzle-orm/pglite/migrator");
+  // PGlite creates its own folder but not missing parents.
+  fs.mkdirSync(path.join(process.cwd(), ".data"), { recursive: true });
   const db = drizzle(new PGlite(path.join(process.cwd(), ".data", "pglite")), { schema });
   await migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
   return db as unknown as Db;
@@ -26,4 +29,11 @@ async function connect(): Promise<Db> {
 
 // Survive dev hot reloads: one connection (and one PGlite instance) per process.
 const g = globalThis as unknown as { __db?: Promise<Db> };
-export const getDb = (): Promise<Db> => (g.__db ??= connect());
+export function getDb(): Promise<Db> {
+  // A failed connect is not cached, so the next request retries.
+  g.__db ??= connect().catch((err) => {
+    g.__db = undefined;
+    throw err;
+  });
+  return g.__db;
+}
