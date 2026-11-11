@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { UserMenu } from "@/components/UserMenu";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/connect" className="hover:text-foreground">
                 에이전트 연결
               </Link>
+              <UserMenu />
             </nav>
           </div>
         </header>
