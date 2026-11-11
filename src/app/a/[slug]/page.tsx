@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ArticleTracking } from "@/components/ArticleTracking";
 import { KitSection } from "@/components/KitSection";
+import { Comments } from "@/components/comments/Comments";
 import { ArticleBody } from "@/components/mdx/ArticleBody";
 import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatDate } from "@/content/labels";
 import { getArticle, listArticles } from "@/content/loader";
@@ -86,6 +87,13 @@ async function ArticleView({ slug }: { slug: string }) {
       <ArticleBody article={article} />
 
       <KitSection article={article} />
+
+      <section id="comments" className="mt-16 border-t border-foreground/10 pt-10" aria-labelledby="comments-title">
+        {/* Comments are request-time data; the article above stays in the static shell. */}
+        <Suspense fallback={<p className="text-sm text-muted">토론을 불러오는 중…</p>}>
+          <Comments slug={article.slug} />
+        </Suspense>
+      </section>
 
       <section className="mt-16 border-t border-foreground/10 pt-8" aria-labelledby="sources">
         <h2 id="sources" className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted">
