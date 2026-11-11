@@ -18,6 +18,7 @@ const article: Article = {
   draft: false,
   publishedAt: new Date(),
   bodyMarkdown: "",
+  persons: [],
   kit: [
     { path: "checklist.md", content: "- [ ] done" },
     { path: "skills/x/SKILL.md", content: "skill" },

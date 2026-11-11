@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { Article, ArticleMeta, Category, KitFile } from "./schema";
+import { parse as parseYaml } from "yaml";
+import { PeopleRegistry, type Article, type ArticleMeta, type Category, type KitFile, type Person } from "./schema";
 import { parseArticle } from "./validate";
 
 /** The single content entry point shared by web pages and the MCP server. */
@@ -29,6 +30,21 @@ function readKit(kitDir: string): KitFile[] {
     .sort((a, b) => a.path.localeCompare(b.path));
 }
 
+/** content/people.yaml -> map by id. Problems are reported like an article's. */
+function readPeople(problems: { dir: string; issues: string[] }[]): Map<string, Person> {
+  const file = path.join(process.cwd(), "content", "people.yaml");
+  if (!fs.existsSync(file)) return new Map();
+  const parsed = PeopleRegistry.safeParse(parseYaml(fs.readFileSync(file, "utf8")) ?? []);
+  if (!parsed.success) {
+    problems.push({
+      dir: "people.yaml",
+      issues: parsed.error.issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`),
+    });
+    return new Map();
+  }
+  return new Map(parsed.data.map((p) => [p.id, p]));
+}
+
 /** Reads and validates every article. Throws ContentError listing all problems. */
 // Every fs path is spelled from process.cwd() + "content/articles" literally so the bundler
 // can scope output file tracing to that folder instead of the whole project.
@@ -36,6 +52,7 @@ export function loadAllArticles(): Article[] {
   if (!fs.existsSync(path.join(process.cwd(), "content", "articles"))) return [];
   const articles: Article[] = [];
   const problems: { dir: string; issues: string[] }[] = [];
+  const people = readPeople(problems);
 
   const entries = fs.readdirSync(path.join(process.cwd(), "content", "articles"), { withFileTypes: true });
   for (const entry of entries) {
@@ -49,6 +66,7 @@ export function loadAllArticles(): Article[] {
       dirName: entry.name,
       raw: fs.readFileSync(indexPath, "utf8"),
       kit: readKit(path.join(process.cwd(), "content", "articles", entry.name, "kit")),
+      people,
     });
     if (result.ok) articles.push(result.article);
     else problems.push({ dir: entry.name, issues: result.issues });
@@ -81,11 +99,11 @@ export function listArticles(filter: {
     .filter(
       (a) =>
         !q ||
-        [a.title, a.summary, ...a.tags, ...a.people, ...a.keyIdeas].some((s) =>
+        [a.title, a.summary, ...a.tags, ...a.persons.flatMap((p) => [p.name, p.nameKo]), ...a.keyIdeas].some((s) =>
           s.toLowerCase().includes(q),
         ),
     )
-    .map(({ bodyMarkdown, kit, ...meta }) => meta);
+    .map(({ bodyMarkdown, kit, persons, ...meta }) => meta);
 }
 
 export function getArticle(

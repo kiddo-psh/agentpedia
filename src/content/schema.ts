@@ -13,8 +13,34 @@ export const Source = z.object({
   author: z.string().min(1),
   kind: z.enum([...TIMED_SOURCE_KINDS, "blog", "paper", "thread"]),
   publishedAt: z.coerce.date(),
+  /** Why the date is uncertain, if it was not read directly from the source. */
+  dateNote: z.string().optional(),
 });
 export type Source = z.infer<typeof Source>;
+
+/** Licenses whose terms allow reuse with attribution. Anything else is rejected. */
+export const PHOTO_LICENSES = ["CC0", "CC BY 2.0", "CC BY 3.0", "CC BY 4.0", "CC BY-SA 2.0", "CC BY-SA 3.0", "CC BY-SA 4.0", "Public domain", "Owner permission"] as const;
+
+export const Person = z.object({
+  id: z.string().regex(/^[a-z0-9-]+$/),
+  name: z.string().min(1),
+  /** Korean name as readers will see it, e.g. "안드레 카파시". */
+  nameKo: z.string().min(1),
+  /** One line on who they are, in Korean. */
+  role: z.string().min(1).max(80),
+  photo: z
+    .object({
+      url: z.url().refine((u) => u.startsWith("https://"), "photo.url must be https"),
+      credit: z.string().min(1),
+      license: z.enum(PHOTO_LICENSES),
+      sourceUrl: z.url(),
+    })
+    .optional(),
+});
+export type Person = z.infer<typeof Person>;
+export const PeopleRegistry = z.array(Person).refine((ps) => new Set(ps.map((p) => p.id)).size === ps.length, {
+  message: "people[].id must be unique",
+});
 
 export const ArticleMeta = z
   .object({
@@ -22,6 +48,7 @@ export const ArticleMeta = z
     title: z.string().min(1),
     summary: z.string().min(1).max(200),
     category: Category,
+    /** Ids from content/people.yaml. */
     people: z.array(z.string()).default([]),
     tags: z.array(z.string()).default([]),
     sources: z.array(Source).min(1),
@@ -42,6 +69,8 @@ export type KitFile = { path: string; content: string };
 export type Article = ArticleMeta & {
   bodyMarkdown: string;
   kit: KitFile[];
+  /** `people` ids resolved against the registry, in the same order. */
+  persons: Person[];
 };
 
 /** JSX components an article body may use. Anything else fails validation. */

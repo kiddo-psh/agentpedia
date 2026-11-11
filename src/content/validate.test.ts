@@ -36,7 +36,8 @@ function mdx(body: string, overrides: Record<string, string> = {}) {
   ].join("\n");
 }
 
-const parse = (raw: string, dirName = "sample", k = kit) => parseArticle({ dirName, raw, kit: k });
+const people = new Map([["ada", { id: "ada", name: "Ada", nameKo: "에이다", role: "테스트 인물" }]]);
+const parse = (raw: string, dirName = "sample", k = kit) => parseArticle({ dirName, raw, kit: k, people });
 
 describe("parseArticle", () => {
   it("accepts a valid article with timed and untimed quotes", () => {
@@ -77,6 +78,13 @@ describe("parseArticle", () => {
     const text = !r.ok ? r.issues.join("\n") : "";
     expect(text).toMatch(/<Callout> is not an allowed component/);
     expect(text).toMatch(/<div> is not an allowed component/);
+  });
+
+  it("resolves people ids and rejects unknown ones", () => {
+    const ok = parse(mdx("body", { people: "[ada]" }));
+    expect(ok).toMatchObject({ ok: true, article: { persons: [{ nameKo: "에이다" }] } });
+    const bad = parse(mdx("body", { people: "[ghost]" }));
+    expect(!bad.ok && bad.issues.join("\n")).toMatch(/"ghost" is not in content\/people.yaml/);
   });
 
   it("rejects slug that differs from directory name", () => {

@@ -1,0 +1,18 @@
+# People referenced by articles (frontmatter `people: [id]`).
+# Photos: only images with a reuse license; see docs/writing-guide.md section 5.
+# Leave `photo` out when no licensed image is confirmed; an initials avatar is shown instead.
+
+- id: andrej-karpathy
+  name: Andrej Karpathy
+  nameKo: 안드레 카파시
+  role: OpenAI 창립 멤버, 전 테슬라 AI 디렉터
+
+- id: boris-cherny
+  name: Boris Cherny
+  nameKo: 보리스 체르니
+  role: Anthropic 엔지니어, Claude Code 창시자
+
+- id: peter-steinberger
+  name: Peter Steinberger
+  nameKo: 피터 스타인버거
+  role: PSPDFKit 창업자, 에이전트 기반 개발자

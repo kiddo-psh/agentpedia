@@ -12,6 +12,7 @@ import {
   TIMED_SOURCE_KINDS,
   type Article,
   type KitFile,
+  type Person,
 } from "./schema";
 
 export type ArticleInput = {
@@ -20,6 +21,8 @@ export type ArticleInput = {
   /** Raw index.mdx contents. */
   raw: string;
   kit: KitFile[];
+  /** content/people.yaml, keyed by id. */
+  people: ReadonlyMap<string, Person>;
 };
 
 export type ParseResult =
@@ -29,7 +32,7 @@ export type ParseResult =
 const TIMESTAMP = /^(?:\d+:)?[0-5]?\d:[0-5]\d$/;
 
 /** Pure: no IO. Collects every problem instead of stopping at the first. */
-export function parseArticle({ dirName, raw, kit }: ArticleInput): ParseResult {
+export function parseArticle({ dirName, raw, kit, people }: ArticleInput): ParseResult {
   const issues: string[] = [];
   const { data, content } = matter(raw);
 
@@ -40,6 +43,11 @@ export function parseArticle({ dirName, raw, kit }: ArticleInput): ParseResult {
     }
   } else if (meta.data.slug !== dirName) {
     issues.push(`frontmatter.slug "${meta.data.slug}" must equal directory name "${dirName}"`);
+  }
+
+  const unknownPeople = meta.success ? meta.data.people.filter((id) => !people.has(id)) : [];
+  for (const id of unknownPeople) {
+    issues.push(`frontmatter.people: "${id}" is not in content/people.yaml`);
   }
 
   if (!kit.some((f) => f.path === REQUIRED_KIT_FILE)) {
@@ -95,7 +103,8 @@ export function parseArticle({ dirName, raw, kit }: ArticleInput): ParseResult {
   }
 
   if (issues.length > 0 || !meta.success) return { ok: false, issues };
-  return { ok: true, article: { ...meta.data, bodyMarkdown: content.trim(), kit } };
+  const persons = meta.data.people.map((id) => people.get(id)!);
+  return { ok: true, article: { ...meta.data, bodyMarkdown: content.trim(), kit, persons } };
 }
 
 /** "1:02:03" -> 3723. Used to build `?t=` links. Assumes the input passed validation. */
