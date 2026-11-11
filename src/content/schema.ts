@@ -6,16 +6,24 @@ export type Category = z.infer<typeof Category>;
 /** Source kinds whose quotes must carry a timestamp (`at`). */
 export const TIMED_SOURCE_KINDS = ["video", "podcast", "talk"] as const;
 
-export const Source = z.object({
-  id: z.string().regex(/^[a-z0-9-]+$/),
-  title: z.string().min(1),
-  url: z.url(),
-  author: z.string().min(1),
-  kind: z.enum([...TIMED_SOURCE_KINDS, "blog", "paper", "thread"]),
-  publishedAt: z.coerce.date(),
-  /** Why the date is uncertain, if it was not read directly from the source. */
-  dateNote: z.string().optional(),
-});
+export const Source = z
+  .object({
+    id: z.string().regex(/^[a-z0-9-]+$/),
+    title: z.string().min(1),
+    url: z.url(),
+    author: z.string().min(1),
+    kind: z.enum([...TIMED_SOURCE_KINDS, "blog", "paper", "thread"]),
+    /** When the source was published. Only this date counts toward an article's "출처 시점". */
+    publishedAt: z.coerce.date().optional(),
+    /** For undated pages (profiles, transcripts): when it was read. Never stands in for publishedAt. */
+    accessedAt: z.coerce.date().optional(),
+    /** Why the date is uncertain, if it was not read directly from the source. */
+    dateNote: z.string().optional(),
+  })
+  .refine((s) => s.publishedAt || s.accessedAt, {
+    message: "a source needs publishedAt, or accessedAt when the page has no date",
+    path: ["publishedAt"],
+  });
 export type Source = z.infer<typeof Source>;
 
 /** Licenses whose terms allow reuse with attribution. Anything else is rejected. */
@@ -51,7 +59,10 @@ export const ArticleMeta = z
     /** Ids from content/people.yaml. */
     people: z.array(z.string()).default([]),
     tags: z.array(z.string()).default([]),
-    sources: z.array(Source).min(1),
+    sources: z
+      .array(Source)
+      .min(1)
+      .refine((ss) => ss.some((s) => s.publishedAt), "at least one source must have publishedAt"),
     keyIdeas: z.array(z.string().min(1)).min(1).max(7),
     difficulty: z.enum(["intro", "practical", "deep"]),
     /** What running the kit does to a reader's repo, shown before they run it. */

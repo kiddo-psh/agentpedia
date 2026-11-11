@@ -24,11 +24,19 @@ export const formatDate = (d: Date) => dateFormat.format(d);
 
 const monthFormat = new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "long", timeZone: "Asia/Seoul" });
 
-/** "2025년 6월", or "2025년 12월 ~ 2026년 1월" when sources span months. */
-export function sourcePeriod(sources: { publishedAt: Date; dateNote?: string }[]): string {
-  const times = sources.map((s) => s.publishedAt.getTime());
+type Dated = { publishedAt?: Date; accessedAt?: Date; dateNote?: string };
+
+/** Newest publication date; undated sources (accessedAt only) do not count. */
+export function newestPublished(sources: Dated[]): Date {
+  return new Date(Math.max(...sources.flatMap((s) => (s.publishedAt ? [s.publishedAt.getTime()] : []))));
+}
+
+/** "2025년 6월", or "2025년 12월 ~ 2026년 1월" when sources span months. Undated sources are ignored. */
+export function sourcePeriod(sources: Dated[]): string {
+  const dated = sources.filter((s): s is Dated & { publishedAt: Date } => Boolean(s.publishedAt));
+  const times = dated.map((s) => s.publishedAt.getTime());
   const [from, to] = [monthFormat.format(Math.min(...times)), monthFormat.format(Math.max(...times))];
-  const estimated = sources.some((s) => s.dateNote) ? " (일부 추정)" : "";
+  const estimated = dated.some((s) => s.dateNote) ? " (일부 날짜 간접 확인)" : "";
   return (from === to ? from : `${from} ~ ${to}`) + estimated;
 }
 

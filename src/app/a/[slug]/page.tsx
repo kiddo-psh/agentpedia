@@ -7,7 +7,7 @@ import { PersonCard } from "@/components/PersonCard";
 import { SourceTiming } from "@/components/SourceTiming";
 import { Comments } from "@/components/comments/Comments";
 import { ArticleBody } from "@/components/mdx/ArticleBody";
-import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatDate, sourcePeriod } from "@/content/labels";
+import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatDate, newestPublished, sourcePeriod } from "@/content/labels";
 import { getArticle, listArticles } from "@/content/loader";
 
 // Cache Components requires at least one param; a placeholder 404s when nothing is published.
@@ -69,7 +69,7 @@ async function ArticleView({ slug }: { slug: string }) {
         <p className="mt-4 text-lg leading-relaxed text-muted">{article.summary}</p>
         <SourceTiming
           period={sourcePeriod(article.sources)}
-          newestIso={new Date(Math.max(...article.sources.map((s) => s.publishedAt.getTime()))).toISOString()}
+          newestIso={newestPublished(article.sources).toISOString()}
         />
         {article.persons.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-x-8 gap-y-4">
@@ -117,8 +117,9 @@ async function ArticleView({ slug }: { slug: string }) {
               </a>
               <span className="text-muted">
                 {" "}
-                · {s.author} · {formatDate(s.publishedAt)}
-                {s.dateNote && <span title={s.dateNote}> (추정)</span>}
+                · {s.author} ·{" "}
+                {s.publishedAt ? formatDate(s.publishedAt) : `날짜 없음 (${formatDate(s.accessedAt!)} 열람)`}
+                {s.publishedAt && s.dateNote && <span title={s.dateNote}> (날짜 간접 확인)</span>}
               </span>
             </li>
           ))}

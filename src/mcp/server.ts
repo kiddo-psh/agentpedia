@@ -56,8 +56,9 @@ const day = (d: Date) => d.toISOString().slice(0, 10);
 function sourcesText(a: Article): string {
   return a.sources
     .map((s) => {
-      const note = s.dateNote ? ` (날짜 추정: ${s.dateNote})` : "";
-      return `- ${s.title} — ${s.author}, ${day(s.publishedAt)}${note}: ${s.url}`;
+      const note = s.dateNote ? ` (날짜 메모: ${s.dateNote})` : "";
+      const when = s.publishedAt ? day(s.publishedAt) : `날짜 없음, ${day(s.accessedAt!)} 열람`;
+      return `- ${s.title} — ${s.author}, ${when}${note}: ${s.url}`;
     })
     .join("\n");
 }
