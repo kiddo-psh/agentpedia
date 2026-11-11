@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ArticleTracking } from "@/components/ArticleTracking";
 import { KitSection } from "@/components/KitSection";
+import { PersonCard } from "@/components/PersonCard";
 import { Comments } from "@/components/comments/Comments";
 import { ArticleBody } from "@/components/mdx/ArticleBody";
 import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatDate } from "@/content/labels";
@@ -65,8 +66,12 @@ async function ArticleView({ slug }: { slug: string }) {
         </div>
         <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{article.title}</h1>
         <p className="mt-4 text-lg leading-relaxed text-muted">{article.summary}</p>
-        {article.people.length > 0 && (
-          <p className="mt-4 text-sm text-muted">다루는 인물: {article.people.join(", ")}</p>
+        {article.persons.length > 0 && (
+          <div className="mt-6 flex flex-wrap gap-x-8 gap-y-4">
+            {article.persons.map((p) => (
+              <PersonCard key={p.id} person={p} />
+            ))}
+          </div>
         )}
       </header>
 
