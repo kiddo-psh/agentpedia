@@ -110,7 +110,16 @@ export function applyPromptText(a: Article, origin: string): string {
 const text = (t: string) => ({ content: [{ type: "text" as const, text: t }] });
 const error = (t: string) => ({ ...text(t), isError: true });
 
-export function createAgentpediaServer(origin: string): McpServer {
+export type McpEventKind = "mcp_get_article" | "mcp_get_kit" | "mcp_prompt";
+
+/**
+ * `onEvent` fires when a call resolves to a real article; the HTTP route uses it to
+ * record apply events. Tests and other hosts can omit it.
+ */
+export function createAgentpediaServer(
+  origin: string,
+  onEvent: (kind: McpEventKind, articleSlug: string) => void = () => {},
+): McpServer {
   const server = new McpServer(
     { name: SERVER_NAME, version: "0.1.0" },
     {
@@ -150,7 +159,9 @@ export function createAgentpediaServer(origin: string): McpServer {
     },
     async ({ slug }) => {
       const a = getArticle(slug);
-      return a ? text(articleText(a, origin)) : error(notFoundText(slug));
+      if (!a) return error(notFoundText(slug));
+      onEvent("mcp_get_article", a.slug);
+      return text(articleText(a, origin));
     },
   );
 
@@ -164,7 +175,9 @@ export function createAgentpediaServer(origin: string): McpServer {
     },
     async ({ slug }) => {
       const a = getArticle(slug);
-      return a ? text(`# ${a.title} — 적용 키트\n\n${kitText(a.kit)}`) : error(notFoundText(slug));
+      if (!a) return error(notFoundText(slug));
+      onEvent("mcp_get_kit", a.slug);
+      return text(`# ${a.title} — 적용 키트\n\n${kitText(a.kit)}`);
     },
   );
 
@@ -177,6 +190,7 @@ export function createAgentpediaServer(origin: string): McpServer {
     },
     async ({ slug }) => {
       const a = getArticle(slug);
+      if (a) onEvent("mcp_prompt", a.slug);
       return {
         messages: [{ role: "user", content: { type: "text", text: a ? applyPromptText(a, origin) : notFoundText(slug) } }],
       };

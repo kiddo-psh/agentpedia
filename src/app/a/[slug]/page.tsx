@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ArticleTracking } from "@/components/ArticleTracking";
 import { KitSection } from "@/components/KitSection";
 import { ArticleBody } from "@/components/mdx/ArticleBody";
 import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatDate } from "@/content/labels";
@@ -46,6 +47,7 @@ async function ArticleView({ slug }: { slug: string }) {
   if (!article) notFound();
 
   return (
+    <ArticleTracking slug={article.slug}>
     <article>
       <header className="mb-10">
         <div className="mb-3 flex flex-wrap items-center gap-2 text-sm text-muted">
@@ -104,5 +106,6 @@ async function ArticleView({ slug }: { slug: string }) {
         </ul>
       </section>
     </article>
+    </ArticleTracking>
   );
 }

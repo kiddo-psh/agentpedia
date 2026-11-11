@@ -8,10 +8,12 @@ const ORIGIN = "https://agentpedia.test";
 const SLUG = "boris-cherny-claude-code-workflow";
 
 let client: Client;
+let recorded: [string, string][];
 
 beforeEach(async () => {
+  recorded = [];
   const [clientSide, serverSide] = InMemoryTransport.createLinkedPair();
-  await createAgentpediaServer(ORIGIN).connect(serverSide);
+  await createAgentpediaServer(ORIGIN, (kind, slug) => recorded.push([kind, slug])).connect(serverSide);
   client = new Client({ name: "test", version: "0.0.0" });
   await client.connect(clientSide);
 });
@@ -59,6 +61,19 @@ describe(`${SERVER_NAME} MCP server`, () => {
     const t = textOf(await client.callTool({ name: "get_apply_kit", arguments: { slug: SLUG } }));
     expect(t.indexOf("### prompt.md")).toBeGreaterThan(-1);
     expect(t.indexOf("### prompt.md")).toBeLessThan(t.indexOf("### checklist.md"));
+  });
+
+  it("reports an apply event per successful article call, none for misses or search", async () => {
+    await client.callTool({ name: "search_articles", arguments: {} });
+    await client.callTool({ name: "get_article", arguments: { slug: SLUG } });
+    await client.callTool({ name: "get_apply_kit", arguments: { slug: SLUG } });
+    await client.getPrompt({ name: "apply_article", arguments: { slug: SLUG } });
+    await client.callTool({ name: "get_article", arguments: { slug: "nope" } });
+    expect(recorded).toEqual([
+      ["mcp_get_article", SLUG],
+      ["mcp_get_kit", SLUG],
+      ["mcp_prompt", SLUG],
+    ]);
   });
 
   it("apply_article embeds the kit and the stop-if-unfit instruction", async () => {

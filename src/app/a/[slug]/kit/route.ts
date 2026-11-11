@@ -1,5 +1,6 @@
 import { buildKitArchive } from "@/content/kit";
 import { getArticle } from "@/content/loader";
+import { trackAfterResponse } from "@/events/track";
 
 export async function GET(request: Request, { params }: RouteContext<"/a/[slug]/kit">) {
   const { slug } = await params;
@@ -8,6 +9,7 @@ export async function GET(request: Request, { params }: RouteContext<"/a/[slug]/
 
   const articleUrl = new URL(`/a/${slug}`, request.url).toString();
   const zip = buildKitArchive(article, articleUrl);
+  trackAfterResponse(request, { kind: "kit_download", articleSlug: slug });
 
   return new Response(zip as BodyInit, {
     headers: {
