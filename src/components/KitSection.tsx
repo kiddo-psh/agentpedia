@@ -33,6 +33,8 @@ export function KitSection({ article }: { article: Article }) {
         </a>
       </div>
 
+      <ApplySummary apply={article.apply} />
+
       <div className="mt-6">
         <p className="text-sm font-semibold">에이전트에서 바로 적용하기</p>
         <McpSnippet
@@ -69,5 +71,48 @@ export function KitSection({ article }: { article: Article }) {
         ))}
       </div>
     </section>
+  );
+}
+
+/** What the kit will do, stated before the reader runs anything. */
+function ApplySummary({ apply }: { apply: Article["apply"] }) {
+  return (
+    <div className="mt-6 rounded-xl bg-background p-5">
+      <p className="text-xs font-semibold uppercase tracking-wider text-accent">이 키트가 하는 일</p>
+      <p className="mt-1 text-lg font-semibold leading-snug">{apply.goal}</p>
+      <div className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
+        <div>
+          <p className="mb-1 font-semibold">바뀔 수 있는 것</p>
+          <ul className="grid gap-1">
+            {apply.changes.map((c) => (
+              <li key={c} className="flex gap-2">
+                <span className="text-accent">+</span>
+                <span>{c}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <p className="mb-1 font-semibold">하지 않는 것</p>
+          <ul className="grid gap-1 text-muted">
+            {apply.doesNotDo.map((c) => (
+              <li key={c} className="flex gap-2">
+                <span>−</span>
+                <span>{c}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <dl className="mt-4 grid gap-1 border-t border-foreground/10 pt-3 text-sm sm:grid-cols-[auto_1fr] sm:gap-x-4">
+        <dt className="text-muted">이런 프로젝트에 맞아요</dt>
+        <dd>{apply.fitsWhen}</dd>
+        <dt className="text-muted">예상 시간</dt>
+        <dd>{apply.time}</dd>
+      </dl>
+      <p className="mt-3 text-xs text-muted">
+        에이전트는 먼저 레포를 읽고 맞지 않으면 멈춥니다. 파일을 바꾸기 전에는 항상 계획을 보여주고 승인을 받습니다.
+      </p>
+    </div>
   );
 }
