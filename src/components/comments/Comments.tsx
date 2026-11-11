@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import Link from "next/link";
+import { connection } from "next/server";
 import { listThreads, type CommentView } from "@/comments/service";
 import { getDb } from "@/db/client";
 import { getSession } from "@/lib/auth";
@@ -14,6 +15,8 @@ const timeFormat = new Intl.DateTimeFormat("ko-KR", {
 
 /** Request-time data (session, live comments): render inside a Suspense boundary. */
 export async function Comments({ slug }: { slug: string }) {
+  // Auth and DB code read the clock; mark this subtree request-time before touching them.
+  await connection();
   const [session, threads] = await Promise.all([
     getSession(await headers()),
     getDb().then((db) => listThreads(db, slug)),
