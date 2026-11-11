@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { getDb } from "@/db/client";
 import { articleMetrics } from "@/events/metrics";
 
@@ -6,6 +7,8 @@ import { articleMetrics } from "@/events/metrics";
  * token is set; without a token it is available only in development.
  */
 export async function GET(request: Request) {
+  // Live numbers: never prerender this at build time.
+  await connection();
   const token = process.env.METRICS_TOKEN;
   const allowed = token
     ? request.headers.get("authorization") === `Bearer ${token}`
