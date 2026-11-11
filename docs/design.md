@@ -151,6 +151,7 @@ export const ArticleMeta = z.object({
   sources: z.array(Source).min(1),      // 출처 없는 기사는 빌드 실패
   keyIdeas: z.array(z.string()).min(1).max(7), // MCP get_article의 핵심
   difficulty: z.enum(["intro", "practical", "deep"]),
+  draft: z.boolean().default(false),    // true면 프로덕션 목록과 MCP에서 숨김
   publishedAt: z.coerce.date(),
   updatedAt: z.coerce.date().optional(),
 });
