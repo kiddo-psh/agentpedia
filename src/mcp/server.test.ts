@@ -81,6 +81,8 @@ describe(`${SERVER_NAME} MCP server`, () => {
     const t = (messages[0].content as { text: string }).text;
     expect(messages[0].role).toBe("user");
     expect(t).toContain("맞지 않으면 이유를 설명하고 멈추세요");
+    expect(t).toContain("## 이 키트가 하는 일");
+    expect(t).toContain("하지 않는 것:");
     expect(t).toContain("### prompt.md");
     expect(t).toContain(`${ORIGIN}/a/${SLUG}`);
   });

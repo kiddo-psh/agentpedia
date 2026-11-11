@@ -51,8 +51,28 @@ function kitText(kit: KitFile[]): string {
     .join("\n\n");
 }
 
+const day = (d: Date) => d.toISOString().slice(0, 10);
+
 function sourcesText(a: Article): string {
-  return a.sources.map((s) => `- ${s.title} — ${s.author}: ${s.url}`).join("\n");
+  return a.sources
+    .map((s) => {
+      const note = s.dateNote ? ` (날짜 추정: ${s.dateNote})` : "";
+      return `- ${s.title} — ${s.author}, ${day(s.publishedAt)}${note}: ${s.url}`;
+    })
+    .join("\n");
+}
+
+export function applySummaryText(a: Article): string {
+  const { apply } = a;
+  return [
+    `목표: ${apply.goal}`,
+    "바뀔 수 있는 것:",
+    ...apply.changes.map((c) => `- ${c}`),
+    "하지 않는 것:",
+    ...apply.doesNotDo.map((c) => `- ${c}`),
+    `맞는 프로젝트: ${apply.fitsWhen}`,
+    `예상 시간: ${apply.time}`,
+  ].join("\n");
 }
 
 export function articleText(a: Article, origin: string): string {
@@ -61,6 +81,7 @@ export function articleText(a: Article, origin: string): string {
     "",
     `URL: ${origin}/a/${a.slug}`,
     `카테고리: ${CATEGORY_LABEL[a.category]}${a.draft ? " · 초안(검수 전)" : ""}`,
+    ...a.persons.map((p) => `인물: ${p.nameKo} (${p.name}) — ${p.role}`),
     "",
     a.summary,
     "",
@@ -75,6 +96,8 @@ export function articleText(a: Article, origin: string): string {
     sourcesText(a),
     "",
     "## 적용 키트",
+    applySummaryText(a),
+    "",
     `파일: ${orderedKit(a.kit).map((f) => f.path).join(", ")}`,
     "전체 내용은 get_apply_kit으로, 단계별 적용 지시는 apply_article 프롬프트로 받을 수 있습니다.",
   ].join("\n");
@@ -89,6 +112,10 @@ export function applyPromptText(a: Article, origin: string): string {
     "",
     "핵심 아이디어:",
     ...a.keyIdeas.map((k) => `- ${k}`),
+    "",
+    "## 이 키트가 하는 일 (이 범위를 벗어나지 마세요)",
+    "",
+    applySummaryText(a),
     "",
     "## 적용 키트",
     "",
