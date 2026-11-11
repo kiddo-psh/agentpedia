@@ -5,8 +5,6 @@ import { parseArticle } from "./validate";
 
 /** The single content entry point shared by web pages and the MCP server. */
 
-const ARTICLES_DIR = path.join(process.cwd(), "content", "articles");
-
 export class ContentError extends Error {
   constructor(public readonly problems: { dir: string; issues: string[] }[]) {
     super(
@@ -32,15 +30,17 @@ function readKit(kitDir: string): KitFile[] {
 }
 
 /** Reads and validates every article. Throws ContentError listing all problems. */
-export function loadAllArticles(dir = ARTICLES_DIR): Article[] {
-  if (!fs.existsSync(dir)) return [];
+// Every fs path is spelled from process.cwd() + "content/articles" literally so the bundler
+// can scope output file tracing to that folder instead of the whole project.
+export function loadAllArticles(): Article[] {
+  if (!fs.existsSync(path.join(process.cwd(), "content", "articles"))) return [];
   const articles: Article[] = [];
   const problems: { dir: string; issues: string[] }[] = [];
 
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+  const entries = fs.readdirSync(path.join(process.cwd(), "content", "articles"), { withFileTypes: true });
+  for (const entry of entries) {
     if (!entry.isDirectory()) continue;
-    const articleDir = path.join(dir, entry.name);
-    const indexPath = path.join(articleDir, "index.mdx");
+    const indexPath = path.join(process.cwd(), "content", "articles", entry.name, "index.mdx");
     if (!fs.existsSync(indexPath)) {
       problems.push({ dir: entry.name, issues: ["index.mdx is missing"] });
       continue;
@@ -48,7 +48,7 @@ export function loadAllArticles(dir = ARTICLES_DIR): Article[] {
     const result = parseArticle({
       dirName: entry.name,
       raw: fs.readFileSync(indexPath, "utf8"),
-      kit: readKit(path.join(articleDir, "kit")),
+      kit: readKit(path.join(process.cwd(), "content", "articles", entry.name, "kit")),
     });
     if (result.ok) articles.push(result.article);
     else problems.push({ dir: entry.name, issues: result.issues });
