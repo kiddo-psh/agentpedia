@@ -17,6 +17,9 @@ if (items.length === 0) throw new Error('args must be a list of { slug, topic, c
 
 const MAX_ROUNDS = 2
 
+// Sonnet everywhere except the fact-checker, which stays on Opus to catch invented facts.
+const MODELS = { research: 'sonnet', people: 'sonnet', write: 'sonnet', revise: 'sonnet' }
+
 const SHARED_RULES = `
 Project: Agentpedia (Next.js). Read docs/writing-guide.md and docs/review-rubric.md first; they are the standard.
 Rules for every agent in this workflow:
@@ -101,16 +104,19 @@ const REVIEW = {
 const REVIEWERS = [
   {
     key: 'facts',
+    model: 'opus',
     rubric: 'A (facts) and E (people/images)',
     lens: 'You are a skeptical fact-checker. Open every source URL yourself. Check each claim, date, quote wording and timestamp against the source, and verify every photo license on its file page. Treat anything you cannot confirm as a problem.',
   },
   {
     key: 'story',
+    model: 'sonnet',
     rubric: 'B (story/readability) and C (timing clarity)',
     lens: 'You are a demanding Korean magazine editor. Judge whether the piece opens with a scene, builds tension, reads as one flow, states when things were said, and avoids hype and translationese.',
   },
   {
     key: 'kit',
+    model: 'sonnet',
     rubric: 'D (kit clarity and safety)',
     lens: 'You are a cautious senior engineer about to run this kit on your own repo. Check that frontmatter apply.goal/changes/doesNotDo match kit/prompt.md and kit/checklist.md exactly, that the prompt stops when unfit, asks for approval before changes, verifies by running commands, and actually implements this article\'s idea.',
   },
@@ -131,7 +137,7 @@ Already registered people (do not re-research their roles unless wrong): see con
 
 Prefer primary sources. Read dates on the source page itself. Collect only quotes whose exact wording you saw.
 For each person not yet in content/people.yaml, look for a photo on Wikimedia Commons and include it only if the file page shows a reuse license from: CC0, CC BY 2.0/3.0/4.0, CC BY-SA 2.0/3.0/4.0, Public domain. Use the upload.wikimedia.org image URL and the Commons file page as sourceUrl.`,
-    { label: `research:${label(it)}`, phase: 'Research', schema: RESEARCH }),
+    { label: `research:${label(it)}`, phase: 'Research', model: MODELS.research, schema: RESEARCH }),
 ))
 
 // Phase 2: one agent edits the shared people registry (barrier: avoids concurrent edits of one file).
@@ -143,7 +149,7 @@ if (newPeople.length > 0) {
 Update content/people.yaml with these people researched by other agents. Add entries whose id is missing; fix an existing entry only if the research shows its role is wrong. Keep existing entries and comments. Drop any photo whose license is not in the PHOTO_LICENSES list in src/content/schema.ts.
 ${JSON.stringify(newPeople, null, 2)}
 Then run \`npm run validate:content\` (errors about articles that do not exist yet are fine; people.yaml errors are not) and report the ids now registered.`,
-    { label: 'people-registry', phase: 'People' })
+    { label: 'people-registry', phase: 'People', model: MODELS.people })
 }
 
 // Phases 3-5 per article, pipelined: write -> review panel -> revise loop.
@@ -162,7 +168,7 @@ ${JSON.stringify(r, null, 2)}
 Open with this angle: ${r.storyAngle}
 Only <Quote> the quotes listed above, with their source id and at. Only use KeyIdea, Quote, TryIt, Compare, Steps.
 Only edit files inside content/articles/${it.slug}/. Run \`npm run validate:content\` and fix until it passes for this article.`,
-      { label: `write:${label(it)}`, phase: 'Write' })
+      { label: `write:${label(it)}`, phase: 'Write', model: MODELS.write })
     return { it, research: r }
   },
 
@@ -179,7 +185,7 @@ ${rv.lens}
 Review content/articles/${it.slug}/ (index.mdx and kit/) against docs/review-rubric.md sections ${rv.rubric}.
 Score only those sections, using keys from: facts, people, story, timing, kit. Do not edit any files.
 Every fix must name the exact place and a concrete rewrite.`,
-          { label: `review:${rv.key}:${label(it)}#${round}`, phase: 'Review', schema: REVIEW }),
+          { label: `review:${rv.key}:${label(it)}#${round}`, phase: 'Review', model: rv.model, schema: REVIEW }),
       ))).filter(Boolean)
 
       const low = reviews.flatMap((rv) => Object.entries(rv.scores).filter(([, s]) => s < 4).map(([k, s]) => `${k}=${s}`))
@@ -195,7 +201,7 @@ Every fix must name the exact place and a concrete rewrite.`,
 Revise content/articles/${it.slug}/ to address these reviews. Blocking items first. If a fix needs a fact that is not verifiable, remove the claim instead of guessing.
 ${JSON.stringify(reviews, null, 2)}
 Only edit files inside content/articles/${it.slug}/. Keep draft: true. Run \`npm run validate:content\` until it passes.`,
-        { label: `revise:${label(it)}#${round}`, phase: 'Revise' })
+        { label: `revise:${label(it)}#${round}`, phase: 'Revise', model: MODELS.revise })
     }
     return {
       slug: it.slug,
