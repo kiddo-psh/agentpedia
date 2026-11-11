@@ -27,9 +27,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Link href="/" className="font-semibold tracking-tight">
               Agentpedia
             </Link>
-            <nav className="text-sm text-muted">
+            <nav className="flex gap-5 text-sm text-muted">
               <Link href="/" className="hover:text-foreground">
                 기사
+              </Link>
+              <Link href="/connect" className="hover:text-foreground">
+                에이전트 연결
               </Link>
             </nav>
           </div>
