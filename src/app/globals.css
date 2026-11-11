@@ -2,25 +2,126 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #18181b;
+  --muted: #71717a;
+  --accent: #4f46e5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0b0b0e;
+    --foreground: #ececf1;
+    --muted: #a1a1aa;
+    --accent: #8b8cf8;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-geist-sans), "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  word-break: keep-all;
+}
+
+/* Article body typography. Components opt out with .not-prose. */
+@layer components {
+  .prose-article {
+    font-size: 1.0625rem;
+    line-height: 1.85;
+  }
+  .prose-article :where(h2):not(:where(.not-prose *)) {
+    margin: 2.75rem 0 1rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+  .prose-article :where(h3):not(:where(.not-prose *)) {
+    margin: 2rem 0 0.75rem;
+    font-size: 1.2rem;
+    font-weight: 650;
+  }
+  .prose-article :where(p, ul, ol, table):not(:where(.not-prose *)) {
+    margin: 1rem 0;
+  }
+  .prose-article :where(ul):not(:where(.not-prose *)) {
+    list-style: disc;
+    padding-left: 1.4rem;
+  }
+  .prose-article :where(ol):not(:where(.not-prose *)) {
+    list-style: decimal;
+    padding-left: 1.4rem;
+  }
+  .prose-article :where(li):not(:where(.not-prose *)) {
+    margin: 0.35rem 0;
+  }
+  .prose-article :where(strong):not(:where(.not-prose *)) {
+    font-weight: 650;
+  }
+  .prose-article :where(a):not(:where(.not-prose *)) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose-article :where(code):not(:where(pre *, .not-prose *)) {
+    border-radius: 0.3rem;
+    background: color-mix(in srgb, var(--foreground) 7%, transparent);
+    padding: 0.1rem 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+  }
+
+  /* <Steps>: numbered, clickable checklist */
+  .steps ol {
+    counter-reset: step;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .steps li {
+    counter-increment: step;
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem 0.75rem 3.25rem;
+    line-height: 1.6;
+    transition: background 120ms, opacity 120ms;
+  }
+  .steps li:hover {
+    background: color-mix(in srgb, var(--foreground) 4%, transparent);
+  }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 1rem;
+    top: 0.8rem;
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+    color: var(--accent);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+  .steps li[data-done] {
+    opacity: 0.6;
+    text-decoration: line-through;
+  }
+  .steps li[data-done]::before {
+    content: "✓";
+    background: var(--accent);
+    color: var(--background);
+  }
 }
