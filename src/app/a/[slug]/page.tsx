@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { KitSection } from "@/components/KitSection";
 import { ArticleBody } from "@/components/mdx/ArticleBody";
 import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatDate } from "@/content/labels";
 import { getArticle, listArticles } from "@/content/loader";
@@ -81,6 +82,8 @@ async function ArticleView({ slug }: { slug: string }) {
       </section>
 
       <ArticleBody article={article} />
+
+      <KitSection article={article} />
 
       <section className="mt-16 border-t border-foreground/10 pt-8" aria-labelledby="sources">
         <h2 id="sources" className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted">

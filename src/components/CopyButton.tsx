@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type MouseEvent } from "react";
 
 export function CopyButton({ text, label = "복사" }: { text: string; label?: string }) {
   const [state, setState] = useState<"idle" | "copied" | "failed">("idle");
 
-  async function copy() {
+  async function copy(e: MouseEvent<HTMLButtonElement>) {
+    // Inside a <summary>, a click would also toggle the <details>.
+    e.preventDefault();
     try {
       await navigator.clipboard.writeText(text);
       setState("copied");
