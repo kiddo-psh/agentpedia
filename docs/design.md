@@ -94,7 +94,7 @@ claude mcp add --transport http ai-learn https://<도메인>/mcp
           │        │                 (빌드 시 zod 검증)            │
           │        ▼                                             │
           │   db (Drizzle) ──▶ Postgres (Supabase)               │
-          │     users, comments, apply_events                    │
+          │     user, comments, events                          │
           └──────────────────────────────────────────────────────┘
 ```
 
@@ -102,8 +102,8 @@ claude mcp add --transport http ai-learn https://<도메인>/mcp
 
 - **Next.js (App Router) + TypeScript**
 - **MDX** (`@next/mdx` 또는 `next-mdx-remote`) + **zod**로 frontmatter 검증
-- **Postgres** (Supabase) + **Drizzle ORM**
-- **Auth.js** GitHub 프로바이더
+- **Postgres** (Supabase/Neon, 로컬은 PGlite) + **Drizzle ORM**
+- **Better Auth** GitHub 로그인 (Auth.js v5는 아직 베타라 교체)
 - **MCP**: `@modelcontextprotocol/sdk`, Next.js 어댑터는 `mcp-handler`
 - 배포: Vercel
 
@@ -183,34 +183,29 @@ export type ArticleMeta = z.infer<typeof ArticleMeta>;
 
 콘텐츠는 DB에 넣지 않는다. DB에는 사용자가 만드는 데이터만 저장한다.
 
+> 4주차 구현 기준으로 갱신했다. 실제 정의는 `src/db/schema.ts`.
+
 ```ts
-// src/db/schema.ts (Drizzle)
-users {
-  id            uuid pk
-  githubId      text unique not null
-  handle        text not null
-  avatarUrl     text
-  createdAt     timestamptz default now()
-}
+// Better Auth가 관리: user, session, account, verification (src/db/auth-schema.ts, CLI로 생성)
 
 comments {
   id            uuid pk
   articleSlug   text not null           -- 콘텐츠 slug 참조 (FK 아님)
-  userId        uuid fk -> users.id
-  parentId      uuid fk -> comments.id null  -- 답글은 1단계만 (앱에서 검사)
-  body          text not null           -- 마크다운, 2000자 제한
+  userId        text fk -> user.id (cascade)
+  parentId      uuid fk -> comments.id null (cascade)  -- 답글은 1단계만 (앱에서 검사)
+  body          text not null           -- 일반 텍스트, 2000자 제한
   createdAt     timestamptz default now()
   deletedAt     timestamptz null        -- soft delete, 답글 스레드 유지
   index (articleSlug, createdAt)
 }
 
-apply_events {
+events {
   id            bigserial pk
+  kind          text not null  -- 'view' | 'web_copy' | 'kit_download'
+                               -- | 'mcp_get_article' | 'mcp_get_kit' | 'mcp_prompt'
   articleSlug   text not null
-  channel       text not null  -- 'web_copy' | 'kit_download' | 'mcp_get_article'
-                               -- | 'mcp_get_kit' | 'mcp_prompt'
-  clientHash    text null      -- MCP: user-agent + IP의 일 단위 솔트 해시. 원문 저장 안 함
-  userId        uuid null      -- 웹에서 로그인한 경우만
+  visitorHash   text null      -- IP + user-agent의 일 단위 솔트 해시. 원문 저장 안 함
+  userId        text null fk -> user.id (set null)
   createdAt     timestamptz default now()
   index (articleSlug, createdAt)
 }
@@ -219,8 +214,11 @@ apply_events {
 **설계 메모**
 
 - `articleSlug`에 FK를 걸지 않는다. 콘텐츠의 원천은 git이고, slug는 빌드 시 존재 여부를 검증한다.
-- `apply_events`는 append-only다. 집계는 SQL 뷰로 만든다. 별도 분석 도구는 사용자가 생긴 뒤에 붙인다.
-- MCP 호출에는 사용자 신원이 없다. 개인정보를 남기지 않도록 해시만 저장한다.
+- 적용률을 구하려면 분모(조회)가 필요해서, 처음 설계의 `apply_events`를 `events`로 바꾸고 `view`를 추가했다.
+  적용률 = 같은 날 웹에서 적용(복사·다운로드)한 방문자 수 / 조회한 방문자 수. `GET /api/metrics`로 본다.
+- `events`는 append-only다. 기록은 응답을 보낸 뒤(`after()`) 하며, 실패해도 요청을 막지 않는다.
+- 방문자 해시는 날마다 바뀌어 날짜를 넘어 이어 붙일 수 없다.
+- 로컬 개발은 `DATABASE_URL` 없이 임베디드 PGlite(`.data/`)를 쓰고, 프로덕션은 Postgres(Supabase/Neon)를 쓴다.
 
 ---
 
@@ -283,12 +281,11 @@ export function registerTools(server: McpServer): void;   // 도구 3개 + 프�
 // src/app/mcp/route.ts
 export { handler as GET, handler as POST };                // mcp-handler 래핑
 
-// src/events.ts
-export type ApplyChannel =
-  | "web_copy" | "kit_download" | "mcp_get_article" | "mcp_get_kit" | "mcp_prompt";
-export function recordApply(e: {
-  articleSlug: string; channel: ApplyChannel; clientHash?: string; userId?: string;
-}): Promise<void>;   // 실패해도 요청을 막지 않는다 (fire-and-forget)
+// src/events/record.ts
+export function recordEvent(db: Db, e: TrackedEvent): Promise<void>;  // 실패해도 throw하지 않는다
+// src/events/track.ts
+export function trackAfterResponse(request: Request, e: Omit<TrackedEvent, "visitorHash">): void;
+// MCP 서버는 이벤트 콜백을 받는다: createAgentpediaServer(origin, onEvent)
 ```
 
 ### 오류 처리
