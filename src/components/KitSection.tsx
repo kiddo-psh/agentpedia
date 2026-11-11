@@ -1,4 +1,7 @@
+import Link from "next/link";
 import { CopyButton } from "@/components/CopyButton";
+import { McpSnippet } from "@/components/McpEndpoint";
+import { SERVER_NAME } from "@/mcp/name";
 import { orderedKit } from "@/content/kit";
 import { REQUIRED_KIT_FILE, type Article } from "@/content/schema";
 
@@ -28,6 +31,21 @@ export function KitSection({ article }: { article: Article }) {
         >
           키트 다운로드 (.zip)
         </a>
+      </div>
+
+      <div className="mt-6">
+        <p className="text-sm font-semibold">에이전트에서 바로 적용하기</p>
+        <McpSnippet
+          template={`/mcp__${SERVER_NAME}__apply_article ${article.slug}`}
+          label="Claude Code 안에서"
+        />
+        <p className="text-xs text-muted">
+          처음이라면{" "}
+          <Link href="/connect" className="underline underline-offset-2">
+            에이전트 연결 방법
+          </Link>
+          을 먼저 확인하세요.
+        </p>
       </div>
 
       <div className="mt-6 grid gap-3">
