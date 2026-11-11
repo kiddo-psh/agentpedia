@@ -82,3 +82,23 @@ frontmatter `apply`에 아래를 반드시 씁니다. 기사 페이지와 MCP `a
 - [ ] 사진이 있다면 `credit`, `license`, `sourceUrl`이 있음
 - [ ] `apply` 필드가 모두 채워져 있고 `kit/prompt.md`가 있음
 - [ ] 사람 검수 전까지 `draft: true`
+
+## 8. 에이전트 워크플로로 쓰기
+
+[`.claude/workflows/write-article.js`](../.claude/workflows/write-article.js)가 이 가이드를 여러 에이전트로 실행합니다.
+
+1. **조사** (기사마다 1명): 1차 출처, 원문에서 확인한 날짜, 원문 그대로의 인용, 인물 정보와 라이선스가 확인된 사진
+2. **인물 등록** (1명): `content/people.yaml`은 공유 파일이라 한 에이전트만 수정
+3. **작성** (기사마다 1명): 조사 결과에 있는 사실만으로 이야기 구성, 키트 작성, 자동 검사 통과
+4. **리뷰** (기사마다 3명, 서로 다른 관점): 팩트체커, 편집자, 키트 리뷰어가 [기준표](review-rubric.md)로 채점
+5. **수정**: 4점 미만이나 반려 사유가 있으면 고치고 다시 리뷰 (최대 2회)
+
+결과물은 모두 `draft: true`로 남고, 커밋과 초안 해제는 사람이 검수한 뒤에 합니다.
+Claude Code에서 "write-article 워크플로를 실행해줘"라고 요청하고, 기사 목록을 넘기면 됩니다.
+
+```json
+[
+  { "slug": "karpathy-software-3", "topic": "카파시의 Software 3.0 강연", "category": "people", "mode": "revise" },
+  { "slug": "new-article-slug", "topic": "다룰 주제", "category": "trends", "sources": ["https://..."] }
+]
+```
