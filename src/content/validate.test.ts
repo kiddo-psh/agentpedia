@@ -72,6 +72,13 @@ describe("parseArticle", () => {
     expect(!r.ok && r.issues.join("\n")).toMatch(/does not match/);
   });
 
+  it("rejects components outside the allowed set, including raw HTML tags", () => {
+    const r = parse(mdx("<Callout>x</Callout>\n\n<div>y</div>"));
+    const text = !r.ok ? r.issues.join("\n") : "";
+    expect(text).toMatch(/<Callout> is not an allowed component/);
+    expect(text).toMatch(/<div> is not an allowed component/);
+  });
+
   it("rejects slug that differs from directory name", () => {
     const r = parse(mdx("body"), "other-dir");
     expect(!r.ok && r.issues.join("\n")).toMatch(/must equal directory name/);

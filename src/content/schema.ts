@@ -44,5 +44,9 @@ export type Article = ArticleMeta & {
   kit: KitFile[];
 };
 
+/** JSX components an article body may use. Anything else fails validation. */
+export const MDX_COMPONENTS = ["KeyIdea", "Quote", "TryIt", "Compare", "Steps"] as const;
+export type MdxComponentName = (typeof MDX_COMPONENTS)[number];
+
 /** Every kit must ship this file; it is the body of the MCP `apply_article` prompt. */
 export const REQUIRED_KIT_FILE = "prompt.md";

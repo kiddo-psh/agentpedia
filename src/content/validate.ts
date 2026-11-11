@@ -7,6 +7,7 @@ import type { Root } from "mdast";
 import type { MdxJsxAttribute } from "mdast-util-mdx-jsx";
 import {
   ArticleMeta,
+  MDX_COMPONENTS,
   REQUIRED_KIT_FILE,
   TIMED_SOURCE_KINDS,
   type Article,
@@ -56,8 +57,14 @@ export function parseArticle({ dirName, raw, kit }: ArticleInput): ParseResult {
     const sources = new Map(meta.data.sources.map((s) => [s.id, s]));
     visit(tree, (node) => {
       if (node.type !== "mdxJsxFlowElement" && node.type !== "mdxJsxTextElement") return;
-      if (node.name !== "Quote") return;
       const line = node.position?.start.line ?? "?";
+      if (!node.name || !(MDX_COMPONENTS as readonly string[]).includes(node.name)) {
+        issues.push(
+          `line ${line}: <${node.name ?? ""}> is not an allowed component (${MDX_COMPONENTS.join(", ")})`,
+        );
+        return;
+      }
+      if (node.name !== "Quote") return;
       const attr = (name: string) => {
         const a = node.attributes.find(
           (x): x is MdxJsxAttribute => x.type === "mdxJsxAttribute" && x.name === name,
