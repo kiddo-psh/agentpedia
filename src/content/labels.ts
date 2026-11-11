@@ -21,3 +21,19 @@ const dateFormat = new Intl.DateTimeFormat("ko-KR", {
 });
 
 export const formatDate = (d: Date) => dateFormat.format(d);
+
+const monthFormat = new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "long", timeZone: "Asia/Seoul" });
+
+/** "2025년 6월", or "2025년 12월 ~ 2026년 1월" when sources span months. */
+export function sourcePeriod(sources: { publishedAt: Date; dateNote?: string }[]): string {
+  const times = sources.map((s) => s.publishedAt.getTime());
+  const [from, to] = [monthFormat.format(Math.min(...times)), monthFormat.format(Math.max(...times))];
+  const estimated = sources.some((s) => s.dateNote) ? " (일부 추정)" : "";
+  return (from === to ? from : `${from} ~ ${to}`) + estimated;
+}
+
+/** Whole months between two dates, floored. */
+export function monthsBetween(from: Date, to: Date): number {
+  const months = (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth());
+  return to.getDate() < from.getDate() ? months - 1 : months;
+}

@@ -4,9 +4,10 @@ import { Suspense } from "react";
 import { ArticleTracking } from "@/components/ArticleTracking";
 import { KitSection } from "@/components/KitSection";
 import { PersonCard } from "@/components/PersonCard";
+import { SourceTiming } from "@/components/SourceTiming";
 import { Comments } from "@/components/comments/Comments";
 import { ArticleBody } from "@/components/mdx/ArticleBody";
-import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatDate } from "@/content/labels";
+import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatDate, sourcePeriod } from "@/content/labels";
 import { getArticle, listArticles } from "@/content/loader";
 
 // Cache Components requires at least one param; a placeholder 404s when nothing is published.
@@ -66,6 +67,10 @@ async function ArticleView({ slug }: { slug: string }) {
         </div>
         <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{article.title}</h1>
         <p className="mt-4 text-lg leading-relaxed text-muted">{article.summary}</p>
+        <SourceTiming
+          period={sourcePeriod(article.sources)}
+          newestIso={new Date(Math.max(...article.sources.map((s) => s.publishedAt.getTime()))).toISOString()}
+        />
         {article.persons.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-x-8 gap-y-4">
             {article.persons.map((p) => (
@@ -113,6 +118,7 @@ async function ArticleView({ slug }: { slug: string }) {
               <span className="text-muted">
                 {" "}
                 · {s.author} · {formatDate(s.publishedAt)}
+                {s.dateNote && <span title={s.dateNote}> (추정)</span>}
               </span>
             </li>
           ))}
