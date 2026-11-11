@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "validate:content": "tsx scripts/validate-content.ts",
-    "prebuild": "npm run validate:content"
+    "prebuild": "npm run validate:content",
+    "prepare": "simple-git-hooks"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
@@ -24,6 +25,8 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@tailwindcss/turbopack": "4.3.3",
     "@types/mdast": "^4.0.4",
     "@types/node": "^24.19.2",
@@ -31,9 +34,14 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "simple-git-hooks": "^2.14.0",
     "tailwindcss": "4.3.3",
     "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.1.0"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npm run lint && npm test",
+    "commit-msg": "npx --no -- commitlint --edit \"$1\""
   }
 }
