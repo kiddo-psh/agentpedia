@@ -4,8 +4,9 @@ import { orderedKit } from "@/content/kit";
 import { CATEGORY_LABEL } from "@/content/labels";
 import { getArticle, listArticles } from "@/content/loader";
 import { Category, REQUIRED_KIT_FILE, type Article, type ArticleMeta, type KitFile } from "@/content/schema";
+import { SERVER_NAME } from "./name";
 
-export const SERVER_NAME = "agentpedia";
+export { SERVER_NAME };
 
 const Slug = z.string().describe("기사 slug (search_articles 결과의 slug 값)");
 
