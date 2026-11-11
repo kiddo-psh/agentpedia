@@ -1,80 +1,185 @@
 ---
 slug: boris-cherny-claude-code-workflow
-title: "Claude Code를 만든 사람은 Claude Code를 어떻게 쓸까"
-summary: "보리스 체르니가 공개한 작업 방식 정리: 병렬 세션, 팀이 함께 키우는 CLAUDE.md, 계획 먼저, 그리고 결과를 2~3배 좋게 만든다는 검증 루프."
+title: "Claude Code를 만든 사람의 설정은 평범했습니다"
+summary: "2026년 1월, Claude Code 창시자 보리스 체르니가 공개한 작업 방식. 비밀 설정 대신 병렬 세션, 실수를 쌓는 CLAUDE.md, 계획 먼저, 그리고 Claude가 스스로 검증하게 하는 습관이 있었습니다."
 category: people
 people: [boris-cherny]
 tags: ["claude-code", "workflow", "verification", "claude-md"]
 difficulty: practical
 apply:
-  goal: "Claude가 스스로 결과를 검증하는 루프와 팀 공용 CLAUDE.md를 갖춥니다."
+  goal: "Claude가 끝내기 전에 스스로 결과를 검증하고, 팀이 실수를 CLAUDE.md에 쌓아 가는 구조를 갖춥니다."
   changes:
-    - "CLAUDE.md에 빌드·테스트 명령과 '끝내기 전 반드시 실행할 명령' 추가"
-    - "포매터가 있다면 .claude/settings.json에 편집 후 자동 포맷 훅(PostToolUse) 제안"
-    - "자주 하는 작업 1~2개를 .claude/commands/ 슬래시 명령으로 추가"
+    - "CLAUDE.md에 실제로 실행해 확인한 빌드·테스트·린트 명령과 '작업을 끝내기 전에 실행할 명령', 실수 기록 섹션 추가 (이미 있으면 빠진 부분만 보강)"
+    - ".claude/settings.json의 permissions.allow에 실행해 확인한 안전한 검증 명령만 추가해 팀과 공유"
+    - "포매터가 있는 경우에만 .claude/settings.json에 편집한 파일 하나만 포맷하는 PostToolUse 훅 추가"
+    - ".claude/commands/에 검증 명령을 실행하는 슬래시 명령 1개(선택으로 읽기 전용 명령 1개 더) 추가. 커밋·푸시·배포를 하는 명령은 만들지 않음"
   doesNotDo:
-    - "권한 확인을 통째로 끄는 설정은 넣지 않습니다."
+    - "--dangerously-skip-permissions를 쓰거나 권한 확인을 통째로 끄는 설정은 넣지 않습니다."
     - "애플리케이션 코드는 수정하지 않습니다."
-  fitsWhen: "Claude Code를 쓰고, 테스트·타입 체크·린트 중 하나라도 있는 프로젝트"
+    - "커밋, 푸시, PR 생성은 하지 않습니다."
+  fitsWhen: "Claude Code를 쓰고, 테스트·타입 체크·린트·빌드 중 하나 이상을 명령으로 실행할 수 있는 프로젝트"
   time: "20~40분"
 draft: true
 publishedAt: 2026-11-11
 keyIdeas:
-  - "여러 세션을 병렬로 돌리고, 세션마다 별도 체크아웃을 써서 충돌을 피한다."
-  - "팀 공용 CLAUDE.md를 git에 두고, 리뷰에서 발견한 실수를 계속 기록한다."
-  - "계획 모드에서 계획을 충분히 다듬은 뒤 자동 수락으로 구현을 맡긴다."
-  - "자주 하는 작업은 슬래시 명령과 훅으로 만들어 반복을 없앤다."
-  - "에이전트가 스스로 결과를 검증할 수단을 주는 것이 품질을 가장 크게 올린다."
+  - "창시자의 설정은 거의 기본값이었고, 차이는 설정이 아니라 습관에서 나왔다."
+  - "Claude에게 스스로 검증할 수단을 주는 것이 아마 가장 중요하며, 체르니는 이것이 결과 품질을 2~3배 높인다고 말한다."
+  - "Claude가 실수할 때마다 팀 공용 CLAUDE.md에 기록해 같은 실수를 반복하지 않게 한다."
+  - "Plan 모드로 계획을 충분히 다듬은 뒤 auto-accept edits로 바꾸면 대개 한 번에 구현이 끝난다."
+  - "매일 반복하는 작업은 슬래시 명령·서브에이전트·훅으로 만들고, 권한은 끄는 대신 안전한 명령만 미리 허용한다."
 sources:
   - id: thread
-    title: "Boris Cherny on how he uses Claude Code (X thread)"
+    title: "Boris Cherny의 Claude Code 사용법 스레드 (X, 15개 게시물)"
     url: https://x.com/bcherny/status/2007179832300581177
     author: Boris Cherny
     kind: thread
     publishedAt: 2026-01-02
+    dateNote: "x.com은 로그인 장벽 때문에 직접 열리지 않음. 날짜는 같은 게시물 ID의 fxtwitter API(created_at: Fri Jan 02 19:58:58 +0000 2026)와 Thread Reader App 미러(Jan 2)에서 확인. 본문 문장도 Thread Reader App 미러에서 확인함. 인용한 1/·4/·6/·10/·13/ 게시물 문장은 각 게시물 ID의 fxtwitter API 응답과도 글자 그대로 대조함"
   - id: infoq
     title: "Inside the Development Workflow of Claude Code's Creator"
     url: https://www.infoq.com/news/2026/01/claude-code-creator-workflow
     author: Sergio De Simone
     kind: blog
     publishedAt: 2026-01-10
+  - id: reply-checkout
+    title: "체르니의 답글: 같은 레포의 git checkout 5개 (X)"
+    url: https://x.com/bcherny/status/2007200880081436864
+    author: Boris Cherny
+    kind: thread
+    publishedAt: 2026-01-02
+    dateNote: "x.com은 로그인 장벽으로 직접 열리지 않음. 날짜와 본문은 같은 게시물 ID의 fxtwitter API 응답(created_at: Fri Jan 02 21:22:36 +0000 2026)으로 확인"
+  - id: reply-discard
+    title: "체르니의 답글: 버리는 세션 비율 (X)"
+    url: https://x.com/bcherny/status/2007219912411115702
+    author: Boris Cherny
+    kind: thread
+    publishedAt: 2026-01-02
+    dateNote: "x.com은 로그인 장벽으로 직접 열리지 않음. 날짜와 본문은 같은 게시물 ID의 fxtwitter API 응답(created_at: Fri Jan 02 22:38:14 +0000 2026)으로 확인"
+  - id: reply-review
+    title: "체르니의 답글: 코드 리뷰와 방향 잡기 (X)"
+    url: https://x.com/bcherny/status/2007290414961963524
+    author: Boris Cherny
+    kind: thread
+    publishedAt: 2026-01-03
+    dateNote: "x.com은 로그인 장벽으로 직접 열리지 않음. 날짜와 본문은 같은 게시물 ID의 fxtwitter API 응답(created_at: Sat Jan 03 03:18:23 +0000 2026)으로 확인"
 ---
 
-{/* 초안: 스레드 원문을 직접 확인한 뒤 <Quote source="thread">로 인용을 추가할 것. */}
+{/* 초안: 인용문은 Thread Reader App 미러에서 글자 그대로 확인함. 공개 전에 x.com 원문과 한 번 더 대조할 것. */}
 
-## 한 줄 요약
+2026년 1월 2일, 보리스 체르니가 X에 15개짜리 스레드를 올렸습니다.
+그는 Anthropic에서 일하며, 첫 게시물에서 자신을 Claude Code를 만든 사람이라고 소개했습니다.
+그런데 이어지는 말은 뜻밖이었습니다. 자기 설정은 의외로 평범할지도 모른다고, Claude Code가 기본 상태로도 잘 동작해서 따로 많이 바꾸지 않는다고 했습니다.
 
-특별한 설정보다 **작업 습관**이 핵심입니다. 병렬로 돌리고, 계획하고, 기록하고, 검증합니다.
+## 창시자에게는 비밀 설정이 있을까요?
 
-<KeyIdea title="가장 중요한 한 가지: 검증 루프">
-Claude가 자기 작업을 확인할 방법을 주세요. 테스트 실행, bash 명령, 브라우저나 시뮬레이터에서 직접 확인하기 같은 것들입니다. 체르니는 이것만으로 결과물 품질이 2~3배 좋아진다고 말합니다.
+도구를 만든 사람이라면 남들이 모르는 정교한 설정을 쓸 거라고 기대하기 쉽습니다.
+숨은 플래그, 공들인 프롬프트, 복잡한 자동화 같은 것들입니다.
+체르니의 스레드에는 그런 것이 거의 없습니다.
+대신 매일 되풀이하는 습관이 있습니다. 여러 세션을 동시에 돌리고, 실수를 기록하고, 먼저 계획하고, 반복 작업을 명령으로 만듭니다.
+그리고 스레드 끝에, 아마 가장 중요할 것이라며 한 가지를 꼽습니다.
+
+<KeyIdea title="가장 중요한 한 가지: Claude가 스스로 검증하게 하기">
+체르니는 마지막 팁이자 아마 가장 중요한 팁으로, Claude에게 자기 작업을 검증할 방법을 주라고 말합니다. 그런 피드백 루프가 있으면 최종 결과의 품질이 2~3배 좋아진다는 것입니다. 이 수치는 체르니 본인의 말이며, 스레드에 측정 근거는 나와 있지 않습니다.
 </KeyIdea>
 
-## 1. 병렬 세션
+<Quote source="thread">
+give Claude a way to verify its work. If Claude has that feedback loop, it will 2-3x the quality of the final result.
+</Quote>
 
-로컬 터미널에서 5개 정도, 웹에서 5~10개의 세션을 동시에 돌립니다. 로컬 세션마다 **별도 git 체크아웃**을 써서 서로의 변경이 충돌하지 않게 합니다. 팀원 중에는 worktree를 선호하는 사람도 많습니다.
+그는 예도 듭니다. claude.ai/code에 올리는 모든 변경은 Claude가 Chrome 확장을 써서 브라우저에서 직접 테스트한다고 합니다.
+이 기사에서는 나머지 습관을 이 원칙을 받쳐 주는 장치로 읽어 보려 합니다.
 
-## 2. 팀이 함께 키우는 CLAUDE.md
+## 한 번에 여러 Claude를 돌립니다
 
-팀마다 `CLAUDE.md`를 git에 두고, Claude가 실수한 것이나 지켜야 할 규칙을 계속 추가합니다. 코드 리뷰에서 동료 PR에 Claude를 태그해 배운 점을 `CLAUDE.md`에 반영하게 하기도 합니다.
+2026년 1월 스레드 당시, 체르니는 터미널에서 Claude 세션 5개를 병렬로 돌렸습니다.
+탭에 번호를 붙이고, Claude가 입력을 기다릴 때 시스템 알림을 받습니다.
 
-## 3. 계획 먼저, 구현은 한 번에
+웹에서도 같은 방식을 씁니다. 로컬 세션과 별도로 claude.ai/code에서 5~10개 세션을 동시에 돌립니다.
+`&`로 로컬 세션을 웹에 넘기고, 가끔은 `--teleport`로 로컬과 웹 사이를 오갑니다.
 
-<Steps>
-1. 계획 모드에서 계획이 마음에 들 때까지 대화로 다듬는다.
-2. 자동 수락 모드로 바꾼다.
-3. 대부분 한 번에 구현이 끝난다.
-</Steps>
+스레드에 달린 질문에 답하면서 체르니는 두 가지를 덧붙였습니다.
+하나는 로컬 세션 5개가 같은 레포를 따로 받은 git checkout 5개에서 돈다는 것입니다.
+다른 하나는 시작한 세션 중 중간에 버리는 비율을 묻자 "대략 10~20%쯤"이라고 어림한 것입니다.
 
-## 4. 반복 작업은 명령과 훅으로
+모델 선택도 단순합니다. 스레드 당시 그는 모든 작업에 thinking을 켠 Opus 4.5를 썼습니다.
+Sonnet보다 크고 느리지만, 덜 이끌어 줘도 되고 도구를 더 잘 써서 결국에는 더 작은 모델을 쓸 때보다 거의 항상 빠르다고 설명합니다.
 
-- `.claude/commands/`에 커밋, PR 생성, 코드 단순화, 검증 같은 슬래시 명령을 둡니다.
-- PostToolUse 훅으로 편집 후 포매터를 자동 실행해 CI 스타일 오류를 막습니다.
-- 권한 확인을 통째로 끄지 않고, 안전한 명령(빌드, 테스트)만 미리 허용합니다.
+## 실수는 CLAUDE.md에 쌓입니다
+
+스레드를 올릴 당시 체르니의 팀은 git에 체크인한 `CLAUDE.md` 하나를 함께 썼습니다.
+규칙은 단순합니다. Claude가 잘못한 일을 보면 그때마다 적어서, 다음에는 같은 일을 하지 않게 합니다.
+
+<Quote source="thread">
+Anytime we see Claude do something incorrectly we add it to the CLAUDE.md, so Claude knows not to do it next time.
+</Quote>
+
+이 기록은 코드 리뷰에서도 이어집니다. 동료 PR에 `@.claude`를 태그하면 Claude Code GitHub Action이 `CLAUDE.md`에 규칙을 추가합니다.
+InfoQ에 따르면 2026년 1월 기준 팀의 `CLAUDE.md`는 약 2.5k 토큰이었습니다. 이 수치는 스레드 본문에서는 확인하지 못했습니다.
+실수를 한 번 기록하면 팀원 모두의 다음 세션이 그만큼 덜 틀립니다.
+검증의 관점에서 보면, `CLAUDE.md`는 Claude가 무엇을 틀렸는지 알려 주는 느린 피드백 루프인 셈입니다.
+
+## 계획에 시간을 쓰고, 구현은 맡깁니다
+
+스레드에서 그는 대부분의 세션을 Plan 모드로 시작한다고 썼습니다.
+계획이 마음에 들 때까지 Claude와 주고받은 다음, auto-accept edits 모드로 바꾸면 Claude가 대개 한 번에 끝낸다고 합니다.
+
+<Quote source="thread">
+From there, I switch into auto-accept edits mode and Claude can usually 1-shot it.
+</Quote>
+
+'대개'라는 단서가 붙어 있다는 점은 기억해 둘 만합니다. 계획이 좋아도 매번 한 번에 끝나지는 않습니다.
+덧붙이자면, 계획을 먼저 맞춰 두면 구현이 끝난 뒤 무엇을 검증할지도 미리 정해집니다.
+
+## 반복 작업은 명령과 훅이 맡습니다
+
+하루에도 여러 번 되풀이하는 작업은 `.claude/commands/`에 슬래시 명령으로 둡니다.
+대표적인 예가 `/commit-push-pr`입니다. 체르니는 자신과 Claude가 이 명령을 하루에도 수십 번 쓴다고 합니다.
+이 명령은 inline bash로 `git status` 같은 정보를 미리 계산해 둡니다. 그만큼 모델과 주고받는 횟수가 줄어듭니다.
+코드 단순화와 검증은 슬래시 명령이 아니라 서브에이전트(`code-simplifier`, `verify-app`)에 맡깁니다. 검증만 맡는 역할을 따로 둔 것입니다.
+
+훅도 씁니다. PostToolUse 훅이 Claude가 쓴 코드를 포맷해서 CI에서 포맷 오류가 나지 않게 합니다. InfoQ는 그 명령을 `bun run format || true`로 전합니다.
+이 밖에도 그는 오래 걸리는 작업에 Stop 훅과 백그라운드 검증 에이전트를 붙이고, Slack·BigQuery·Sentry 같은 외부 도구도 Claude가 직접 다루게 합니다.
+
+## 권한은 끄지 않고 미리 허용합니다
+
+속도를 원하면 권한 확인을 통째로 끄고 싶어집니다. 같은 스레드에서 체르니는 평소에는 그 길을 택하지 않는다고 밝힙니다.
 
 <Compare
-  before="권한 확인을 모두 끄고 빠르게 진행한다"
-  after="안전한 명령만 미리 허용하고, 위험한 명령은 여전히 확인받는다"
+  before="--dangerously-skip-permissions로 권한 확인을 통째로 끈다"
+  after="/permissions로 자주 쓰는 안전한 bash 명령만 미리 허용하고, 그 설정을 .claude/settings.json에 두어 팀과 공유한다"
 />
 
-<TryIt prompt="이 레포에서 내가 Claude에게 자주 시키는 작업 3가지를 찾아 .claude/commands/ 슬래시 명령으로 만들어줘. 그리고 편집 후 포매터를 실행하는 PostToolUse 훅도 제안해줘." />
+<Quote source="thread">
+I don't use --dangerously-skip-permissions.
+</Quote>
+
+다만 같은 스레드에서 오래 걸리는 작업을 다룬 게시물에서는, 샌드박스 안이라면 권한 확인을 건너뛰기도 한다고 덧붙입니다.
+허용 목록이 팀 설정 파일에 있으니, 한 사람이 정리한 결과를 모두가 함께 씁니다.
+
+## 내 레포에서 해 보기
+
+체르니의 습관 중 가장 옮기기 쉬운 것은 검증 루프와 공용 `CLAUDE.md`입니다. 아래 순서로 시작해 보세요.
+
+<Steps>
+1. 레포에서 Claude가 실행할 수 있는 검증 명령(테스트, 타입 체크, 린트, 빌드)을 찾아 직접 실행해 봅니다.
+2. 동작을 확인한 명령을 `CLAUDE.md`에 "작업을 끝내기 전에 실행할 명령"으로 적고, git에 체크인합니다.
+3. `CLAUDE.md`에 실수 기록 섹션을 만들고, Claude가 틀릴 때마다 한 줄씩 추가합니다.
+4. 다음 작업은 Plan 모드로 시작해, 계획이 마음에 들 때 auto-accept edits로 바꿉니다.
+5. 하루에 몇 번씩 반복하는 작업이 보이면 `.claude/commands/`에 슬래시 명령으로 만듭니다.
+</Steps>
+
+<TryIt prompt="이 레포에서 네가 스스로 작업 결과를 검증할 때 쓸 수 있는 명령(테스트, 타입 체크, 린트, 빌드)을 찾아서 하나씩 실제로 실행해 봐. 배포나 의존성 설치처럼 상태를 바꾸는 명령은 실행하지 말고 건너뛰어. 결과를 보여주고, 동작하는 명령만 CLAUDE.md의 '작업을 끝내기 전에 실행할 명령' 섹션에 넣는 변경안을 제안해 줘. 파일을 바꾸기 전에 먼저 나에게 확인받아." />
+
+## 이 방식이 맞지 않을 때
+
+이 이야기를 그대로 따라 하기 전에 몇 가지를 생각해 볼 필요가 있습니다.
+
+첫째, 병렬 세션은 공짜가 아닙니다. 체르니는 시작한 세션 중 대략 10~20%쯤은 중간에 버린다고 어림했습니다. 여러 세션을 동시에 지켜보는 데도 사람의 주의가 듭니다.
+
+둘째, 모델 선택에는 대가가 있습니다. 체르니 스스로 Opus 4.5가 Sonnet보다 크고 느리다고 말합니다. 그가 결국 거의 항상 더 빠르다고 한 것은 자신의 작업에 대한 판단입니다. 또 이것은 2026년 1월 기준 이야기여서, 모델 이름과 기능은 그 뒤로 바뀌었을 수 있습니다.
+
+셋째, '2~3배'는 측정값이 아니라 체르니의 경험에서 나온 말입니다. 검증 루프의 효과는 레포에 믿을 만한 테스트나 실행 수단이 얼마나 있는지에 따라 달라질 것입니다.
+
+마지막으로, 체르니 본인이 스레드 첫머리에서 정답인 사용법은 없고 팀원마다 쓰는 방식이 다르다고 말합니다.
+스레드 뒤에 단 답글에서 체르니는 이제 일의 많은 부분이 코드 리뷰와 방향 잡기라고 말합니다. CI에서 Claude Agent SDK가 코드 리뷰 대부분을 먼저 하기 때문에, 사람이 읽을 때쯤에는 코드가 이미 좋은 상태라는 것입니다.
+여기서도 핵심은 사람보다 먼저 확인하는 장치입니다. 가져갈 것은 그의 설정 파일이 아니라 습관이고, 그중에서도 Claude가 자기 일을 스스로 확인하게 만드는 습관입니다.
