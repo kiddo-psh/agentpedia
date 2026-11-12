@@ -11,7 +11,7 @@
 ### 흐름 A: 웹에서 읽고 바로 적용
 
 1. 사용자가 `/a/karpathy-software-3` 기사를 읽는다.
-2. 본문 중간의 `<TryIt>` 블록에서 프롬프트를 복사한다. 이때 `apply_event(channel: web_copy)`가 기록된다.
+2. 기사 끝 "적용 키트" 맨 위의 진단 프롬프트(frontmatter `tryIt`, 읽기 전용)를 복사한다. 이때 `apply_event(channel: web_copy)`가 기록된다.
 3. 기사 끝의 "적용 키트"에서 `CLAUDE.md` 스니펫과 스킬 파일을 받는다. 이때 `kit_download`가 기록된다.
 
 ### 흐름 B: 에이전트에서 적용 (핵심 차별점)
@@ -167,15 +167,16 @@ export type ArticleMeta = z.infer<typeof ArticleMeta>;
 - 영상이나 팟캐스트 출처인데 `at`(타임스탬프)이 없으면 빌드가 실패한다.
 - 렌더링할 때 원문 링크에 타임스탬프를 붙인다 (`?t=754`).
 
-### 인터랙티브 컴포넌트 (MVP는 5개만)
+### 인터랙티브 컴포넌트
 
 | 컴포넌트 | 역할 |
 |---|---|
 | `<KeyIdea>` | 핵심 주장 하나를 카드로 강조 |
 | `<Quote source at>` | 출처가 검증된 인용 |
-| `<TryIt prompt>` | 복사 버튼이 있는 프롬프트 블록. 복사하면 `web_copy` 이벤트 기록 |
 | `<Compare>` | 이전 방식과 새 방식 비교 표 |
-| `<Steps>` | 단계별 적용 가이드 (체크 가능) |
+| `<Term id>` | 용어를 누르면 정의가 팝오버로 뜸 |
+
+`<TryIt>`과 `<Steps>`는 2026-11-12에 없앴다. Steps는 키트 `prompt.md`와 중복이었고, 진단 프롬프트는 frontmatter `tryIt`으로 옮겨 키트 섹션 맨 위에 둔다. 적용은 한 곳에서만 한다.
 
 ---
 
@@ -310,7 +311,7 @@ side-pjt/
       api/comments/route.ts
       api/events/route.ts
     content/{schema.ts, loader.ts, validate.ts}
-    components/mdx/{KeyIdea,Quote,TryIt,Compare,Steps}.tsx
+    components/mdx/{KeyIdea,Quote,Compare,Term}.tsx
     mcp/server.ts
     db/{schema.ts, client.ts}
     events.ts
