@@ -35,3 +35,117 @@
   term: 지속성 확보
   en: persistence
   definition: 재부팅하거나 원인 프로그램을 지워도 악성 코드가 다시 실행되도록 시작 프로그램이나 예약 작업 등에 자신을 등록하는 것입니다.
+
+- id: cli
+  term: CLI
+  en: Command-Line Interface
+  definition: 터미널에서 명령으로 프로그램을 쓰는 인터페이스입니다. 코딩 에이전트는 셸 명령을 잘 다뤄 API를 감싼 CLI를 쉽게 씁니다.
+
+- id: agent-skill
+  term: 에이전트 스킬
+  en: Agent Skill
+  definition: 에이전트에게 특정 도구나 작업의 쓰는 법을 알려 주는 SKILL.md 중심의 설명 묶음입니다. Claude Code나 Codex가 필요할 때 읽습니다.
+
+- id: trustmrr
+  term: TrustMRR
+  definition: 창업자가 Stripe API 키를 연결해 매출을 검증해 공개하는 서비스입니다. 스크린샷이 아닌 결제 기록에서 계산합니다.
+
+- id: mrr
+  term: MRR
+  en: Monthly Recurring Revenue
+  definition: 구독으로 매달 반복해서 들어오는 매출입니다. 월 매출(실제 청구액)과는 다를 수 있습니다.
+
+- id: context-file
+  term: 컨텍스트 파일
+  en: context file
+  definition: CLAUDE.md, AGENTS.md처럼 저장소 루트에 두고 코딩 에이전트가 작업 전에 읽는 지침 파일입니다.
+
+- id: ablation-study
+  term: 절제 연구
+  en: ablation study
+  definition: 시스템의 한 요소만 빼거나 바꿔 가며 결과가 어떻게 달라지는지 비교하는 실험입니다.
+
+- id: swe-bench
+  term: SWE-bench
+  en: SWE-bench
+  definition: 실제 GitHub 이슈를 에이전트가 해결하는지 테스트로 채점하는 코딩 에이전트 벤치마크입니다.
+
+- id: equivalence-testing
+  term: 동등성 검정
+  en: equivalence testing (TOST)
+  definition: 두 조건에 차이가 없다고 주장하기 위해, 차이가 정해 둔 범위 안에 든다는 것을 보이는 통계 검정입니다.
+
+- id: statistical-power
+  term: 검정력
+  en: statistical power
+  definition: 실제로 있는 효과를 표본에서 찾아낼 확률입니다. 표본이 작으면 낮아서 효과가 없다는 결론을 믿기 어렵습니다.
+
+- id: inference-cost
+  term: 추론 비용
+  en: inference cost
+  definition: 에이전트가 작업하며 쓴 토큰과 호출에 드는 비용입니다. 단계와 추론 토큰이 늘면 함께 커집니다.
+
+- id: sandbox
+  term: 샌드박스
+  en: sandbox
+  definition: 코드를 실행하되 외부 파일·네트워크에 영향을 주지 못하게 가둔 격리 환경입니다. OpenAI 글에서는 모델 작업을 실행하는 클라우드 가상 컴퓨터를 가리킵니다.
+
+- id: ssrf
+  term: SSRF
+  en: server-side request forgery
+  definition: 서버를 속여 공격자가 원하는 주소로 요청을 대신 보내게 하는 공격입니다. 이 사고에서는 패키지 서비스가 임의의 인터넷 요청을 보내게 됐습니다.
+
+- id: zero-day
+  term: 제로데이
+  en: zero-day
+  definition: 개발자도 아직 모르거나 패치가 없는 보안 취약점입니다.
+
+- id: reward-hacking
+  term: 보상 해킹
+  en: reward hacking
+  definition: 에이전트가 의도한 방식이 아니라 편법으로 높은 점수를 얻으려는 행동입니다. 이 사고의 주요 원인으로 지목됐습니다.
+
+- id: cot-monitoring
+  term: 추론 과정(CoT) 모니터링
+  en: chain-of-thought monitoring
+  definition: 모델의 추론 과정을 읽어 위험하거나 범위를 벗어난 행동을 감지하는 방법입니다.
+
+- id: exploitgym
+  term: ExploitGym
+  en: ExploitGym
+  definition: 에이전트가 소프트웨어 취약점을 악용해 플래그(정답)를 찾는 사이버 보안 평가입니다. 사고 당시 평가의 이름입니다.
+
+- id: permission-deny-rule
+  term: 권한 차단 규칙
+  en: permission deny rule
+  definition: 코딩 에이전트 설정에서 특정 명령, 파일, 네트워크 접근을 실행 자체가 안 되도록 막는 규칙입니다. 프롬프트 지시와 달리 도구가 강제합니다.
+
+- id: agent-harness
+  term: 하네스
+  en: harness
+  definition: 모델 바깥에서 에이전트 루프를 돌리는 코드입니다. 프롬프트, 도구 호출, 파일 시스템, 서브에이전트, 메모리처럼 모델에 컨텍스트를 공급하는 부분을 포함합니다.
+
+- id: subagent
+  term: 서브에이전트
+  en: subagent
+  definition: 메인 에이전트가 일을 나눠 맡기는 별도 에이전트입니다. 자체 컨텍스트로 작업하고 결과만 메인 에이전트에게 돌려줍니다.
+
+- id: agent-middleware
+  term: 미들웨어
+  en: middleware
+  definition: 에이전트 루프의 앞뒤 단계에 끼어들어 동작을 바꾸는 코드입니다. 요약, 컨텍스트 정리, 검증 같은 기능을 루프에 붙일 때 씁니다.
+
+- id: code-mode
+  term: 코드 모드
+  en: Code Mode
+  definition: 에이전트가 사람용 도구를 쓰는 대신 코드를 작성해 작업하는 방식입니다.
+
+- id: agent-trace
+  term: 트레이스
+  en: trace
+  definition: 에이전트가 실행 중 한 도구 호출, 컨텍스트 구성, 실행 단계를 시간순으로 남긴 기록입니다. 실패 원인을 컨텍스트에서 찾을 때 씁니다.
+
+- id: service-account
+  term: 서비스 계정
+  en: service account
+  definition: 사람이 아니라 프로그램이 쓰는 별도 계정입니다. 에이전트가 사용자 권한을 위임받아 일하는 방식과 대비해 논의됩니다.

@@ -16,3 +16,43 @@
   name: Peter Steinberger
   nameKo: 피터 스타인버거
   role: PSPDFKit 창업자, 에이전트 기반 개발자
+
+- id: nevo-david
+  name: Nevo David
+  nameKo: 네보 데이비드
+  role: Postiz 창업자(오픈소스 SNS 예약 도구), 이전 Gitroom 설립. 공동창업 여부는 출처마다 다름
+
+- id: john-rush
+  name: John Rush
+  nameKo: 존 러시
+  role: SEObot 창업자(TrustMRR 표기 johnrushx), 2023년 9월 SEObot 출시
+
+- id: prakhar-khatri
+  name: Prakhar Khatri
+  nameKo: 프라카르 카트리
+  role: Do Context Files Help Coding Agents? 단독 저자, 독립 연구자
+
+- id: thibaud-gloaguen
+  name: Thibaud Gloaguen
+  nameKo: 티보 글로아겐
+  role: Evaluating AGENTS.md 제1저자, ETH Zurich 컴퓨터과학과
+
+- id: martin-vechev
+  name: Martin Vechev
+  nameKo: 마르틴 베체프
+  role: Evaluating AGENTS.md 마지막 저자, ETH Zurich 컴퓨터과학과
+
+- id: jai-lal-lulla
+  name: Jai Lal Lulla
+  nameKo: 자이 랄 룰라
+  role: AGENTS.md 효율 연구와 Loop Engineering 연구의 제1저자, Singapore Management University
+
+- id: christoph-treude
+  name: Christoph Treude
+  nameKo: 크리스토프 트로이데
+  role: AGENTS.md 효율 연구와 Loop Engineering 연구 공저자, Singapore Management University
+
+- id: harrison-chase
+  name: Harrison Chase
+  nameKo: 해리슨 체이스
+  role: LangChain 공동 창업자이자 CEO
