@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ArticleBrief } from "@/components/ArticleBrief";
 import { ArticleTracking } from "@/components/ArticleTracking";
+import { GlossaryPanel } from "@/components/GlossaryPanel";
 import { KitSection } from "@/components/KitSection";
 import { PersonCard } from "@/components/PersonCard";
 import { SourceTiming } from "@/components/SourceTiming";
@@ -80,21 +82,12 @@ async function ArticleView({ slug }: { slug: string }) {
         )}
       </header>
 
-      <section className="mb-12 rounded-xl bg-foreground/[.03] p-6" aria-labelledby="key-ideas">
-        <h2 id="key-ideas" className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted">
-          이 글의 핵심 {article.keyIdeas.length}가지
-        </h2>
-        <ol className="grid gap-3">
-          {article.keyIdeas.map((idea, i) => (
-            <li key={i} className="flex gap-3 leading-relaxed">
-              <span className="font-mono text-sm font-semibold text-accent">{String(i + 1).padStart(2, "0")}</span>
-              <span>{idea}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
+      <ArticleBrief article={article} />
 
-      <ArticleBody article={article} />
+      <div className="relative">
+        <ArticleBody article={article} />
+        <GlossaryPanel terms={article.terms} />
+      </div>
 
       <KitSection article={article} />
 
