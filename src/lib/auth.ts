@@ -23,7 +23,13 @@ export type Session = Auth["$Infer"]["Session"];
  */
 let auth: Promise<Auth> | undefined;
 export function getAuth(): Promise<Auth> {
-  auth ??= getDb().then(createAuth);
+  // Like getDb: do not cache a failure, or one bad start disables auth until restart.
+  auth ??= getDb()
+    .then(createAuth)
+    .catch((err) => {
+      auth = undefined;
+      throw err;
+    });
   return auth;
 }
 
