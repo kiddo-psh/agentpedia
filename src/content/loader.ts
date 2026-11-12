@@ -1,7 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { parse as parseYaml } from "yaml";
-import { PeopleRegistry, type Article, type ArticleMeta, type Category, type KitFile, type Person } from "./schema";
+import type { z } from "zod";
+import { GlossaryRegistry, PeopleRegistry, type Article, type ArticleMeta, type Category, type KitFile } from "./schema";
 import { parseArticle } from "./validate";
 
 /** The single content entry point shared by web pages and the MCP server. */
@@ -30,19 +31,25 @@ function readKit(kitDir: string): KitFile[] {
     .sort((a, b) => a.path.localeCompare(b.path));
 }
 
-/** content/people.yaml -> map by id. Problems are reported like an article's. */
-function readPeople(problems: { dir: string; issues: string[] }[]): Map<string, Person> {
-  const file = path.join(process.cwd(), "content", "people.yaml");
+type Problems = { dir: string; issues: string[] }[];
+
+/** A content/*.yaml list of `{ id, ... }` -> map by id. Problems are reported like an article's. */
+function readRegistry<T extends { id: string }>(
+  file: string,
+  name: string,
+  schema: z.ZodType<T[]>,
+  problems: Problems,
+): Map<string, T> {
   if (!fs.existsSync(file)) return new Map();
-  const parsed = PeopleRegistry.safeParse(parseYaml(fs.readFileSync(file, "utf8")) ?? []);
+  const parsed = schema.safeParse(parseYaml(fs.readFileSync(file, "utf8")) ?? []);
   if (!parsed.success) {
     problems.push({
-      dir: "people.yaml",
+      dir: name,
       issues: parsed.error.issues.map((i) => `${i.path.join(".") || "(root)"}: ${i.message}`),
     });
     return new Map();
   }
-  return new Map(parsed.data.map((p) => [p.id, p]));
+  return new Map(parsed.data.map((x) => [x.id, x]));
 }
 
 /** Reads and validates every article. Throws ContentError listing all problems. */
@@ -51,8 +58,14 @@ function readPeople(problems: { dir: string; issues: string[] }[]): Map<string, 
 export function loadAllArticles(): Article[] {
   if (!fs.existsSync(path.join(process.cwd(), "content", "articles"))) return [];
   const articles: Article[] = [];
-  const problems: { dir: string; issues: string[] }[] = [];
-  const people = readPeople(problems);
+  const problems: Problems = [];
+  const people = readRegistry(path.join(process.cwd(), "content", "people.yaml"), "people.yaml", PeopleRegistry, problems);
+  const glossary = readRegistry(
+    path.join(process.cwd(), "content", "glossary.yaml"),
+    "glossary.yaml",
+    GlossaryRegistry,
+    problems,
+  );
 
   const entries = fs.readdirSync(path.join(process.cwd(), "content", "articles"), { withFileTypes: true });
   for (const entry of entries) {
@@ -67,6 +80,7 @@ export function loadAllArticles(): Article[] {
       raw: fs.readFileSync(indexPath, "utf8"),
       kit: readKit(path.join(process.cwd(), "content", "articles", entry.name, "kit")),
       people,
+      glossary,
     });
     if (result.ok) articles.push(result.article);
     else problems.push({ dir: entry.name, issues: result.issues });
@@ -103,7 +117,7 @@ export function listArticles(filter: {
           s.toLowerCase().includes(q),
         ),
     )
-    .map(({ bodyMarkdown, kit, persons, ...meta }) => meta);
+    .map(({ bodyMarkdown, kit, persons, terms, ...meta }) => meta);
 }
 
 export function getArticle(

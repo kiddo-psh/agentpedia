@@ -6,6 +6,7 @@ import { Compare } from "./Compare";
 import { KeyIdea } from "./KeyIdea";
 import { makeQuote } from "./Quote";
 import { Steps } from "./Steps";
+import { makeTerm } from "./Term";
 import { TryIt } from "./TryIt";
 
 /** Keyed by MDX_COMPONENTS, so adding an allowed name without a component fails to compile. */
@@ -16,6 +17,7 @@ function componentsFor(article: Article) {
     TryIt,
     Compare,
     Steps,
+    Term: makeTerm(article.terms),
   } satisfies Record<MdxComponentName, unknown>;
 }
 

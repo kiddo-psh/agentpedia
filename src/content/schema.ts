@@ -50,6 +50,32 @@ export const PeopleRegistry = z.array(Person).refine((ps) => new Set(ps.map((p) 
   message: "people[].id must be unique",
 });
 
+/** One entry in content/glossary.yaml, shared by every article so a term means one thing site-wide. */
+export const GlossaryEntry = z.object({
+  id: z.string().regex(/^[a-z0-9-]+$/),
+  /** The term as Korean readers see it, e.g. "신뢰 경계". */
+  term: z.string().min(1),
+  /** Original English term, if the Korean differs. */
+  en: z.string().min(1).optional(),
+  /** One or two plain sentences. Shown beside the article and as a tooltip. */
+  definition: z.string().min(1).max(200),
+});
+export type GlossaryEntry = z.infer<typeof GlossaryEntry>;
+export const GlossaryRegistry = z.array(GlossaryEntry).refine((gs) => new Set(gs.map((g) => g.id)).size === gs.length, {
+  message: "glossary[].id must be unique",
+});
+
+/** The 30-second layer: one short sentence each, facts only, no story. */
+export const Brief = z.object({
+  /** What happened, who, and when. */
+  what: z.string().min(1).max(140),
+  /** Why it matters to a developer using agents. */
+  why: z.string().min(1).max(140),
+  /** What the reader can do now (usually what the kit does). */
+  action: z.string().min(1).max(140),
+});
+export type Brief = z.infer<typeof Brief>;
+
 export const ArticleMeta = z
   .object({
     slug: z.string().regex(/^[a-z0-9-]+$/),
@@ -65,6 +91,8 @@ export const ArticleMeta = z
       .refine((ss) => ss.some((s) => s.publishedAt), "at least one source must have publishedAt"),
     keyIdeas: z.array(z.string().min(1)).min(1).max(7),
     difficulty: z.enum(["intro", "practical", "deep"]),
+    /** Structured summary shown above the story. Required for new articles by the writing guide. */
+    brief: Brief.optional(),
     /** What running the kit does to a reader's repo, shown before they run it. */
     apply: z.object({
       goal: z.string().min(1).max(120),
@@ -90,10 +118,12 @@ export type Article = ArticleMeta & {
   kit: KitFile[];
   /** `people` ids resolved against the registry, in the same order. */
   persons: Person[];
+  /** Glossary entries the body marks with <Term>, in first-use order. */
+  terms: GlossaryEntry[];
 };
 
 /** JSX components an article body may use. Anything else fails validation. */
-export const MDX_COMPONENTS = ["KeyIdea", "Quote", "TryIt", "Compare", "Steps"] as const;
+export const MDX_COMPONENTS = ["KeyIdea", "Quote", "TryIt", "Compare", "Steps", "Term"] as const;
 export type MdxComponentName = (typeof MDX_COMPONENTS)[number];
 
 /** Every kit must ship this file; it is the body of the MCP `apply_article` prompt. */

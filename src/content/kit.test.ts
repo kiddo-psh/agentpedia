@@ -20,6 +20,7 @@ const article: Article = {
   publishedAt: new Date(),
   bodyMarkdown: "",
   persons: [],
+  terms: [],
   kit: [
     { path: "checklist.md", content: "- [ ] done" },
     { path: "skills/x/SKILL.md", content: "skill" },

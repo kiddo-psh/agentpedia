@@ -43,7 +43,8 @@ function mdx(body: string, overrides: Record<string, string> = {}) {
 }
 
 const people = new Map([["ada", { id: "ada", name: "Ada", nameKo: "에이다", role: "테스트 인물" }]]);
-const parse = (raw: string, dirName = "sample", k = kit) => parseArticle({ dirName, raw, kit: k, people });
+const glossary = new Map([["mcp", { id: "mcp", term: "MCP", definition: "에이전트에 도구를 연결하는 규약입니다." }]]);
+const parse = (raw: string, dirName = "sample", k = kit) => parseArticle({ dirName, raw, kit: k, people, glossary });
 
 describe("parseArticle", () => {
   it("accepts a valid article with timed and untimed quotes", () => {
@@ -91,6 +92,23 @@ describe("parseArticle", () => {
     expect(ok).toMatchObject({ ok: true, article: { persons: [{ nameKo: "에이다" }] } });
     const bad = parse(mdx("body", { people: "[ghost]" }));
     expect(!bad.ok && bad.issues.join("\n")).toMatch(/"ghost" is not in content\/people.yaml/);
+  });
+
+  it("resolves <Term> ids in first-use order and rejects unknown ones", () => {
+    const ok = parse(mdx('<Term id="mcp">MCP</Term> 서버와 <Term id="mcp">MCP</Term>'));
+    expect(ok).toMatchObject({ ok: true, article: { terms: [{ id: "mcp" }] } });
+    expect(ok.ok && ok.article.terms).toHaveLength(1);
+    const bad = parse(mdx('<Term id="ghost">x</Term>\n\n<Term>y</Term>'));
+    const text = !bad.ok ? bad.issues.join("\n") : "";
+    expect(text).toMatch(/<Term id="ghost"> is not in content\/glossary.yaml/);
+    expect(text).toMatch(/<Term> needs a string "id"/);
+  });
+
+  it("accepts a brief and rejects an over-long one", () => {
+    const brief = (what: string) => `{ what: "${what}", why: "중요합니다", action: "키트를 돌립니다" }`;
+    expect(parse(mdx("body", { brief: brief("무슨 일") })).ok).toBe(true);
+    const bad = parse(mdx("body", { brief: brief("가".repeat(141)) }));
+    expect(!bad.ok && bad.issues.join("\n")).toMatch(/frontmatter\.brief\.what/);
   });
 
   it("rejects bold that cannot close before Korean text", () => {

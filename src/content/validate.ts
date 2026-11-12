@@ -11,6 +11,7 @@ import {
   REQUIRED_KIT_FILE,
   TIMED_SOURCE_KINDS,
   type Article,
+  type GlossaryEntry,
   type KitFile,
   type Person,
 } from "./schema";
@@ -23,6 +24,8 @@ export type ArticleInput = {
   kit: KitFile[];
   /** content/people.yaml, keyed by id. */
   people: ReadonlyMap<string, Person>;
+  /** content/glossary.yaml, keyed by id. */
+  glossary: ReadonlyMap<string, GlossaryEntry>;
 };
 
 export type ParseResult =
@@ -32,7 +35,7 @@ export type ParseResult =
 const TIMESTAMP = /^(?:\d+:)?[0-5]?\d:[0-5]\d$/;
 
 /** Pure: no IO. Collects every problem instead of stopping at the first. */
-export function parseArticle({ dirName, raw, kit, people }: ArticleInput): ParseResult {
+export function parseArticle({ dirName, raw, kit, people, glossary }: ArticleInput): ParseResult {
   const issues: string[] = [];
   const { data, content } = matter(raw);
 
@@ -75,6 +78,7 @@ export function parseArticle({ dirName, raw, kit, people }: ArticleInput): Parse
     });
   }
 
+  const termIds = new Set<string>();
   if (tree && meta.success) {
     const sources = new Map(meta.data.sources.map((s) => [s.id, s]));
     visit(tree, (node) => {
@@ -86,13 +90,20 @@ export function parseArticle({ dirName, raw, kit, people }: ArticleInput): Parse
         );
         return;
       }
-      if (node.name !== "Quote") return;
       const attr = (name: string) => {
         const a = node.attributes.find(
           (x): x is MdxJsxAttribute => x.type === "mdxJsxAttribute" && x.name === name,
         );
         return typeof a?.value === "string" ? a.value : undefined;
       };
+      if (node.name === "Term") {
+        const id = attr("id");
+        if (!id) issues.push(`line ${line}: <Term> needs a string "id" attribute`);
+        else if (!glossary.has(id)) issues.push(`line ${line}: <Term id="${id}"> is not in content/glossary.yaml`);
+        else termIds.add(id);
+        return;
+      }
+      if (node.name !== "Quote") return;
 
       const sourceId = attr("source");
       const at = attr("at");
@@ -118,7 +129,8 @@ export function parseArticle({ dirName, raw, kit, people }: ArticleInput): Parse
 
   if (issues.length > 0 || !meta.success) return { ok: false, issues };
   const persons = meta.data.people.map((id) => people.get(id)!);
-  return { ok: true, article: { ...meta.data, bodyMarkdown: content.trim(), kit, persons } };
+  const terms = [...termIds].map((id) => glossary.get(id)!);
+  return { ok: true, article: { ...meta.data, bodyMarkdown: content.trim(), kit, persons, terms } };
 }
 
 /** "1:02:03" -> 3723. Used to build `?t=` links. Assumes the input passed validation. */
