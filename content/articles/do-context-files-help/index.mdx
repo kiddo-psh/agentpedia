@@ -1,0 +1,157 @@
+---
+slug: do-context-files-help
+title: "CLAUDE.md는 에이전트를 더 똑똑하게 만들까: 정확도를 잰 2026년 연구들이 찾지 못한 것"
+summary: "2026년 연구 가운데 정확도를 직접 잰 두 편은 AGENTS.md 같은 컨텍스트 파일이 코딩 에이전트의 정확도를 올린다는 증거를 찾지 못했습니다. 컨텍스트 파일이 바꾼 것은 주로 에이전트의 행동이었고, 비용과 시간 결과는 연구마다 엇갈립니다."
+category: trends
+people: [prakhar-khatri, thibaud-gloaguen, martin-vechev, jai-lal-lulla, christoph-treude]
+tags: ["context-files", "claude-md", "agents-md", "evaluation", "coding-agents"]
+difficulty: practical
+brief:
+  what: "2026년 1~7월 연구 세 편 중 정확도를 잰 두 편은 CLAUDE.md·AGENTS.md가 성공률을 올린다는 증거를 찾지 못했고, 시간과 비용 결과는 엇갈렸습니다."
+  why: "성공률을 올린다는 증거가 없는 내용에 비용과 유지보수 시간을 쓰고 있을 수 있습니다."
+  action: "키트로 내 컨텍스트 파일을 줄이기만 하는 감사를 하고, 코드로 알 수 있는 줄은 승인한 것만 지웁니다. 그 밖의 줄은 기본으로 남기고, 지울 줄은 내가 정합니다."
+apply:
+  goal: "내 컨텍스트 파일의 각 줄을 코드로 알 수 있는 내용인지, 실제 실패와 이어진 규칙인지 따져 보고, 승인한 줄만 지웁니다."
+  changes:
+    - "`docs/context-file-audit.md`(없으면 `docs/` 폴더도 새로 만듦)에 점검 날짜와 줄별 감사표(파일, 줄 번호, 분류, 근거, 결정: 유지 또는 삭제) 추가"
+    - "승인한 줄에 한해 루트나 하위의 `CLAUDE.md`, `AGENTS.md`에서 삭제"
+    - "삭제한 줄의 원문은 파일명과 원래 줄 번호와 함께 보고서에 남겨 되돌릴 수 있게 함"
+  doesNotDo:
+    - "새 규칙이나 설명을 추가하지 않습니다. 줄이기만 합니다."
+    - "코드, 테스트, 홈 디렉터리의 전역 설정은 수정하지 않습니다."
+    - "커밋하지 않고, 삭제 전후 성능이나 비용을 측정하거나 개선을 주장하지 않습니다."
+  fitsWhen: "git 저장소에 CLAUDE.md나 AGENTS.md가 있고, 그 파일에 커밋되지 않은 변경이 없으며 `docs/context-file-audit.md`가 아직 없는 프로젝트"
+  time: "20~40분"
+tryIt: "이 레포(하위 폴더 포함)의 CLAUDE.md와 AGENTS.md를 모두 찾아 파일별 줄 수를 알려줘. 각 파일에서 앞 15줄만 골라, 코드나 설정 파일을 열어 실제로 확인되는 줄이 몇 개인지 세어줘. 파일을 여는 것 외에 어떤 명령도 실행하지 마. docs/context-file-audit.md가 이미 있는지도 알려줘. 파일이 없거나 전체 10줄 미만이면 그렇게만 말하고 멈춰. 아무 파일도 바꾸지 마."
+draft: true
+publishedAt: 2026-11-12
+keyIdeas:
+  - "Gloaguen 연구에서 LLM이 만든 컨텍스트 파일은 SWE-bench에서 약 -0.5%p, CTXbench에서 약 -2%p로 성공률을 올리지 못했고, 비용은 약 20% 늘렸습니다."
+  - "Khatri 연구는 Claude와 Codex 모두에서 컨텍스트 전략이 정확도를 측정 가능하게 바꾸지 못했다고 보고합니다."
+  - "Lulla 외 연구는 반대로 Codex 한 에이전트에서 AGENTS.md가 있을 때 실행 시간 중앙값이 28.64% 낮았다고 보고합니다. 저자들은 이를 \"연관\"으로 표현합니다."
+  - "Khatri 연구는 작업이 적어 10%p 효과도 볼 수 없다고 스스로 밝힙니다. 증거가 없다는 말과 효과가 없다는 말은 다릅니다."
+  - "Gloaguen 연구는 컨텍스트 파일이 비표준 코딩 관행을 지정할 때 유용하다고 결론짓습니다."
+sources:
+  - id: khatri-2026
+    title: "Do Context Files Help Coding Agents? A Two-Agent Ablation Study on Real Repositories"
+    url: https://arxiv.org/abs/2607.27250
+    author: Prakhar Khatri
+    kind: paper
+    publishedAt: 2026-07-28
+    primary: true
+    dateNote: "arXiv 제출일 v1(2026-07-28)입니다. 본문 세부는 arxiv.org/html/2607.27250에서 확인했습니다."
+  - id: gloaguen-2026
+    title: "Evaluating AGENTS.md: Are Repository-Level Context Files Helpful for Coding Agents?"
+    url: https://arxiv.org/abs/2602.11988
+    author: Thibaud Gloaguen, Niels Mündler-Sasahara, Mark Niklas Müller, Veselin Raychev, Martin Vechev
+    kind: paper
+    publishedAt: 2026-02-12
+    primary: true
+    dateNote: "v1 제출일입니다. 개정은 v2(2026-06-23), v3(2026-09-29)입니다. 본문 수치는 v3 HTML(arxiv.org/html/2602.11988v3)에서 확인했습니다."
+  - id: lulla-agentsmd-2026
+    title: "On the Impact of AGENTS.md Files on the Efficiency of AI Coding Agents"
+    url: https://arxiv.org/abs/2601.20404
+    author: Jai Lal Lulla, Seyedmoein Mohsenimofidi, Matthias Galster, Jie M. Zhang, Sebastian Baltes, Christoph Treude
+    kind: paper
+    publishedAt: 2026-01-28
+    primary: true
+    dateNote: "v1 제출일이고 v2 개정은 2026-03-30입니다. 본문 수치가 어느 판의 것인지는 확인하지 못했습니다. HTML 본문(arxiv.org/html/2601.20404)에서 실험 설계를 확인했습니다."
+---
+
+CLAUDE.md에 "uv를 씁니다"라고 한 줄 적었더니, Gloaguen 연구의 에이전트는 작업 하나당 uv를 약 1.6번 썼습니다. 적지 않았을 때는 0.01번도 안 됐습니다. 에이전트는 파일을 정말로 읽고 따릅니다. 그런데 따른다고 해서 문제도 더 잘 풀까요?
+
+2026년 1월부터 7월까지 연구 세 편이 이 질문을 각기 다른 지표로 시험했습니다. 세 편 중 두 편(Gloaguen, Khatri)이 정확도를, 한 편(Lulla)이 시간과 토큰을 쟀습니다. 정확도를 잰 두 편은 기대한 숫자를 얻지 못했습니다.
+
+## 다들 믿는 통념은 무엇입니까
+
+대부분의 개발자는 <Term id="context-file">컨텍스트 파일</Term>을 쓰면 에이전트가 더 잘한다고 믿습니다. 레포를 처음 보는 에이전트에게 지도를 쥐여 주는 일이라고 생각하기 때문입니다.
+
+2026년 2월, 제1저자 Thibaud Gloaguen의 연구진이 이 믿음을 직접 시험했습니다. 마지막 저자는 Martin Vechev입니다. 9월에 개정판(v3)이 올라왔고, 아래 수치는 v3 기준입니다. 그들의 결론은 이렇습니다.
+
+<Quote source="gloaguen-2026">
+providing context files does not generally improve task success rates
+</Quote>
+
+컨텍스트 파일을 줘도 작업 성공률은 대체로 오르지 않는다는 뜻입니다.
+
+## 파일을 넣으면 정확도가 오릅니까
+
+Gloaguen 연구(2026년 2월 제출)는 두 벤치마크를 썼습니다. 하나는 <Term id="swe-bench">SWE-bench</Term> Lite의 300개 작업(11개 레포)입니다. 다른 하나는 연구진이 새로 만든 CTXbench로, PR 5,694개에서 12개 레포와 138개 인스턴스를 구성했습니다.
+
+LLM이 만든 파일은 성공률을 올리지 못했습니다. SWE-bench에서 약 -0.5%p, CTXbench에서 약 -2%p였고, 둘 다 우연과 구분되지 않았습니다. 개발자가 직접 쓴 파일은 CTXbench에서 약 +2.4%p였지만 이것도 우연과 구분되지 않았습니다.
+
+연구진은 개요 부분에도 결론을 달았습니다.
+
+<Quote source="gloaguen-2026">
+repository overviews, although popular and recommended by model providers, are not helpful
+</Quote>
+
+인기 있고 모델 제공사가 권하는 레포 개요도 도움이 되지 않았다는 뜻입니다. 개요는 에이전트가 PR과 관련된 파일에 더 빨리 닿게 해 주지도 못했습니다.
+
+## 그러면 파일은 무엇을 바꿉니까
+
+바뀐 것은 행동이었습니다. Gloaguen 연구에서 에이전트는 테스트를 더 돌리고, 파일을 더 많이 탐색하고 읽었으며, 레포 전용 도구를 더 썼습니다. 파일에 적은 말을 에이전트는 실제로 따릅니다.
+
+그 대가는 <Term id="inference-cost">추론 비용</Term>이었습니다. 2026년 2월 제출된 Gloaguen 연구(v3 기준)에서 LLM이 만든 파일은 비용을 SWE-bench에서 약 20%, CTXbench에서 약 23% 늘렸고, 둘 다 유의했습니다. 개발자가 쓴 파일도 단계를 평균 약 3.34 늘렸고 비용은 최대 19% 늘렸습니다. 추론 토큰도 늘었습니다. LLM이 만든 파일을 주면 GPT-5.2는 추론 토큰을 SWE-bench에서 약 22%, CTXbench에서 약 14% 더 썼습니다. 개발자가 쓴 파일은 CTXbench에만 있는데, 이때는 약 20% 더 썼습니다.
+
+<KeyIdea title="파일은 행동을 바꿨지만 정답률은 바꾸지 못했습니다">
+파일이 바꾼 것은 정답률이 아니라 에이전트의 행동이었습니다. 적어 둔 도구를 더 쓰고 테스트를 더 돌렸지만, 성공률 상승으로는 이어지지 않았습니다.
+</KeyIdea>
+
+## 시간은 오히려 줄었다는 연구도 있습니다
+
+2026년 1월에 처음 제출되고 3월에 개정된 Lulla 연구는 다른 지표를 냈습니다. 수치가 어느 판의 것인지는 이 글이 확인하지 못했습니다. Codex(gpt-5.2-codex)로 10개 레포의 PR 124개를 AGENTS.md가 있을 때와 없을 때 짝지어 돌렸습니다. AGENTS.md가 있을 때 에이전트의 실행 시간 중앙값이 28.64% 낮았고 출력 토큰은 16.58% 적었습니다. 저자들은 무작위로 고른 결과물 50개만 비어 있거나 엉뚱한 수정이 아닌지 직접 확인했고, 정답인지는 평가하지 않았다고 밝힙니다.
+
+저자들은 이 차이를 "연관(associated)"이라고 표현합니다. 에이전트가 Codex 하나뿐이고, 작업 설명은 LLM(gpt-oss-120b)이 PR에서 만들어 냈습니다. Gloaguen 연구는 비용이 늘었다고 했고 Lulla 연구는 시간이 줄었다고 했습니다. 재는 것이 다르므로 서로 부딪히는 결과인지는 이 글이 확인한 범위로는 알 수 없습니다.
+
+## 세 번째 연구는 무엇을 말합니까
+
+2026년 7월 28일, Khatri가 <Term id="ablation-study">절제 연구</Term>를 올렸습니다. 세 연구 중 마지막으로 나온 것입니다. 단독 저자가 두 에이전트를 비교했습니다. Claude Code(claude-sonnet-4-6)와 Codex CLI(gpt-5.5)입니다. 대상은 Python 레포 3개(pdm, firebase-admin-python, opshin)였습니다. Claude는 15개, Codex는 17개 작업을 맡았고, 전략마다 3회씩 반복했습니다. 291회 실행 중 평가된 것은 288회입니다.
+
+조건은 세 가지입니다. none은 레포 컨텍스트를 전혀 주지 않는 경우입니다. always_on은 AGENTS.md 전문을 매 턴 시스템 프롬프트에 넣는 경우입니다. selective는 주제별 위키 파일을 작업 공간에 두고 에이전트가 필요할 때 가져가게 하는 경우입니다.
+
+성공률은 다음과 같았습니다.
+
+| | none | always_on | selective |
+|---|---|---|---|
+| Claude | 53.3% | 55.6% | 55.6% |
+| Codex | 58.8% | 56.9% | 52.9% |
+
+저자의 요약은 이렇습니다.
+
+<Quote source="khatri-2026">
+Context strategy does not measurably move correctness on either agent
+</Quote>
+
+컨텍스트 전략을 바꿔도 정답률은 측정 가능한 수준으로 움직이지 않았다는 뜻입니다.
+
+기술적(descriptive) <Term id="equivalence-testing">동등성 검정</Term>으로 보면 효과의 크기는 10~15%p 안쪽으로 묶였습니다. 실제로 관측된 차이는 Claude에서 2.3%p, Codex에서 5.9%p였습니다. 저자는 표본이 작아 이것을 검정력 있는 동등성 주장으로 내세우지는 않습니다. 이 논문은 실패의 원인도 짚습니다. 에이전트는 레포 지식이 모자라서가 아니라, 기능을 설계하고 패턴을 고르고 정확히 연결하는 구현 능력에서 실패하는 것으로 보였습니다. AGENTS.md가 아슬아슬하게 실패하던 작업을 통과로 바꾼 사례는 없었습니다.
+
+효율 쪽 결과는 작았습니다. Claude의 캐시 생성 토큰만 selective에서 낮았습니다(11개 작업 모두, 여러 비교를 보정한 Holm 보정 p=0.012). 저자는 이를 능력이 아니라 주입 방식 때문이라 해석합니다. 또 pdm과 firebase에서는 selective 위키가 AGENTS.md보다 약 10배, 18배 길어, 이 조건은 전달 방식과 내용이 함께 달랐습니다. 턴 수와 도구 호출은 보정 뒤 차이가 없었고, Codex는 거의 같았습니다.
+
+<Compare
+  before="컨텍스트 파일에 레포 정보를 충실히 적어 두면 에이전트가 더 잘 고친다."
+  after="정확도를 잰 두 연구는 증거를 찾지 못했습니다. 시간과 비용 결과는 연구마다 엇갈렸습니다."
+/>
+
+## 효과가 없다는 말을 믿어도 됩니까
+
+그런데 2026년 7월 28일 논문에서 Khatri 본인이 한계를 먼저 밝힙니다. <Term id="statistical-power">검정력</Term>이 낮습니다. 검출할 수 있는 최소 효과가 30%p보다 큽니다. 30%p짜리 큰 효과도 57%만 잡아냅니다. 10%p 효과를 80% 검정력으로 보려면 작업이 대략 120~200개 필요합니다. 이 연구는 15~17개였습니다.
+
+그러므로 이 결과를 "효과가 없다"로 읽으면 안 됩니다. "큰 효과는 없어 보이지만 작은 효과는 이 설계로 볼 수 없다"가 정확합니다. 저자는 다른 한계도 적습니다. 레포는 Python 3개뿐입니다. 파일을 Claude에는 시스템 프롬프트로, Codex에는 사용자 턴 앞에 넣어서 두 에이전트를 같은 조건으로 비교하기 어렵습니다. 결과는 시험한 모델 버전에만 해당합니다. 원문 문장은 이렇습니다.
+
+<Quote source="khatri-2026">
+Results may not generalize to other languages, larger codebases, or repositories with exceptionally detailed context files.
+</Quote>
+
+다른 언어, 더 큰 코드베이스, 아주 상세한 컨텍스트 파일을 가진 레포에는 결과가 일반화되지 않을 수 있다는 뜻입니다.
+
+왜 연구마다 결론이 다를까요. Khatri는 한 가지 가설을 냅니다. 한 에이전트로만 시험한 연구는 그 에이전트에게만 경계 난이도인 작업, 즉 컨텍스트 효과가 드러날 여지가 있는 작업을 골랐을 수 있다는 것입니다. 다른 에이전트에게는 같은 작업이 너무 쉽거나 너무 어려워 차이가 보이지 않습니다. 두 에이전트가 함께 푼 15개 작업의 성공률은 대체로 같은 방향이었지만, 15개 중 6개는 한쪽 에이전트만 가끔 푸는 작업이었습니다(성공률이 0과 1 사이). 이는 가설이지 확인된 설명이 아닙니다.
+
+## 그러면 파일을 어떻게 써야 합니까
+
+2026년 1월부터 7월까지 나온 세 연구를 합쳐 봐도 정확도를 올리려고 파일을 늘릴 이유는 찾기 어렵습니다. Gloaguen 연구진은 결론에서 컨텍스트 파일이 비표준 코딩 관행을 지정할 때 유용하다고 적고, 성능을 올리려는 시도는 도입 전에 엄격히 평가해야 한다고 말합니다. 코드에서 이미 드러나는 내용을 반복하는 줄은 이 쓸모에 해당하지 않습니다.
+
+그래서 아래 키트는 줄이기만 합니다. 각 줄이 코드로 알 수 있는 내용인지 따져 보고, 그런 줄만 삭제 후보로 올립니다. 코드에 드러나지 않는 규칙은 실제 실패와 이어졌는지 물어 사용자가 지울지 정합니다. 이 키트는 위 연구 결과에서 끌어낸 추론입니다. 줄인 뒤 성능이나 비용이 어떻게 바뀌는지를 직접 시험한 연구는 찾지 못했습니다.
+
+한계도 분명합니다. Gloaguen 연구는 Python만 평가했고 생성된 코드의 효율이나 보안은 재지 않았습니다. Khatri 연구는 작업이 15~17개입니다. Lulla 연구는 Codex 한 에이전트와 한 모델만 썼습니다. 세 연구가 시험한 것은 Sonnet-4.5, GPT-5.2, claude-sonnet-4-6, gpt-5.5 같은 해당 시점의 모델입니다. 이후 나온 모델로 같은 시험을 한 연구는 이 글이 확인한 범위에 없습니다. Gloaguen 연구는 LLM이 만든 파일이 성공률을 올리지 못했다고 봤고, Khatri 연구는 작업이 적어 작은 효과는 판단하지 못했습니다. 파일이 쓸모없다는 결론은 아직 어느 연구에서도 나오지 않았습니다.
