@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatDate } from "@/content/labels";
+import { SourceAge } from "@/components/SourceAge";
+import { CATEGORY_LABEL, DIFFICULTY_LABEL, newestPublished, sourcePeriod } from "@/content/labels";
 import type { ArticleMeta, Category } from "@/content/schema";
 
 export function ArticleList({ articles }: { articles: ArticleMeta[] }) {
@@ -41,9 +42,8 @@ export function ArticleList({ articles }: { articles: ArticleMeta[] }) {
                   <span>·</span>
                   <span>{DIFFICULTY_LABEL[a.difficulty]}</span>
                   <span>·</span>
-                  <time dateTime={new Date(a.publishedAt).toISOString()}>
-                    {formatDate(new Date(a.publishedAt))}
-                  </time>
+                  <span>{sourcePeriod(a.sources)}</span>
+                  <SourceAge newestIso={newestPublished(a.sources).toISOString()} />
                   {a.draft && (
                     <span className="rounded bg-amber-500/15 px-1.5 py-0.5 font-medium text-amber-600 dark:text-amber-400">
                       초안

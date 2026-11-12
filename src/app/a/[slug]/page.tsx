@@ -6,7 +6,7 @@ import { ArticleTracking } from "@/components/ArticleTracking";
 import { GlossaryList } from "@/components/GlossaryList";
 import { KitSection } from "@/components/KitSection";
 import { PersonCard } from "@/components/PersonCard";
-import { SourceTiming } from "@/components/SourceTiming";
+import { SourceAge } from "@/components/SourceAge";
 import { Comments } from "@/components/comments/Comments";
 import { ArticleBody } from "@/components/mdx/ArticleBody";
 import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatDate, newestPublished, sourcePeriod } from "@/content/labels";
@@ -60,7 +60,8 @@ async function ArticleView({ slug }: { slug: string }) {
           <span>·</span>
           <span>{DIFFICULTY_LABEL[article.difficulty]}</span>
           <span>·</span>
-          <time dateTime={article.publishedAt.toISOString()}>{formatDate(article.publishedAt)}</time>
+          <span title="출처가 나온 시점입니다">{sourcePeriod(article.sources)}</span>
+          <SourceAge newestIso={newestPublished(article.sources).toISOString()} />
           {article.draft && (
             <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
               초안 · 검수 전
@@ -69,10 +70,6 @@ async function ArticleView({ slug }: { slug: string }) {
         </div>
         <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{article.title}</h1>
         <p className="mt-4 text-lg leading-relaxed text-muted">{article.summary}</p>
-        <SourceTiming
-          period={sourcePeriod(article.sources)}
-          newestIso={newestPublished(article.sources).toISOString()}
-        />
         {article.persons.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-x-8 gap-y-4">
             {article.persons.map((p) => (

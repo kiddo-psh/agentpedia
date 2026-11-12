@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { monthsBetween, newestPublished, sourcePeriod } from "./labels";
+import { monthsBetween, newestPublished, sourceAge, sourcePeriod } from "./labels";
 
 const at = (iso: string, dateNote?: string) => ({ publishedAt: new Date(iso), dateNote });
 
@@ -24,5 +24,14 @@ describe("monthsBetween", () => {
   it("floors partial months", () => {
     expect(monthsBetween(new Date("2025-06-19"), new Date("2025-12-18"))).toBe(5);
     expect(monthsBetween(new Date("2025-06-19"), new Date("2025-12-19"))).toBe(6);
+  });
+});
+
+describe("sourceAge", () => {
+  it("reads this month, months, and years with months", () => {
+    expect(sourceAge(0)).toBe("이번 달 자료");
+    expect(sourceAge(5)).toBe("5개월 전 자료");
+    expect(sourceAge(12)).toBe("1년 전 자료");
+    expect(sourceAge(17)).toBe("1년 5개월 전 자료");
   });
 });

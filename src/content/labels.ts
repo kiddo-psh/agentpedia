@@ -40,6 +40,14 @@ export function sourcePeriod(sources: Dated[]): string {
   return (from === to ? from : `${from} ~ ${to}`) + estimated;
 }
 
+/** "이번 달 자료", "5개월 전 자료", "1년 5개월 전 자료". */
+export function sourceAge(months: number): string {
+  if (months < 1) return "이번 달 자료";
+  const [y, m] = [Math.floor(months / 12), months % 12];
+  const parts = [y > 0 && `${y}년`, m > 0 && `${m}개월`].filter(Boolean).join(" ");
+  return `${parts} 전 자료`;
+}
+
 /** Whole months between two dates, floored. */
 export function monthsBetween(from: Date, to: Date): number {
   const months = (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth());
