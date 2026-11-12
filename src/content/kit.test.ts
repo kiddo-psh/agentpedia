@@ -16,6 +16,7 @@ const article: Article = {
   keyIdeas: ["idea one"],
   difficulty: "intro",
   apply: { goal: "g", changes: ["a", "b"], doesNotDo: ["c"], fitsWhen: "f", time: "t" },
+  tryIt: "p",
   draft: false,
   publishedAt: new Date(),
   bodyMarkdown: "",

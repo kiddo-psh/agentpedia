@@ -18,6 +18,7 @@ apply:
     - "UI나 기존 화면 코드는 수정하지 않습니다."
   fitsWhen: "UI나 수동 조작으로만 동작을 확인할 수 있는 핵심 기능이 있는 프로젝트"
   time: "30분~1시간"
+tryIt: "이 레포를 읽고, 지금은 UI나 수동 조작으로만 확인할 수 있는 핵심 기능을 세 개까지 골라줘. 기능마다 기존 함수를 그대로 호출하는 CLI 명령을 만든다면 이름과 인자가 어떻게 될지 제안만 해줘. 아무 파일도 바꾸지 마."
 draft: true
 publishedAt: 2026-11-11
 keyIdeas:
@@ -125,18 +126,6 @@ The simplest form is text, so by default, whatever I wanna build, it starts as C
 After all, I don’t design codebases to be easy to navigate for me, I engineer them so agents can work in it efficiently.
 </Quote>
 
-## 내 프로젝트에서 해볼 것
-
-이 글에서 가장 옮겨 오기 쉬운 것은 CLI로 루프를 닫는 습관입니다. 언어를 바꾸거나 모델을 바꾸지 않아도 시작할 수 있습니다.
-
-<Steps>
-1. 지금은 화면을 눌러 봐야만 확인되는 핵심 기능 하나를 고릅니다.
-2. 그 기능의 기존 함수를 그대로 호출하는 가장 작은 CLI 명령을 만듭니다.
-3. 에이전트가 CLI를 직접 실행하고 출력을 읽어 결과를 확인하게 합니다.
-4. 실행 방법과 실제 출력 예시를 에이전트가 읽는 문서(README, AGENTS.md, CLAUDE.md)에 적습니다.
-</Steps>
-
-<TryIt prompt="이 레포를 읽고, 지금은 UI나 수동 조작으로만 확인할 수 있는 핵심 기능 하나를 골라줘. 그 기능의 기존 함수를 그대로 호출하는 작은 CLI 명령을 만들 계획을 먼저 보여주고, 내가 승인하면 만든 뒤 직접 실행해서 출력을 확인해줘." />
 
 ## 이 방식이 맞지 않는 곳
 

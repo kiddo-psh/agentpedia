@@ -43,13 +43,14 @@ describe(`${SERVER_NAME} MCP server`, () => {
     expect(textOf(none)).toContain("기사가 없습니다");
   });
 
-  it("get_article returns key ideas, sources and an absolute URL", async () => {
+  it("get_article returns key ideas, sources, the diagnosis prompt and an absolute URL", async () => {
     const r = await client.callTool({ name: "get_article", arguments: { slug: SLUG } });
     const t = textOf(r);
     expect(r.isError).toBeFalsy();
     expect(t).toContain(`URL: ${ORIGIN}/a/${SLUG}`);
     expect(t).toContain("## 핵심 아이디어");
     expect(t).toContain("https://x.com/bcherny/status/2007179832300581177");
+    expect(t).toContain("먼저 진단 (파일 수정 없음): ");
   });
 
   it("unknown slug is a tool error that suggests close matches", async () => {

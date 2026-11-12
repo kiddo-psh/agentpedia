@@ -101,6 +101,8 @@ export function articleText(a: Article, origin: string): string {
     sourcesText(a),
     "",
     "## 적용 키트",
+    `먼저 진단 (파일 수정 없음): ${a.tryIt}`,
+    "",
     applySummaryText(a),
     "",
     `파일: ${orderedKit(a.kit).map((f) => f.path).join(", ")}`,

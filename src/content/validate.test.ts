@@ -24,6 +24,7 @@ function mdx(body: string, overrides: Record<string, string> = {}) {
     "  doesNotDo: [Touch app logic]",
     "  fitsWhen: Any repo",
     "  time: 10분",
+    "tryIt: List the test commands. Change no files.",
     "sources:",
     "  - id: talk",
     "    title: A talk",
@@ -81,10 +82,11 @@ describe("parseArticle", () => {
   });
 
   it("rejects components outside the allowed set, including raw HTML tags", () => {
-    const r = parse(mdx("<Callout>x</Callout>\n\n<div>y</div>"));
+    const r = parse(mdx("<Callout>x</Callout>\n\n<div>y</div>\n\n<Steps>z</Steps>"));
     const text = !r.ok ? r.issues.join("\n") : "";
     expect(text).toMatch(/<Callout> is not an allowed component/);
     expect(text).toMatch(/<div> is not an allowed component/);
+    expect(text).toMatch(/<Steps> is not an allowed component/);
   });
 
   it("resolves people ids and rejects unknown ones", () => {

@@ -101,6 +101,8 @@ export const ArticleMeta = z
       fitsWhen: z.string().min(1),
       time: z.string().min(1),
     }),
+    /** Read-only diagnosis prompt shown above the kit: the reader sees fit before running the kit. */
+    tryIt: z.string().min(1).max(400),
     draft: z.boolean().default(false),
     publishedAt: z.coerce.date(),
     updatedAt: z.coerce.date().optional(),
@@ -123,7 +125,7 @@ export type Article = ArticleMeta & {
 };
 
 /** JSX components an article body may use. Anything else fails validation. */
-export const MDX_COMPONENTS = ["KeyIdea", "Quote", "TryIt", "Compare", "Steps", "Term"] as const;
+export const MDX_COMPONENTS = ["KeyIdea", "Quote", "Compare", "Term"] as const;
 export type MdxComponentName = (typeof MDX_COMPONENTS)[number];
 
 /** Every kit must ship this file; it is the body of the MCP `apply_article` prompt. */

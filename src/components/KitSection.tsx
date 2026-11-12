@@ -33,6 +33,8 @@ export function KitSection({ article }: { article: Article }) {
         </a>
       </div>
 
+      <TryIt prompt={article.tryIt} />
+
       <ApplySummary apply={article.apply} />
 
       <div className="mt-6">
@@ -71,6 +73,24 @@ export function KitSection({ article }: { article: Article }) {
         ))}
       </div>
     </section>
+  );
+}
+
+/** Read-only first step: the reader checks fit in a minute before running the kit. */
+function TryIt({ prompt }: { prompt: string }) {
+  return (
+    <div className="mt-6 overflow-hidden rounded-xl border border-foreground/15 bg-background">
+      <div className="flex items-center justify-between gap-3 border-b border-foreground/10 bg-foreground/[.03] px-4 py-2">
+        <span className="text-sm font-semibold">
+          먼저 진단만 해 보기 <span className="font-normal text-muted">· 파일을 바꾸지 않습니다</span>
+        </span>
+        <CopyButton text={prompt} label="프롬프트 복사" />
+      </div>
+      <p className="whitespace-pre-wrap px-4 py-3 font-mono text-sm leading-relaxed">{prompt}</p>
+      <p className="border-t border-foreground/10 px-4 py-2 text-xs text-muted">
+        아무 코딩 에이전트에나 붙여 넣으세요. 진단 결과가 맞으면 아래 키트로 적용합니다.
+      </p>
+    </div>
   );
 }
 
