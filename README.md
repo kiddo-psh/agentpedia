@@ -18,6 +18,19 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## View articles without the dev server
+
+```bash
+npm run preview
+```
+
+This builds the site with drafts included and serves it at [http://localhost:3100](http://localhost:3100).
+Article pages are prerendered at build time, so they are served as static HTML.
+Pass another port with `npm run preview -- 4000`.
+
+Rebuild after you edit content: run `npm run preview` again.
+The preview keeps its comments in `.data/pglite-prod`, separate from the dev server's `.data/pglite`, so both can run at the same time.
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More

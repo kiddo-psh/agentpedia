@@ -22,7 +22,13 @@ async function connect(): Promise<Db> {
   const { migrate } = await import("drizzle-orm/pglite/migrator");
   // PGlite creates its own folder but not missing parents.
   fs.mkdirSync(path.join(process.cwd(), ".data"), { recursive: true });
-  const db = drizzle(new PGlite(path.join(process.cwd(), ".data", "pglite")), { schema });
+  // PGlite is single-process. `next dev` and a local `next start` running side by side must not
+  // share one data folder, or the files corrupt; give each its own.
+  const dir =
+    process.env.NODE_ENV === "production"
+      ? path.join(process.cwd(), ".data", "pglite-prod")
+      : path.join(process.cwd(), ".data", "pglite");
+  const db = drizzle(new PGlite(dir), { schema });
   await migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
   return db as unknown as Db;
 }
