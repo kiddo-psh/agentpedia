@@ -86,6 +86,7 @@ export function articleText(a: Article, origin: string): string {
     "",
     a.summary,
     "",
+    ...(a.brief ? ["## 30초 요약", `무슨 일: ${a.brief.what}`, `왜 중요한가: ${a.brief.why}`, `지금 할 수 있는 일: ${a.brief.action}`, ""] : []),
     "## 핵심 아이디어",
     ...a.keyIdeas.map((k, i) => `${i + 1}. ${k}`),
     "",
@@ -93,6 +94,9 @@ export function articleText(a: Article, origin: string): string {
     "",
     a.bodyMarkdown,
     "",
+    ...(a.terms.length > 0
+      ? ["## 용어 (본문의 <Term id>)", ...a.terms.map((t) => `- ${t.term}${t.en ? ` (${t.en})` : ""}: ${t.definition}`), ""]
+      : []),
     "## 출처",
     sourcesText(a),
     "",
