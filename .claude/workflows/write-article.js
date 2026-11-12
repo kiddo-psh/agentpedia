@@ -4,7 +4,7 @@ export const meta = {
   whenToUse: 'Writing new articles or rewriting existing drafts to docs/writing-guide.md. args: [{ slug, topic, category, mode?, people?, sources? }]',
   phases: [
     { title: 'Research', detail: 'one researcher per article: primary sources, dates, quotes, people, licensed photos' },
-    { title: 'People', detail: 'one agent registers new people in content/people.yaml (shared file)' },
+    { title: 'Registry', detail: 'one agent registers new people and glossary terms (shared files)' },
     { title: 'Write', detail: 'one writer per article directory' },
     { title: 'Review', detail: 'three reviewers per article: facts, story, kit' },
     { title: 'Revise', detail: 'apply fixes until every score is 4+ (max 2 rounds)' },
@@ -78,10 +78,22 @@ const RESEARCH = {
         required: ['id', 'name', 'nameKo', 'role'],
       },
     },
+    terms: {
+      type: 'array',
+      description: 'Terms a developer new to the topic may not know (3-8). Check content/glossary.yaml first and reuse existing ids.',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' }, term: { type: 'string', description: 'Korean form readers will see' },
+          en: { type: 'string' }, definition: { type: 'string', description: 'One or two plain Korean sentences, max 200 chars' },
+        },
+        required: ['id', 'term', 'definition'],
+      },
+    },
     storyAngle: { type: 'string', description: 'The scene to open with and the tension the article resolves' },
     gaps: { type: 'array', items: { type: 'string' }, description: 'What could not be verified' },
   },
-  required: ['sources', 'claims', 'quotes', 'people', 'storyAngle', 'gaps'],
+  required: ['sources', 'claims', 'quotes', 'people', 'terms', 'storyAngle', 'gaps'],
 }
 
 const REVIEW = {
@@ -140,16 +152,20 @@ For each person not yet in content/people.yaml, look for a photo on Wikimedia Co
     { label: `research:${label(it)}`, phase: 'Research', model: MODELS.research, schema: RESEARCH }),
 ))
 
-// Phase 2: one agent edits the shared people registry (barrier: avoids concurrent edits of one file).
-phase('People')
+// Phase 2: one agent edits the shared registries (barrier: avoids concurrent edits of one file).
+phase('Registry')
 const newPeople = research.filter(Boolean).flatMap((r) => r.people)
-if (newPeople.length > 0) {
+const newTerms = research.filter(Boolean).flatMap((r) => r.terms ?? [])
+if (newPeople.length > 0 || newTerms.length > 0) {
   await agent(`${SHARED_RULES}
 
-Update content/people.yaml with these people researched by other agents. Add entries whose id is missing; fix an existing entry only if the research shows its role is wrong. Keep existing entries and comments. Drop any photo whose license is not in the PHOTO_LICENSES list in src/content/schema.ts.
+Update the shared registries with what other agents researched. Keep existing entries and comments.
+1. content/people.yaml: add people whose id is missing; fix an existing entry only if the research shows its role is wrong. Drop any photo whose license is not in the PHOTO_LICENSES list in src/content/schema.ts.
 ${JSON.stringify(newPeople, null, 2)}
-Then run \`npm run validate:content\` (errors about articles that do not exist yet are fine; people.yaml errors are not) and report the ids now registered.`,
-    { label: 'people-registry', phase: 'People', model: MODELS.people })
+2. content/glossary.yaml: add terms whose id is missing. If two articles propose the same idea under different ids, keep one id. Do not change an existing definition unless it is wrong. Definitions are max 200 chars, 합니다체.
+${JSON.stringify(newTerms, null, 2)}
+Then run \`npm run validate:content\` (errors about articles that do not exist yet are fine; registry errors are not) and report the ids now registered.`,
+    { label: 'registry', phase: 'Registry', model: MODELS.people })
 }
 
 // Phases 3-5 per article, pipelined: write -> review panel -> revise loop.
@@ -161,12 +177,13 @@ const results = await pipeline(
     await agent(`${SHARED_RULES}
 
 ${it.mode === 'revise' ? `Rewrite the existing draft in content/articles/${it.slug}/` : `Create content/articles/${it.slug}/`} following docs/writing-guide.md exactly:
-index.mdx (frontmatter incl. apply, people ids, sources with dateNote where dateVerified is false, draft: true), kit/prompt.md, kit/checklist.md.
+index.mdx (frontmatter incl. brief, apply, people ids, sources with dateNote where dateVerified is false, draft: true), kit/prompt.md, kit/checklist.md.
+Follow the three layers in docs/writing-guide.md section 2: brief is facts only; the body is the story; wrap each glossary term at its first use in <Term id="..."> using ids from content/glossary.yaml.
 Look at content/articles/boris-cherny-claude-code-workflow/ for the file format, but write a far better story than it.
 Use only these verified facts and quotes; anything not here must not appear:
 ${JSON.stringify(r, null, 2)}
 Open with this angle: ${r.storyAngle}
-Only <Quote> the quotes listed above, with their source id and at. Only use KeyIdea, Quote, TryIt, Compare, Steps.
+Only <Quote> the quotes listed above, with their source id and at. Only use KeyIdea, Quote, TryIt, Compare, Steps, Term.
 Only edit files inside content/articles/${it.slug}/. Run \`npm run validate:content\` and fix until it passes for this article.`,
       { label: `write:${label(it)}`, phase: 'Write', model: MODELS.write })
     return { it, research: r }
