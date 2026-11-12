@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import Link from "next/link";
 import { connection } from "next/server";
-import { listThreads, type CommentView } from "@/comments/service";
+import { listThreads, type CommentView, type Thread } from "@/comments/service";
 import { getDb } from "@/db/client";
 import { getSession } from "@/lib/auth";
 import { CommentForm } from "./CommentForm";
@@ -17,10 +17,28 @@ const timeFormat = new Intl.DateTimeFormat("ko-KR", {
 export async function Comments({ slug }: { slug: string }) {
   // Auth and DB code read the clock; mark this subtree request-time before touching them.
   await connection();
-  const [session, threads] = await Promise.all([
-    getSession(await headers()),
-    getDb().then((db) => listThreads(db, slug)),
-  ]);
+  const requestHeaders = await headers();
+  let session: Awaited<ReturnType<typeof getSession>>;
+  let threads: Thread[];
+  try {
+    [session, threads] = await Promise.all([
+      getSession(requestHeaders),
+      getDb().then((db) => listThreads(db, slug)),
+    ]);
+  } catch (err) {
+    // Comments are secondary: a broken database must not take the article down with it.
+    console.error(`[comments] failed to load for ${slug}`, err);
+    return (
+      <>
+        <h2 id="comments-title" className="text-xl font-bold">
+          토론
+        </h2>
+        <p className="mt-4 rounded-lg border border-dashed border-foreground/20 px-4 py-3 text-sm text-muted">
+          지금은 토론을 불러올 수 없습니다. 기사는 그대로 읽을 수 있습니다.
+        </p>
+      </>
+    );
+  }
   const me = session?.user.id;
   const count = threads.reduce((n, t) => n + (t.body !== null ? 1 : 0) + t.replies.length, 0);
 
