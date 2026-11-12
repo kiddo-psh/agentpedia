@@ -38,7 +38,8 @@ describe(`${SERVER_NAME} MCP server`, () => {
     const hit = await client.callTool({ name: "search_articles", arguments: { query: "Boris" } });
     expect(textOf(hit)).toContain(`slug: ${SLUG}`);
 
-    const none = await client.callTool({ name: "search_articles", arguments: { category: "security" } });
+    // Boris's article is in another category, so the filter must drop it.
+    const none = await client.callTool({ name: "search_articles", arguments: { query: "Boris", category: "security" } });
     expect(textOf(none)).toContain("기사가 없습니다");
   });
 
