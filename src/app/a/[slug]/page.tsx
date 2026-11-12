@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ArticleBrief } from "@/components/ArticleBrief";
 import { ArticleTracking } from "@/components/ArticleTracking";
-import { GlossaryPanel } from "@/components/GlossaryPanel";
+import { GlossaryList } from "@/components/GlossaryList";
 import { KitSection } from "@/components/KitSection";
 import { PersonCard } from "@/components/PersonCard";
 import { SourceTiming } from "@/components/SourceTiming";
@@ -84,10 +84,8 @@ async function ArticleView({ slug }: { slug: string }) {
 
       <ArticleBrief article={article} />
 
-      <div className="relative">
-        <ArticleBody article={article} />
-        <GlossaryPanel terms={article.terms} />
-      </div>
+      <ArticleBody article={article} />
+      <GlossaryList terms={article.terms} />
 
       <KitSection article={article} />
 
