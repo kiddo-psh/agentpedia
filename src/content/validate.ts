@@ -76,6 +76,11 @@ export function parseArticle({ dirName, raw, kit, people, glossary }: ArticleInp
         `line ${line}: "**" did not become bold and will show as literal asterisks. Move punctuation outside the markers: "**...**"이라고`,
       );
     });
+    // The 30-second brief already outlines the article; body headings repeated it.
+    visit(tree, "heading", (node) => {
+      const line = (node.position?.start.line ?? 0) + bodyOffset;
+      issues.push(`line ${line}: body headings are not allowed. Bridge with a sentence, or use "---" for a scene break`);
+    });
   }
 
   const termIds = new Set<string>();

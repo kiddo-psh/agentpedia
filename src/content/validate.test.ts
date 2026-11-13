@@ -113,6 +113,12 @@ describe("parseArticle", () => {
     expect(!bad.ok && bad.issues.join("\n")).toMatch(/frontmatter\.brief\.what/);
   });
 
+  it("rejects body headings but allows a scene break", () => {
+    const bad = parse(mdx("첫 문단입니다.\n\n## 소제목\n\n둘째 문단입니다."));
+    expect(!bad.ok && bad.issues.join("\n")).toMatch(/body headings are not allowed/);
+    expect(parse(mdx("첫 문단입니다.\n\n---\n\n둘째 문단입니다.")).ok).toBe(true);
+  });
+
   it("rejects bold that cannot close before Korean text", () => {
     const bad = parse(mdx('그는 **"에이전트의 10년"**이라고 부릅니다.'));
     expect(!bad.ok && bad.issues.join("\n")).toMatch(/literal asterisks/);
