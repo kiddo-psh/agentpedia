@@ -20,7 +20,8 @@ function componentsFor(article: Article) {
 export async function ArticleBody({ article }: { article: Article }) {
   const { default: Content } = await evaluate(article.bodyMarkdown, {
     ...runtime,
-    remarkPlugins: [remarkGfm],
+    // Korean ranges like "15~17개" use a single tilde; GFM would read a pair of them as strikethrough.
+    remarkPlugins: [[remarkGfm, { singleTilde: false }]],
   });
   return (
     <div className="prose-article">
