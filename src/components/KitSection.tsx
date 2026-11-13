@@ -75,12 +75,12 @@ export function KitSection({ article }: { article: Article }) {
         <Fold title={`키트 파일 보기 (${files.length}개)`}>
           <div className="grid gap-5">
             {files.map((f) => (
-              <div key={f.path}>
+              <div key={f.path} className="min-w-0">
                 <div className="mb-1.5 flex items-center justify-between gap-3">
                   <span className="font-mono">{f.path}</span>
                   <CopyButton text={f.content} />
                 </div>
-                <pre className="max-h-80 overflow-auto rounded-xl bg-background px-4 py-3 font-mono text-[0.8rem] leading-relaxed whitespace-pre-wrap">
+                <pre className="max-h-80 overflow-auto rounded-xl bg-background px-4 py-3 font-mono text-[0.8rem] leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]">
                   {f.content}
                 </pre>
               </div>
