@@ -1,18 +1,23 @@
 @import "tailwindcss";
 
+/* Monochrome: the accent is the ink colour, so emphasis comes from weight, size and space. */
 :root {
   --background: #ffffff;
-  --foreground: #18181b;
-  --muted: #71717a;
-  --accent: #4f46e5;
+  --foreground: #0d0d0d;
+  --muted: #6b6b6b;
+  --accent: #0d0d0d;
+  --line: #ececec;
+  --soft: #f4f4f4;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0b0b0e;
-    --foreground: #ececf1;
-    --muted: #a1a1aa;
-    --accent: #8b8cf8;
+    --background: #0b0b0b;
+    --foreground: #f2f2f2;
+    --muted: #9a9a9a;
+    --accent: #f2f2f2;
+    --line: #232323;
+    --soft: #171717;
   }
 }
 
@@ -21,6 +26,8 @@
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
+  --color-line: var(--line);
+  --color-soft: var(--soft);
   --font-sans: var(--font-geist-sans), "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
@@ -35,7 +42,7 @@ body {
 /* Article body typography. Components opt out with .not-prose. */
 @layer components {
   .prose-article {
-    font-size: 1.0625rem;
+    font-size: 1.125rem;
     line-height: 1.85;
   }
   /* Scene break: the body has no headings, so a short centered rule marks a change of scene. */
