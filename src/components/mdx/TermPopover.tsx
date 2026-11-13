@@ -2,7 +2,6 @@
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import type { GlossaryEntry } from "@/content/schema";
-import { termAnchor } from "./termAnchor";
 
 const GAP = 6;
 const MARGIN = 16;
@@ -82,13 +81,6 @@ export function TermPopover({ entry, children }: { entry: GlossaryEntry; childre
           {entry.en && <span className="ml-1.5 font-normal text-muted">{entry.en}</span>}
         </span>
         <span className="mt-1 block leading-relaxed text-muted">{entry.definition}</span>
-        <a
-          href={`#${termAnchor(entry.id)}`}
-          onClick={() => card.current?.hidePopover()}
-          className="mt-2 inline-block text-xs text-accent underline underline-offset-2"
-        >
-          이 글의 용어 목록에서 보기
-        </a>
       </span>
     </>
   );

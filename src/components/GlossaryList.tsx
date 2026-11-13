@@ -1,21 +1,21 @@
 import type { GlossaryEntry } from "@/content/schema";
-import { termAnchor } from "./mdx/termAnchor";
 
-/** Terms the article marks with <Term>, listed after the body like footnotes. Popovers link here. */
+/**
+ * Terms the article marks with <Term>, folded after the body. Each term already opens its
+ * definition in place, so the list stays closed until a reader wants the whole set.
+ */
 export function GlossaryList({ terms }: { terms: GlossaryEntry[] }) {
   if (terms.length === 0) return null;
   return (
-    <aside aria-labelledby="glossary" className="mt-10 rounded-xl border border-foreground/10 p-5">
-      <h2 id="glossary" className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">
-        이 글의 용어
-      </h2>
-      <dl className="grid gap-3 text-sm">
+    <details className="group mt-10 rounded-xl border border-foreground/10 text-sm">
+      <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-muted hover:text-foreground">
+        <span className="inline-block transition-transform group-open:rotate-90">▸</span>
+        <span className="font-semibold">이 글의 용어 {terms.length}개</span>
+        <span className="truncate">· {terms.map((t) => t.term).join(", ")}</span>
+      </summary>
+      <dl className="grid gap-3 border-t border-foreground/10 px-4 py-4">
         {terms.map((t) => (
-          <div
-            key={t.id}
-            id={termAnchor(t.id)}
-            className="-mx-2 scroll-mt-8 rounded-md px-2 py-1 transition-colors target:bg-accent/10"
-          >
+          <div key={t.id}>
             <dt className="font-semibold">
               {t.term}
               {t.en && <span className="ml-1.5 font-normal text-muted">{t.en}</span>}
@@ -24,6 +24,6 @@ export function GlossaryList({ terms }: { terms: GlossaryEntry[] }) {
           </div>
         ))}
       </dl>
-    </aside>
+    </details>
   );
 }
