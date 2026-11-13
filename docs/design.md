@@ -93,7 +93,7 @@ claude mcp add --transport http ai-learn https://<도메인>/mcp
           │   content/loader.ts  ◀── content/articles/**/*.mdx   │
           │        │                 (빌드 시 zod 검증)            │
           │        ▼                                             │
-          │   db (Drizzle) ──▶ Postgres (Supabase)               │
+          │   db (Drizzle) ──▶ Postgres (Neon)                   │
           │     user, comments, events                          │
           └──────────────────────────────────────────────────────┘
 ```
@@ -102,10 +102,10 @@ claude mcp add --transport http ai-learn https://<도메인>/mcp
 
 - **Next.js (App Router) + TypeScript**
 - **MDX** (`@next/mdx` 또는 `next-mdx-remote`) + **zod**로 frontmatter 검증
-- **Postgres** (Supabase/Neon, 로컬은 PGlite) + **Drizzle ORM**
+- **Postgres** (Neon, Vercel 통합. 로컬은 PGlite) + **Drizzle ORM**
 - **Better Auth** GitHub 로그인 (Auth.js v5는 아직 베타라 교체)
 - **MCP**: `@modelcontextprotocol/sdk`, Next.js 어댑터는 `mcp-handler`
-- 배포: Vercel
+- 배포: Vercel (Production 브랜치 `master`), DB는 Vercel Marketplace의 Neon 통합
 
 ---
 
@@ -219,7 +219,7 @@ events {
   적용률 = 같은 날 웹에서 적용(복사·다운로드)한 방문자 수 / 조회한 방문자 수. `GET /api/metrics`로 본다.
 - `events`는 append-only다. 기록은 응답을 보낸 뒤(`after()`) 하며, 실패해도 요청을 막지 않는다.
 - 방문자 해시는 날마다 바뀌어 날짜를 넘어 이어 붙일 수 없다.
-- 로컬 개발은 `DATABASE_URL` 없이 임베디드 PGlite(`.data/`)를 쓰고, 프로덕션은 Postgres(Supabase/Neon)를 쓴다.
+- 로컬 개발은 `DATABASE_URL` 없이 임베디드 PGlite(`.data/`)를 쓰고, 프로덕션은 Neon Postgres를 쓴다. 앱은 풀러 URL(`DATABASE_URL`), 마이그레이션은 직접 URL(`DATABASE_URL_UNPOOLED`)로 붙는다.
 
 ---
 

@@ -33,17 +33,42 @@ The preview keeps its comments in `.data/pglite-prod`, separate from the dev ser
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Deploy
 
-To learn more about Next.js, take a look at the following resources:
+Production runs on Vercel with Neon Postgres. Pushes to `master` deploy to production; other branches get preview deploys.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### One-time setup
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Import `kiddo-psh/agentpedia` in Vercel. Set the Production Branch to `master`.
+2. Add the Neon integration from the Vercel Marketplace. It sets `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED` (direct).
+3. Create a GitHub OAuth app. Set its callback URL to `https://<domain>/api/auth/callback/github`.
+4. Set these environment variables in Vercel:
 
-## Deploy on Vercel
+   | Variable | Environment | Value |
+   | --- | --- | --- |
+   | `BETTER_AUTH_SECRET` | Production | `openssl rand -base64 32` |
+   | `BETTER_AUTH_URL` | Production | `https://<domain>` |
+   | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | Production | From the OAuth app |
+   | `EVENT_SALT` | Production | A long random string |
+   | `METRICS_TOKEN` | Production | A long random string |
+   | `SHOW_DRAFTS` | Preview | `1` |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. Apply the migrations to the production database:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   DATABASE_URL_UNPOOLED="<direct Neon URL>" npm run db:migrate
+   ```
+
+Run step 5 again whenever `drizzle/` gets a new migration, before you push the code that needs it.
+
+GitHub login works only on the production domain, because the OAuth app has one callback URL. Preview deploys can show comments but cannot sign in.
+
+### Check a deploy
+
+```bash
+npm run mcp:smoke -- https://<domain>/mcp
+```
+
+```bash
+curl -H "Authorization: Bearer $METRICS_TOKEN" https://<domain>/api/metrics
+```
