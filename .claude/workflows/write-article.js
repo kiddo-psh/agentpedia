@@ -6,7 +6,7 @@ export const meta = {
     { title: 'Research', detail: 'one researcher per article: primary sources, dates, quotes, people, licensed photos' },
     { title: 'Registry', detail: 'one agent registers new people and glossary terms (shared files)' },
     { title: 'Write', detail: 'one writer per article directory' },
-    { title: 'Review', detail: 'three reviewers per article: facts, story, kit' },
+    { title: 'Review', detail: 'four reviewers per article: facts, story, kit, and a blind first-time reader' },
     { title: 'Revise', detail: 'apply fixes until every score is 4+ (max 2 rounds)' },
   ],
 }
@@ -118,7 +118,7 @@ const REVIEWERS = [
     key: 'facts',
     model: 'opus',
     rubric: 'A (facts) and E (people/images)',
-    lens: 'You are a skeptical fact-checker. Open every source URL yourself. Check each claim, date, quote wording and timestamp against the source, and verify every photo license on its file page. Treat anything you cannot confirm as a problem.',
+    lens: 'You are a skeptical fact-checker. Open every source URL yourself. Check each claim, date, quote wording and timestamp against the source, and verify every photo license on its file page. Treat anything you cannot confirm as a problem. Check that the brief does not contradict the body. For a claim about how a product behaves that has no source, look it up in that vendor\'s official documentation (Anthropic docs for Claude and Claude Code, OpenAI docs for Codex, the vendor\'s own docs for any other product) and put the URL you found in the fix; if the docs do not confirm it, the fix is to remove the claim (writing guide section 5, "공식 문서로 보강하기").',
   },
   {
     key: 'story',
@@ -130,9 +130,21 @@ const REVIEWERS = [
     key: 'kit',
     model: 'sonnet',
     rubric: 'D (kit clarity and safety)',
-    lens: 'You are a cautious senior engineer about to run this kit on your own repo. Check that frontmatter apply.goal/changes/doesNotDo match kit/prompt.md and kit/checklist.md exactly, that frontmatter tryIt is read-only (changes no files) and helps decide whether to run the kit, that the prompt stops when unfit, asks for approval before changes, verifies by running commands, and actually implements this article\'s idea.',
+    lens: 'You are a cautious senior engineer about to run this kit on your own repo. Check that frontmatter apply.goal/changes/doesNotDo match kit/prompt.md and kit/checklist.md exactly, that frontmatter tryIt is read-only (changes no files) and helps decide whether to run the kit, that the prompt stops when unfit, asks for approval before changes, verifies by running commands, and actually implements this article\'s idea. Check every config key, file location and command in kit/prompt.md against the vendor\'s official documentation.',
   },
 ]
+
+// Knows nothing about the project: reads only the page-order text, never the guide, rubric or repo.
+const BLIND_READER = (slug) => `You are a Korean developer seeing this website for the first time. You know nothing about the project.
+Run exactly one command: \`npm run -s render:article -- ${slug}\`. Its output is the article page as a reader sees it, top to bottom.
+In that text, "[용어 팝오버(클릭 시 표시): ...]" is a popover shown only when the reader clicks the word, and "[접힌 영역: ...]" with "[펼치면 보이는 내용: ...]" is a section that stays folded until clicked.
+Do not open any other file, do not read the repository or its docs, and do not run git. Read the output from the top as a real reader would, without skipping, and note every place you stopped, got bored or got confused.
+Score one key, "reader", from 1 to 5:
+5 = nothing stopped you, and at the end you can say what you learned and what you can do.
+4 = one or two snags, but you followed the flow.
+3 = the summary and the body disagree, the same point repeats, or unexplained words stopped you several times.
+1-2 = you could not tell what the article is about or what the kit does.
+Put a contradiction between the summary and the body in "blocking". For every fix, quote the exact text, say why it stopped you, and give a concrete rewrite in natural Korean.`
 
 const label = (it) => it.slug
 
@@ -148,6 +160,7 @@ ${it.people?.length ? `People involved: ${it.people.join(', ')}` : ''}
 Already registered people (do not re-research their roles unless wrong): see content/people.yaml.
 
 Prefer primary sources. Read dates on the source page itself. Collect only quotes whose exact wording you saw.
+For claims about how a product behaves (Claude Code, Codex, Cursor and so on), use that vendor's official documentation as the source and record accessedAt when the page has no date.
 For each person not yet in content/people.yaml, look for a photo on Wikimedia Commons and include it only if the file page shows a reuse license from: CC0, CC BY 2.0/3.0/4.0, CC BY-SA 2.0/3.0/4.0, Public domain. Use the upload.wikimedia.org image URL and the Commons file page as sourceUrl.`,
     { label: `research:${label(it)}`, phase: 'Research', model: MODELS.research, schema: RESEARCH }),
 ))
@@ -195,15 +208,19 @@ Only edit files inside content/articles/${it.slug}/. Run \`npm run validate:cont
     let round = 0
     let reviews = []
     while (true) {
-      reviews = (await parallel(REVIEWERS.map((rv) => () =>
-        agent(`${SHARED_RULES}
+      reviews = (await parallel([
+        ...REVIEWERS.map((rv) => () =>
+          agent(`${SHARED_RULES}
 
 ${rv.lens}
 Review content/articles/${it.slug}/ (index.mdx and kit/) against docs/review-rubric.md sections ${rv.rubric}.
 Score only those sections, using keys from: facts, people, story, timing, kit. Do not edit any files.
 Every fix must name the exact place and a concrete rewrite.`,
-          { label: `review:${rv.key}:${label(it)}#${round}`, phase: 'Review', model: rv.model, schema: REVIEW }),
-      ))).filter(Boolean)
+            { label: `review:${rv.key}:${label(it)}#${round}`, phase: 'Review', model: rv.model, schema: REVIEW })),
+        // No SHARED_RULES: this reviewer must not read the writing guide or rubric.
+        () => agent(BLIND_READER(it.slug),
+          { label: `review:reader:${label(it)}#${round}`, phase: 'Review', model: 'opus', schema: REVIEW }),
+      ])).filter(Boolean)
 
       const low = reviews.flatMap((rv) => Object.entries(rv.scores).filter(([, s]) => s < 4).map(([k, s]) => `${k}=${s}`))
       const blocking = reviews.flatMap((rv) => rv.blocking)
@@ -216,6 +233,7 @@ Every fix must name the exact place and a concrete rewrite.`,
       await agent(`${SHARED_RULES}
 
 Revise content/articles/${it.slug}/ to address these reviews. Blocking items first. If a fix needs a fact that is not verifiable, remove the claim instead of guessing.
+For a claim about how a product behaves, you may confirm it in that vendor's official documentation and add the page to sources (accessedAt when it has no date). State the docs' date in the sentence if the article is about an earlier event, and never use vendor docs as evidence of an effect such as quality or speed (writing guide section 5, "공식 문서로 보강하기").
 ${JSON.stringify(reviews, null, 2)}
 Only edit files inside content/articles/${it.slug}/. Keep draft: true. Run \`npm run validate:content\` until it passes.`,
         { label: `revise:${label(it)}#${round}`, phase: 'Revise', model: MODELS.revise })
