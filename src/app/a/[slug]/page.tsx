@@ -7,6 +7,7 @@ import { GlossaryList } from "@/components/GlossaryList";
 import { KitSection } from "@/components/KitSection";
 import { PersonCard } from "@/components/PersonCard";
 import { RelatedArticles } from "@/components/RelatedArticles";
+import { ShareButton } from "@/components/ShareButton";
 import { SourceAge } from "@/components/SourceAge";
 import { Comments } from "@/components/comments/Comments";
 import { LikeButton, LikeButtonSkeleton } from "@/components/likes/LikeButton";
@@ -104,6 +105,7 @@ async function ArticleView({ slug }: { slug: string }) {
           <Suspense fallback={<LikeButtonSkeleton />}>
             <LikeButton slug={article.slug} />
           </Suspense>
+          <ShareButton slug={article.slug} title={article.title} text={article.summary} />
         </div>
       </header>
 

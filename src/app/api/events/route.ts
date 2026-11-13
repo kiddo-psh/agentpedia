@@ -5,7 +5,7 @@ import { trackAfterResponse } from "@/events/track";
 // Browsers may only report these; downloads and MCP calls are recorded server-side.
 const Body = z.object({
   slug: z.string().max(200),
-  kind: z.enum(["view", "web_copy"]),
+  kind: z.enum(["view", "web_copy", "share"]),
 });
 
 export async function POST(request: Request) {

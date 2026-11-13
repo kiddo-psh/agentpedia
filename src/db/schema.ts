@@ -47,14 +47,15 @@ export const likes = pgTable(
 export const EVENT_KINDS = [
   "view",
   "web_copy",
+  "share",
   "kit_download",
   "mcp_get_article",
   "mcp_get_kit",
   "mcp_prompt",
 ] as const;
 export type EventKind = (typeof EVENT_KINDS)[number];
-/** Every kind except `view` counts toward the apply rate. */
-export const APPLY_KINDS = EVENT_KINDS.filter((k) => k !== "view");
+/** Every kind except `view` and `share` counts toward the apply rate. */
+export const APPLY_KINDS = EVENT_KINDS.filter((k) => k !== "view" && k !== "share");
 
 /** Append-only. Raw IPs and user agents are never stored, only a daily salted hash. */
 export const events = pgTable(

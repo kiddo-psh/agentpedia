@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, type ReactNode } from "react";
 
-type ClientEventKind = "view" | "web_copy";
+type ClientEventKind = "view" | "web_copy" | "share";
 
 export function sendEvent(slug: string, kind: ClientEventKind) {
   const body = JSON.stringify({ slug, kind });
