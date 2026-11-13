@@ -23,12 +23,16 @@ export function KitSection({ article }: { article: Article }) {
       <h2 id="kit-title" className="text-xl font-bold">
         내 프로젝트에 적용하기
       </h2>
-      <p className="mt-2 leading-relaxed">{apply.goal}</p>
+      <p className="mt-2 text-sm text-muted">
+        키트는 코딩 에이전트에게 건네는 작업 지시문(<code className="font-mono">prompt.md</code>)과 점검표(
+        <code className="font-mono">checklist.md</code>) 묶음입니다. 이 글의 키트는 다음 일을 합니다.
+      </p>
+      <p className="mt-3 leading-relaxed">{apply.goal}</p>
       <p className="mt-1 text-sm text-muted">
         {apply.time} · {apply.fitsWhen}
       </p>
 
-      <Step n={1} title="맞는지 먼저 진단하기" note="파일을 바꾸지 않습니다">
+      <Step n={1} title="내 레포에 맞는지 진단하기" note="파일을 바꾸지 않습니다">
         <div className="overflow-hidden rounded-xl border border-foreground/15 bg-background">
           <div className="flex items-center justify-between gap-3 border-b border-foreground/10 bg-foreground/[.03] px-4 py-2">
             <span className="text-xs font-medium text-muted">아무 코딩 에이전트에나 붙여 넣으세요</span>
