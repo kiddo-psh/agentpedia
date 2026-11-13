@@ -1,4 +1,5 @@
 import { evaluate } from "@mdx-js/mdx";
+import type { ComponentProps } from "react";
 import * as runtime from "react/jsx-runtime";
 import remarkGfm from "remark-gfm";
 import type { Article, MdxComponentName } from "@/content/schema";
@@ -25,7 +26,16 @@ export async function ArticleBody({ article }: { article: Article }) {
   });
   return (
     <div className="prose-article">
-      <Content components={componentsFor(article)} />
+      <Content components={{ ...componentsFor(article), table: ScrollTable }} />
+    </div>
+  );
+}
+
+/** A wide table scrolls on its own so a phone never scrolls the whole page sideways. */
+function ScrollTable(props: ComponentProps<"table">) {
+  return (
+    <div className="table-scroll">
+      <table {...props} />
     </div>
   );
 }
