@@ -12,6 +12,7 @@ import { Comments } from "@/components/comments/Comments";
 import { ArticleBody } from "@/components/mdx/ArticleBody";
 import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatDate, newestPublished, sourcePeriod } from "@/content/labels";
 import { getArticle, getRelatedGraph, listArticles } from "@/content/loader";
+import type { Article } from "@/content/schema";
 
 // Cache Components requires at least one param; a placeholder 404s when nothing is published.
 const PLACEHOLDER = "__none__";
@@ -48,6 +49,31 @@ function ArticleSkeleton() {
   );
 }
 
+/** Up to two people get cards; a study with many authors gets one line so the brief stays in view. */
+function People({ persons }: { persons: Article["persons"] }) {
+  if (persons.length <= 2) {
+    return (
+      <div className="mt-6 flex flex-wrap gap-x-8 gap-y-4">
+        {persons.map((p) => (
+          <PersonCard key={p.id} person={p} />
+        ))}
+      </div>
+    );
+  }
+  return (
+    <p className="mt-5 text-sm text-muted">
+      {persons.map((p, i) => (
+        <span key={p.id}>
+          {i > 0 && " · "}
+          <span className="font-medium text-foreground" title={p.role}>
+            {p.nameKo}
+          </span>
+        </span>
+      ))}
+    </p>
+  );
+}
+
 async function ArticleView({ slug }: { slug: string }) {
   const article = getArticle(slug);
   if (!article) notFound();
@@ -71,13 +97,7 @@ async function ArticleView({ slug }: { slug: string }) {
         </div>
         <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{article.title}</h1>
         {/* `summary` feeds the list and metadata; here the 30-second brief below says the same thing. */}
-        {article.persons.length > 0 && (
-          <div className="mt-6 flex flex-wrap gap-x-8 gap-y-4">
-            {article.persons.map((p) => (
-              <PersonCard key={p.id} person={p} />
-            ))}
-          </div>
-        )}
+        {article.persons.length > 0 && <People persons={article.persons} />}
       </header>
 
       <ArticleBrief article={article} />
