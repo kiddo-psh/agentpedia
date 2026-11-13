@@ -22,6 +22,9 @@ export function UserMenu() {
 
   return (
     <span className="flex items-center gap-3">
+      <Link href="/likes" className="hover:text-foreground">
+        좋아요한 글
+      </Link>
       <span className="text-foreground">{data.user.name}</span>
       <button
         type="button"
