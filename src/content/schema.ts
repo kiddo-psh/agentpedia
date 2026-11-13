@@ -79,7 +79,11 @@ export type Brief = z.infer<typeof Brief>;
 export const ArticleMeta = z
   .object({
     slug: z.string().regex(/^[a-z0-9-]+$/),
-    title: z.string().min(1),
+    // A "hook: description" title hides the topic behind a hook readers cannot parse yet.
+    title: z
+      .string()
+      .min(1)
+      .refine((t) => !t.includes(":"), 'no ":" in titles. Drop the hook and keep the plain description'),
     summary: z.string().min(1).max(200),
     category: Category,
     /** Ids from content/people.yaml. */

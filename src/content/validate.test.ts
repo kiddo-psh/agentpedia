@@ -114,6 +114,11 @@ describe("parseArticle", () => {
     expect(!bad.ok && bad.issues.join("\n")).toMatch(/frontmatter\.brief\.what/);
   });
 
+  it("rejects a hook-colon title", () => {
+    const bad = parse(mdx("body", { title: `"로봇 말고 슈트를: 카파시의 Software 3.0"` }));
+    expect(!bad.ok && bad.issues.join("\n")).toMatch(/frontmatter\.title: no ":" in titles/);
+  });
+
   it("rejects body headings but allows a scene break", () => {
     const bad = parse(mdx("첫 문단입니다.\n\n## 소제목\n\n둘째 문단입니다."));
     expect(!bad.ok && bad.issues.join("\n")).toMatch(/body headings are not allowed/);
