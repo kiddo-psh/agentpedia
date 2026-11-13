@@ -1,5 +1,14 @@
 import { sql } from "drizzle-orm";
-import { bigserial, index, pgTable, text, timestamp, uuid, type AnyPgColumn } from "drizzle-orm/pg-core";
+import {
+  bigserial,
+  index,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid,
+  type AnyPgColumn,
+} from "drizzle-orm/pg-core";
 import { user } from "./auth-schema";
 
 export * from "./auth-schema";
@@ -20,6 +29,19 @@ export const comments = pgTable(
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
   },
   (t) => [index("comments_article_created_idx").on(t.articleSlug, t.createdAt)],
+);
+
+/** One row per (user, article); the primary key makes a second like a no-op. */
+export const likes = pgTable(
+  "likes",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    articleSlug: text("article_slug").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.articleSlug] }), index("likes_article_idx").on(t.articleSlug)],
 );
 
 export const EVENT_KINDS = [
