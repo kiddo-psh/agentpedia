@@ -70,7 +70,7 @@ async function ArticleView({ slug }: { slug: string }) {
           )}
         </div>
         <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{article.title}</h1>
-        <p className="mt-4 text-lg leading-relaxed text-muted">{article.summary}</p>
+        {/* `summary` feeds the list and metadata; here the 30-second brief below says the same thing. */}
         {article.persons.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-x-8 gap-y-4">
             {article.persons.map((p) => (

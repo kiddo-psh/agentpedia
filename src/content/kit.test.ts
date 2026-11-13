@@ -14,6 +14,7 @@ const article: Article = {
     { id: "a", title: "Src", url: "https://example.com", author: "Au", kind: "blog", publishedAt: new Date() },
   ],
   keyIdeas: ["idea one"],
+  brief: { what: "w", why: "y", action: "a" },
   difficulty: "intro",
   apply: { goal: "g", changes: ["a", "b"], doesNotDo: ["c"], fitsWhen: "f", time: "t" },
   tryIt: "p",

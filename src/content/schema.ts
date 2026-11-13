@@ -91,8 +91,8 @@ export const ArticleMeta = z
       .refine((ss) => ss.some((s) => s.publishedAt), "at least one source must have publishedAt"),
     keyIdeas: z.array(z.string().min(1)).min(1).max(7),
     difficulty: z.enum(["intro", "practical", "deep"]),
-    /** Structured summary shown above the story. Required for new articles by the writing guide. */
-    brief: Brief.optional(),
+    /** The 30-second summary: the only summary shown above the story. */
+    brief: Brief,
     /** What running the kit does to a reader's repo, shown before they run it. */
     apply: z.object({
       goal: z.string().min(1).max(120),

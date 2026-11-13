@@ -11,6 +11,7 @@ function mdx(body: string, overrides: Record<string, string> = {}) {
     category: "people",
     difficulty: "intro",
     publishedAt: "2026-11-01",
+    brief: "{ what: 무슨 일, why: 중요합니다, action: 키트를 돌립니다 }",
     ...overrides,
   };
   return [
