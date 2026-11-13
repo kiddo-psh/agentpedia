@@ -15,7 +15,7 @@
     "mcp:smoke": "tsx scripts/mcp-smoke.mts",
     "preview": "tsx scripts/preview.mts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "tsx scripts/migrate.mts"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.16",
