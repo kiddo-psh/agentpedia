@@ -6,6 +6,10 @@ category: trends
 people: [peter-steinberger]
 tags: ["agentic-coding", "cli-first", "workflow", "codex"]
 difficulty: practical
+brief:
+  what: "2025년 12월, PSPDFKit 창업자 피터 스타인버거가 코드를 거의 읽지 않고 에이전트로 개발하는 자신의 방식을 블로그에 공개했습니다."
+  why: "구현을 에이전트가 맡으면 사람의 일은 언어·의존성·설계를 고르고 에이전트가 결과를 스스로 확인하게 만드는 쪽으로 옮겨 갑니다."
+  action: "키트로 핵심 기능 하나를 CLI 명령으로 노출해 에이전트가 직접 실행하고 출력으로 결과를 확인하게 합니다."
 apply:
   goal: "핵심 기능 하나를 에이전트가 직접 실행하고 출력으로 결과를 확인할 수 있는 CLI 명령으로 노출합니다."
   changes:
@@ -60,7 +64,7 @@ sources:
 The amount of software I can create is now mostly limited by inference time and hard thinking.
 </Quote>
 
-모든 소프트웨어에 깊은 고민이 필요한 건 아니라고도 했습니다. 대부분의 앱은 데이터를 다른 형태로 바꾸고, 저장하고, 보여 주는 일을 할 뿐이라는 설명입니다.
+이제 그가 만들 수 있는 소프트웨어의 양은 주로 추론 시간과 깊은 고민에 달려 있다는 말입니다. 모든 소프트웨어에 깊은 고민이 필요한 건 아니라고도 했습니다. 대부분의 앱은 데이터를 다른 형태로 바꾸고, 저장하고, 보여 주는 일을 할 뿐이라는 설명입니다.
 
 이런 변화를 그가 확실히 느낀 건 GPT 5부터입니다. 소프트웨어를 공장처럼 빠르게 만들어 내기 시작한 계기였다고 씁니다. GPT 5 이후 그는 코드를 거의 읽지 않습니다. 에이전트가 일하는 과정을 지켜보다가 가끔 중요한 부분만 열어 봅니다.
 
@@ -72,7 +76,9 @@ The amount of software I can create is now mostly limited by inference time and 
 The important decisions these days are language/ecosystem and dependencies.
 </Quote>
 
-2025년 12월 기준으로 그는 웹에는 TypeScript, CLI에는 Go를 씁니다. macOS 기능이 필요하거나 UI가 있으면 Swift를 씁니다. Go는 몇 달 전만 해도 고려하지 않던 언어입니다. 에이전트가 Go를 잘 쓰고, 타입 시스템이 단순해서 린트가 빠르다는 이유로 골랐다고 합니다.
+요즘 중요한 결정은 언어와 생태계, 그리고 의존성이라는 뜻입니다.
+
+2025년 12월 기준으로 그는 웹에는 TypeScript, <Term id="cli">CLI</Term>에는 Go를 씁니다. macOS 기능이 필요하거나 UI가 있으면 Swift를 씁니다. Go는 몇 달 전만 해도 고려하지 않던 언어입니다. 에이전트가 Go를 잘 쓰고, 타입 시스템이 단순해서 린트가 빠르다는 이유로 골랐다고 합니다.
 
 Mac과 iOS 개발에서도 Xcode는 크게 필요 없고, xcodeproj 파일도 쓰지 않는다고 합니다. codex가 iOS 앱을 실행하고 시뮬레이터를 다룰 줄 알기 때문입니다.
 
@@ -87,7 +93,7 @@ Mac과 iOS 개발에서도 Xcode는 크게 필요 없고, xcodeproj 파일도 �
 The simplest form is text, so by default, whatever I wanna build, it starts as CLI. Agents can call it directly and verify output - closing the loop.
 </Quote>
 
-인용문의 "closing the loop"는 에이전트가 만들고, 실행하고, 결과를 확인하는 과정을 사람 없이 혼자 끝낸다는 뜻입니다. 그가 드는 예는 YouTube 영상을 요약하는 크롬 확장 프로그램입니다. 먼저 summarize라는 CLI로 핵심 기능을 완성했고, 그다음 확장 프로그램 전체를 하루 만에 만들었다고 합니다. 글의 다른 부분에서도 무엇을 만들든 모델과 CLI부터 시작하라고 권합니다.
+가장 단순한 형태는 텍스트라서, 무엇을 만들든 CLI로 시작하면 에이전트가 직접 호출하고 출력을 확인할 수 있다는 설명입니다. 인용문의 "closing the loop"는 에이전트가 만들고, 실행하고, 결과를 확인하는 과정을 사람 없이 혼자 끝낸다는 뜻입니다. 그가 드는 예는 YouTube 영상을 요약하는 크롬 확장 프로그램입니다. 먼저 summarize라는 CLI로 핵심 기능을 완성했고, 그다음 확장 프로그램 전체를 하루 만에 만들었다고 합니다. 글의 다른 부분에서도 무엇을 만들든 모델과 CLI부터 시작하라고 권합니다.
 
 <Compare
   before="UI부터 만들고, 동작은 사람이 화면을 눌러 보며 확인한다"
@@ -98,13 +104,13 @@ The simplest form is text, so by default, whatever I wanna build, it starts as C
 
 추론 시간이 병목이라면 빠른 모델이 나아 보입니다. 그의 경험은 반대였습니다. codex는 코드를 쓰기 전에 10~15분 동안 파일을 읽기도 합니다. Opus는 더 서두르는 편이라 작은 수정에는 좋지만, 큰 기능이나 리팩터링에는 덜 맞는다고 평가합니다. 같은 작업에 codex가 4배 오래 걸려도 결과를 다시 고칠 일이 없어서 결국 더 빠르다고 합니다.
 
-모드를 고르는 데도 시간을 쓰지 않습니다. 기본 모델은 gpt-5.2-codex이고, 거의 모든 작업을 high 추론 수준으로 돌립니다. xhigh는 훨씬 느리기만 하고 나은 점이 거의 없다고 봅니다. GPT 5.2와 codex는 충분히 비슷해서 모델을 바꿀 이유도 없다고 합니다. Opus는 컴퓨터 자동화 작업과 개인 AI 비서에 씁니다. 글 끝에는 이 설정이 담긴 `~/.codex/config.toml`도 공개했습니다.
+모드를 고르는 데도 시간을 쓰지 않습니다. 기본 모델은 gpt-5.2-codex이고, 거의 모든 작업을 high <Term id="reasoning-effort">추론 수준</Term>으로 돌립니다. xhigh는 훨씬 느리기만 하고 나은 점이 거의 없다고 봅니다. GPT 5.2와 codex는 충분히 비슷해서 모델을 바꿀 이유도 없다고 합니다. Opus는 컴퓨터 자동화 작업과 개인 AI 비서에 씁니다. 글 끝에는 이 설정이 담긴 `~/.codex/config.toml`도 공개했습니다.
 
-구체적인 사례도 있습니다. 그는 예전에 VibeTunnel 멀티플렉서의 핵심 부분을 TypeScript에서 Rust, Go, zig로 옮기려 했지만, 당시 모델들은 번번이 실패했다고 합니다. 이번에는 포워딩 시스템 전체를 zig로 바꾸라는 두 문장짜리 프롬프트를 codex에 줬습니다. codex는 5시간 넘게 일하며 컴팩션을 여러 번 거쳤고, 한 번에 동작하는 결과를 내놓았다고 합니다.
+구체적인 사례도 있습니다. 그는 예전에 VibeTunnel 멀티플렉서의 핵심 부분을 TypeScript에서 Rust, Go, zig로 옮기려 했지만, 당시 모델들은 번번이 실패했다고 합니다. 이번에는 포워딩 시스템 전체를 zig로 바꾸라는 두 문장짜리 프롬프트를 codex에 줬습니다. codex는 5시간 넘게 일하며 <Term id="compaction">컴팩션</Term>을 여러 번 거쳤고, 한 번에 동작하는 결과를 내놓았다고 합니다.
 
-모델이 좋아지자 더 강한 모델을 따로 불러 쓸 일도 줄었습니다. 글을 쓰기 한 달쯤 전, 그는 에이전트가 GPT 5 Pro를 호출할 수 있게 해 주는 CLI 'oracle'을 만들었습니다. 처음에는 하루에 여러 번 썼지만, GPT 5.2가 나온 뒤에는 일주일에 몇 번으로 줄었다고 합니다. GPT 5.2의 지식 컷오프가 Opus보다 5개월쯤 늦다는 점도 언급합니다.
+모델이 좋아지자 더 강한 모델을 따로 불러 쓸 일도 줄었습니다. 글을 쓰기 한 달쯤 전, 그는 에이전트가 GPT 5 Pro를 호출할 수 있게 해 주는 CLI 'oracle'을 만들었습니다. 처음에는 하루에 여러 번 썼지만, GPT 5.2가 나온 뒤에는 일주일에 몇 번으로 줄었다고 합니다. GPT 5.2의 <Term id="knowledge-cutoff">지식 컷오프</Term>가 Opus보다 5개월쯤 늦다는 점도 언급합니다.
 
-작업 절차도 단순해졌습니다. 스타인버거는 별도의 계획 모드를 쓰지 않습니다. 모델에게 질문하고, 검색과 코드 탐색을 시키면서 대화로 계획을 세웁니다. 계획이 마음에 들면 "build"라고 쓰거나 "write plan to docs/*.md and build this"라고 씁니다. 계획 모드는 프롬프트를 잘 따르지 못하던 예전 모델 때문에 필요했던 임시방편이라고 봅니다.
+작업 절차도 단순해졌습니다. 스타인버거는 별도의 <Term id="plan-mode">계획 모드</Term>를 쓰지 않습니다. 모델에게 질문하고, 검색과 코드 탐색을 시키면서 대화로 계획을 세웁니다. 계획이 마음에 들면 "build"라고 쓰거나 "write plan to docs/*.md and build this"라고 씁니다. 계획 모드는 프롬프트를 잘 따르지 못하던 예전 모델 때문에 필요했던 임시방편이라고 봅니다.
 
 ---
 
@@ -118,13 +124,15 @@ The simplest form is text, so by default, whatever I wanna build, it starts as C
 After all, I don’t design codebases to be easy to navigate for me, I engineer them so agents can work in it efficiently.
 </Quote>
 
+코드베이스를 자기가 둘러보기 편하게가 아니라 에이전트가 효율적으로 일할 수 있게 설계한다는 말입니다.
+
 일하는 방식도 과감합니다. 되돌리기나 체크포인트는 거의 쓰지 않고, 문제가 생기면 모델에게 고쳐 달라고 합니다. main 브랜치에 바로 커밋하고, 워크트리는 가끔만 씁니다. 그리고 바로 이 대목에서 직접 조건을 붙입니다.
 
 <Quote source="post">
 Caveat: I usually work alone, if you work in a bigger team that workflow obv won’t fly.
 </Quote>
 
-리뷰와 브랜치 규칙이 있는 팀이라면 이 방식을 그대로 가져올 수 없습니다. CLI로 에이전트가 스스로 확인하게 하는 습관처럼 팀 규칙과 부딪히지 않는 부분만 골라 쓰는 편이 낫습니다.
+자신은 보통 혼자 일하니 큰 팀에서는 이 방식이 통하지 않을 거라는 단서입니다. 리뷰와 브랜치 규칙이 있는 팀이라면 그대로 따라 하기 어렵습니다. CLI로 에이전트가 스스로 확인하게 하는 습관처럼 팀 규칙과 부딪히지 않는 부분만 골라 쓰는 편이 낫습니다.
 
 시점도 감안해야 합니다. 이 글은 그가 OpenAI에 합류하기 전, gpt-5.2-codex를 기본 모델로 쓰던 2025년 12월의 기록입니다. codex와 Opus 비교, oracle 사용 빈도, 지식 컷오프 차이는 모두 당시 모델을 쓴 한 사람의 경험입니다. 모델이 바뀌면 이 비교도 쉽게 달라질 수 있습니다.
 

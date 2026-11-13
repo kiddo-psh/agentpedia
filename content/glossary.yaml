@@ -149,3 +149,71 @@
   term: 서비스 계정
   en: service account
   definition: 사람이 아니라 프로그램이 쓰는 별도 계정입니다. 에이전트가 사용자 권한을 위임받아 일하는 방식과 대비해 논의됩니다.
+
+- id: software-3-0
+  term: Software 3.0
+  definition: 카파시가 소프트웨어를 셋으로 나눈 틀입니다. 사람이 쓴 코드(1.0), 학습한 신경망 가중치(2.0)에 이어, 영어로 쓴 프롬프트가 LLM을 움직이는 프로그램이 됐다는 뜻입니다.
+
+- id: partial-autonomy
+  term: 부분 자율
+  en: partial autonomy
+  definition: AI가 일을 하되 사람이 결과를 확인하고 승인하는 방식입니다. AI에게 맡기는 범위를 자율성 슬라이더처럼 조금씩 넓혀 갑니다.
+
+- id: context-window
+  term: 컨텍스트 창
+  en: context window
+  definition: LLM이 한 번에 읽고 기억할 수 있는 입력의 범위입니다. 이 창을 벗어나거나 세션이 끝나면 모델은 그 내용을 잊습니다.
+
+- id: prompt-injection
+  term: 프롬프트 인젝션
+  en: prompt injection
+  definition: 웹 페이지나 문서 같은 입력에 지시문을 숨겨 LLM이 원래 사용자의 뜻과 다르게 행동하게 만드는 공격입니다.
+
+- id: vibe-coding
+  term: 바이브 코딩
+  en: vibe coding
+  definition: 코드를 한 줄씩 직접 쓰지 않고, 원하는 것을 말로 설명해 AI가 코드를 만들게 하는 개발 방식입니다. 카파시가 붙인 이름입니다.
+
+- id: llms-txt
+  term: llms.txt
+  definition: 사이트 루트에 두는 마크다운 파일로, LLM이 그 사이트의 핵심 문서를 찾아 읽게 안내합니다. 검색 로봇용 robots.txt에 빗댄 제안입니다.
+
+- id: feedback-loop
+  term: 피드백 루프
+  en: feedback loop
+  definition: 에이전트가 작업한 뒤 테스트나 실행으로 결과를 직접 확인하고, 그 결과를 보고 다시 고치는 반복입니다. 사람이 확인하기 전에 에이전트가 스스로 오류를 잡습니다.
+
+- id: plan-mode
+  term: 계획 모드
+  en: plan mode
+  definition: 코딩 에이전트가 파일을 고치지 않고 코드를 읽으며 구현 계획만 세우는 모드입니다. 계획이 정해지면 일반 모드로 바꿔 구현합니다.
+
+- id: slash-command
+  term: 슬래시 명령
+  en: slash command
+  definition: 채팅 입력창에 `/이름`으로 실행하는 미리 정의한 프롬프트입니다. Claude Code에서는 `.claude/commands/`에 마크다운 파일로 만들어 팀과 공유합니다.
+
+- id: extended-thinking
+  term: 확장 사고
+  en: extended thinking
+  definition: 모델이 답하기 전에 추론 과정을 길게 거치도록 하는 기능입니다. 켜면 느려지고 토큰을 더 쓰지만 어려운 작업의 정확도가 올라갑니다.
+
+- id: reasoning-effort
+  term: 추론 수준
+  en: reasoning effort
+  definition: 모델이 답하기 전에 생각에 쓸 노력의 정도를 정하는 설정입니다. low, medium, high처럼 고르며, 높을수록 느리고 비용이 큽니다.
+
+- id: compaction
+  term: 컴팩션
+  en: compaction
+  definition: 대화가 컨텍스트 창을 채우면 지난 내용을 요약해 줄이고 작업을 이어 가는 기능입니다. 긴 작업을 한 세션에서 계속할 수 있게 합니다.
+
+- id: knowledge-cutoff
+  term: 지식 컷오프
+  en: knowledge cutoff
+  definition: 모델이 학습한 데이터의 마지막 시점입니다. 그 뒤에 나온 라이브러리나 사건은 모델이 따로 검색하지 않으면 모릅니다.
+
+- id: git-worktree
+  term: 워크트리
+  en: git worktree
+  definition: 한 git 저장소에서 여러 브랜치를 서로 다른 폴더에 동시에 꺼내 두는 기능입니다. 에이전트 여러 개가 같은 레포에서 충돌 없이 따로 일할 때 씁니다.
