@@ -12,9 +12,9 @@ export function makeQuote(sources: Source[]) {
   return function Quote({ source, at, children }: { source: string; at?: string; children: ReactNode }) {
     const s = byId.get(source)!;
     return (
-      <figure className="not-prose my-8 border-l-4 border-foreground/80 pl-5">
-        <blockquote className="text-lg leading-relaxed [&_p]:m-0">{children}</blockquote>
-        <figcaption className="mt-2 text-sm text-muted">
+      <figure className="not-prose my-12">
+        <blockquote className="text-2xl leading-snug font-medium tracking-[-0.02em] sm:text-[28px] [&_p]:m-0">{children}</blockquote>
+        <figcaption className="mt-4 text-sm text-muted">
           — {s.author},{" "}
           <a href={sourceUrlAt(s, at)} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-foreground">
             {s.title}

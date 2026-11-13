@@ -25,11 +25,11 @@ export function RelatedArticles({ graph }: { graph: RelatedGraph }) {
   const at = new Map(related.map((r, i) => [r.slug, position(i, related.length)]));
 
   return (
-    <section aria-labelledby="related" className="mt-16 border-t border-foreground/10 pt-10">
-      <h2 id="related" className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted">
+    <section id="related" aria-labelledby="related-title" className="mt-24 scroll-mt-24">
+      <h2 id="related-title" className="mb-5 text-[22px] font-semibold tracking-tight">
         관련 기사
       </h2>
-      <svg viewBox={`0 0 ${W} ${H}`} className="mx-auto mb-6 block w-full max-w-md" aria-hidden>
+      <svg viewBox={`0 0 ${W} ${H}`} className="mx-auto mb-8 block w-full max-w-md" aria-hidden>
         <g className="stroke-foreground/20" strokeWidth={1}>
           {related.map((r) => (
             <line key={r.slug} x1={CENTER.x} y1={CENTER.y} x2={at.get(r.slug)!.x} y2={at.get(r.slug)!.y} />

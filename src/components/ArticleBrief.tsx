@@ -13,18 +13,18 @@ const ROWS = [
 export function ArticleBrief({ article }: { article: Article }) {
   const { brief } = article;
   return (
-    <section className="mb-12 rounded-xl bg-foreground/[.03] p-6" aria-labelledby="brief">
-      <h2 id="brief" className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted">
+    <section className="mb-14 scroll-mt-24 rounded-2xl bg-soft px-6 pt-5 pb-2" aria-labelledby="brief">
+      <h2 id="brief" className="text-[13px] font-medium text-muted">
         30초 요약
       </h2>
-      <dl className="grid gap-3 sm:grid-cols-[8.5rem_1fr] sm:gap-x-4">
+      <dl className="mt-1">
         {ROWS.map(([key, label]) => (
-          <div key={key} className="contents">
-            <dt className="text-sm font-semibold text-accent sm:pt-0.5">{label}</dt>
-            <dd className="mb-2 leading-relaxed sm:mb-0">
+          <div key={key} className="grid gap-1 border-t border-line py-3.5 first:border-t-0 sm:grid-cols-[8.5rem_1fr] sm:gap-4">
+            <dt className="text-[13px] font-medium text-muted sm:pt-0.5">{label}</dt>
+            <dd className="leading-relaxed">
               {brief[key]}
               {key === "action" && (
-                <a href="#kit" className="ml-2 whitespace-nowrap text-sm text-accent underline underline-offset-2">
+                <a href="#kit" className="ml-2 text-sm font-medium whitespace-nowrap underline underline-offset-4">
                   적용 방법 보기 ↓
                 </a>
               )}

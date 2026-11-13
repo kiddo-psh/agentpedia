@@ -6,7 +6,7 @@ import { setArticleLike } from "@/likes/actions";
 import type { LikeState } from "@/likes/service";
 
 const buttonClass =
-  "inline-flex items-center gap-1.5 rounded-md border border-foreground/15 px-2.5 py-1 text-sm hover:bg-foreground/5";
+  "inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm ring-1 ring-line ring-inset hover:bg-soft";
 
 export function LikeToggle({ slug, initial, signedIn }: { slug: string; initial: LikeState; signedIn: boolean }) {
   const [state, setState] = useState(initial);
@@ -45,7 +45,7 @@ export function LikeToggle({ slug, initial, signedIn }: { slug: string; initial:
         onClick={toggle}
         aria-pressed={optimistic.liked}
         aria-label={optimistic.liked ? "좋아요 취소" : "좋아요"}
-        className={`${buttonClass} ${optimistic.liked ? "border-rose-500/40 text-rose-600 dark:text-rose-400" : ""}`}
+        className={`${buttonClass} ${optimistic.liked ? "text-rose-600 ring-rose-500/40 dark:text-rose-400" : ""}`}
       >
         <Heart filled={optimistic.liked} />
         <span>{optimistic.count}</span>

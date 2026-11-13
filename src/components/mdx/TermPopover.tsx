@@ -74,7 +74,7 @@ export function TermPopover({ entry, children }: { entry: GlossaryEntry; childre
         popover="auto"
         role="dialog"
         aria-label={entry.term}
-        className="inset-auto m-0 w-[min(20rem,calc(100vw-2rem))] rounded-xl border border-foreground/15 bg-background p-4 text-sm text-foreground shadow-lg max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-0 max-sm:w-full max-sm:rounded-b-none max-sm:p-5"
+        className="inset-auto m-0 w-[min(20rem,calc(100vw-2rem))] rounded-2xl border border-line bg-background p-4 text-sm text-foreground shadow-lg max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-0 max-sm:w-full max-sm:rounded-b-none max-sm:p-5"
       >
         <span className="block font-semibold">
           {entry.term}

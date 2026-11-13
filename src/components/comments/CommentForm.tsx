@@ -34,7 +34,7 @@ export function CommentForm({
         maxLength={MAX_COMMENT_LENGTH}
         rows={parentId ? 2 : 3}
         placeholder={placeholder}
-        className="w-full resize-y rounded-lg border border-foreground/15 bg-background px-3 py-2 text-[0.95rem] leading-relaxed"
+        className="w-full resize-y rounded-xl bg-soft px-4 py-3 text-[0.95rem] leading-relaxed outline-none focus:ring-2 focus:ring-foreground/20"
       />
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-red-600" role="alert">
@@ -42,7 +42,7 @@ export function CommentForm({
         </p>
         <button
           disabled={pending}
-          className="shrink-0 rounded-lg bg-foreground px-4 py-1.5 text-sm font-semibold text-background disabled:opacity-50"
+          className="inline-flex h-9 shrink-0 items-center rounded-full bg-foreground px-4 text-sm font-medium text-background hover:opacity-85 disabled:opacity-50"
         >
           {pending ? "등록 중…" : parentId ? "답글 달기" : "댓글 달기"}
         </button>

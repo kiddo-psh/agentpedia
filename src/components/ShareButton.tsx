@@ -32,7 +32,7 @@ export function ShareButton({ slug, title, text }: { slug: string; title: string
     <button
       type="button"
       onClick={share}
-      className="inline-flex items-center gap-1.5 rounded-md border border-foreground/15 px-2.5 py-1 text-sm hover:bg-foreground/5"
+      className="inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm ring-1 ring-line ring-inset hover:bg-soft"
     >
       <svg viewBox="0 0 24 24" className="size-4" aria-hidden fill="none" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" />

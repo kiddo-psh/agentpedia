@@ -30,10 +30,10 @@ export async function Comments({ slug }: { slug: string }) {
     console.error(`[comments] failed to load for ${slug}`, err);
     return (
       <>
-        <h2 id="comments-title" className="text-xl font-bold">
+        <h2 id="comments-title" className="text-[22px] font-semibold tracking-tight">
           토론
         </h2>
-        <p className="mt-4 rounded-lg border border-dashed border-foreground/20 px-4 py-3 text-sm text-muted">
+        <p className="mt-4 rounded-xl bg-soft px-5 py-4 text-sm text-muted">
           지금은 토론을 불러올 수 없습니다. 기사는 그대로 읽을 수 있습니다.
         </p>
       </>
@@ -44,7 +44,7 @@ export async function Comments({ slug }: { slug: string }) {
 
   return (
     <>
-      <h2 id="comments-title" className="text-xl font-bold">
+      <h2 id="comments-title" className="text-[22px] font-semibold tracking-tight">
         토론 <span className="text-muted">{count}</span>
       </h2>
 
@@ -52,8 +52,8 @@ export async function Comments({ slug }: { slug: string }) {
         {session ? (
           <CommentForm slug={slug} />
         ) : (
-          <p className="rounded-lg border border-dashed border-foreground/20 px-4 py-3 text-sm text-muted">
-            <Link href={`/login?next=${encodeURIComponent(`/a/${slug}#comments`)}`} className="underline">
+          <p className="rounded-xl bg-soft px-5 py-4 text-sm text-muted">
+            <Link href={`/login?next=${encodeURIComponent(`/a/${slug}#comments`)}`} className="font-medium text-foreground underline underline-offset-4">
               로그인
             </Link>
             하고 토론에 참여하세요.
@@ -71,7 +71,7 @@ export async function Comments({ slug }: { slug: string }) {
               <div className="mt-2 pl-11">
                 {session && t.body !== null && <ReplyBox slug={slug} parentId={t.id} />}
                 {t.replies.length > 0 && (
-                  <ul className="mt-3 grid gap-4 border-l border-foreground/10 pl-4">
+                  <ul className="mt-3 grid gap-4 border-l border-line pl-4">
                     {t.replies.map((r) => (
                       <li key={r.id}>
                         <Comment c={r} me={me} />
@@ -95,7 +95,7 @@ function Comment({ c, me }: { c: CommentView; me?: string }) {
         // eslint-disable-next-line @next/next/no-img-element -- avatar URLs come from arbitrary OAuth hosts
         <img src={c.authorImage} alt="" className="size-8 shrink-0 rounded-full" />
       ) : (
-        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-foreground/10 text-sm font-semibold">
+        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-soft text-sm font-semibold">
           {c.authorName.slice(0, 1)}
         </span>
       )}

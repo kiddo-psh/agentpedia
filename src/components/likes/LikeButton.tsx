@@ -23,5 +23,5 @@ export async function LikeButton({ slug }: { slug: string }) {
 }
 
 export function LikeButtonSkeleton() {
-  return <span className="inline-block h-7 w-14 rounded-md bg-foreground/5" aria-hidden />;
+  return <span className="inline-block h-9 w-16 rounded-full bg-soft" aria-hidden />;
 }

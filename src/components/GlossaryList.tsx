@@ -7,13 +7,13 @@ import type { GlossaryEntry } from "@/content/schema";
 export function GlossaryList({ terms }: { terms: GlossaryEntry[] }) {
   if (terms.length === 0) return null;
   return (
-    <details className="group mt-10 rounded-xl border border-foreground/10 text-sm">
-      <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-muted hover:text-foreground">
+    <details className="group mt-12 rounded-2xl bg-soft text-sm">
+      <summary className="flex cursor-pointer list-none items-center gap-2 px-5 py-4 text-muted hover:text-foreground">
         <span className="inline-block transition-transform group-open:rotate-90">▸</span>
         <span className="font-semibold">이 글의 용어 {terms.length}개</span>
         <span className="truncate">· {terms.map((t) => t.term).join(", ")}</span>
       </summary>
-      <dl className="grid gap-3 border-t border-foreground/10 px-4 py-4">
+      <dl className="grid gap-3 border-t border-line px-5 py-4">
         {terms.map((t) => (
           <div key={t.id}>
             <dt className="font-semibold">

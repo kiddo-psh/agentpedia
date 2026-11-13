@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ApplyRail } from "@/components/ApplyRail";
 import { ArticleBrief } from "@/components/ArticleBrief";
 import { ArticleTracking } from "@/components/ArticleTracking";
 import { GlossaryList } from "@/components/GlossaryList";
@@ -55,11 +57,11 @@ export default function ArticlePage({ params }: PageProps<"/a/[slug]">) {
 
 function ArticleSkeleton() {
   return (
-    <div className="mx-auto max-w-3xl animate-pulse" aria-busy="true" aria-label="기사를 불러오는 중">
-      <div className="mb-4 h-4 w-40 rounded bg-foreground/10" />
-      <div className="mb-3 h-9 w-full rounded bg-foreground/10" />
-      <div className="mb-10 h-9 w-2/3 rounded bg-foreground/10" />
-      <div className="h-48 rounded-xl bg-foreground/5" />
+    <div className="mx-auto max-w-[720px] animate-pulse" aria-busy="true" aria-label="기사를 불러오는 중">
+      <div className="mb-5 h-4 w-40 rounded bg-soft" />
+      <div className="mb-3 h-11 w-full rounded bg-soft" />
+      <div className="mb-10 h-11 w-2/3 rounded bg-soft" />
+      <div className="h-48 rounded-2xl bg-soft" />
     </div>
   );
 }
@@ -92,15 +94,34 @@ function People({ persons }: { persons: Article["persons"] }) {
 async function ArticleView({ slug }: { slug: string }) {
   const article = getArticle(slug);
   if (!article) notFound();
+  const related = getRelatedGraph(article);
+  const sections: [string, string][] = [
+    ["brief", "30초 요약"],
+    ["kit", "적용 키트"],
+    ...(related.related.length > 0 ? [["related", "관련 기사"] as [string, string]] : []),
+    ["comments", "토론"],
+    ["sources", "출처"],
+  ];
 
   return (
     <ArticleTracking slug={article.slug}>
-    <article className="mx-auto max-w-3xl">
+    <div className="mx-auto max-w-[720px] xl:grid xl:max-w-none xl:grid-cols-[minmax(0,720px)_260px] xl:justify-center xl:gap-20">
+    <article className="min-w-0">
       <header className="mb-10">
-        <div className="mb-3 flex flex-wrap items-center gap-2 text-sm text-muted">
-          <span className="font-medium text-accent">{CATEGORY_LABEL[article.category]}</span>
-          <span>·</span>
-          <span>{DIFFICULTY_LABEL[article.difficulty]}</span>
+        <nav className="mb-5 text-sm text-muted" aria-label="위치">
+          <Link href="/" className="hover:text-foreground">
+            기사
+          </Link>
+          <span className="mx-1.5" aria-hidden>
+            ›
+          </span>
+          <Link href={`/c/${article.category}`} className="hover:text-foreground">
+            {CATEGORY_LABEL[article.category]}
+          </Link>
+        </nav>
+        <h1 className="text-3xl leading-[1.22] font-medium tracking-[-0.035em] sm:text-[44px]">{article.title}</h1>
+        <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted">
+          <span className="font-medium text-foreground">{DIFFICULTY_LABEL[article.difficulty]}</span>
           <span>·</span>
           <span title="출처가 나온 시점입니다">{sourcePeriod(article.sources)}</span>
           <SourceAge newestIso={newestPublished(article.sources).toISOString()} />
@@ -110,7 +131,6 @@ async function ArticleView({ slug }: { slug: string }) {
             </span>
           )}
         </div>
-        <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{article.title}</h1>
         {/* `summary` feeds the list and metadata; here the 30-second brief below says the same thing. */}
         {article.persons.length > 0 && <People persons={article.persons} />}
       </header>
@@ -121,7 +141,7 @@ async function ArticleView({ slug }: { slug: string }) {
       <GlossaryList terms={article.terms} />
 
       {/* Reactions come once the reader has finished the article. */}
-      <div className="mt-12 flex items-center justify-center gap-2">
+      <div className="mt-14 flex items-center justify-center gap-2">
         {/* The like count is request-time; a fixed-size placeholder keeps the row from shifting. */}
         <Suspense fallback={<LikeButtonSkeleton />}>
           <LikeButton slug={article.slug} />
@@ -131,22 +151,22 @@ async function ArticleView({ slug }: { slug: string }) {
 
       <KitSection article={article} />
 
-      <RelatedArticles graph={getRelatedGraph(article)} />
+      <RelatedArticles graph={related} />
 
-      <section id="comments" className="mt-16 border-t border-foreground/10 pt-10" aria-labelledby="comments-title">
+      <section id="comments" className="mt-24 scroll-mt-24" aria-labelledby="comments-title">
         {/* Comments are request-time data; the article above stays in the static shell. */}
         <Suspense fallback={<p className="text-sm text-muted">토론을 불러오는 중…</p>}>
           <Comments slug={article.slug} />
         </Suspense>
       </section>
 
-      <section className="mt-16 border-t border-foreground/10 pt-8" aria-labelledby="sources">
-        <h2 id="sources" className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted">
+      <section className="mt-24 scroll-mt-24" id="sources" aria-labelledby="sources-title">
+        <h2 id="sources-title" className="mb-4 text-[22px] font-semibold tracking-tight">
           출처
         </h2>
-        <ul className="grid gap-2 text-sm">
+        <ul className="border-b border-line text-sm">
           {article.sources.map((s) => (
-            <li key={s.id}>
+            <li key={s.id} className="border-t border-line py-3 leading-relaxed">
               <a href={s.url} target="_blank" rel="noreferrer" className="underline underline-offset-2">
                 {s.title}
               </a>
@@ -161,6 +181,8 @@ async function ArticleView({ slug }: { slug: string }) {
         </ul>
       </section>
     </article>
+    <ApplyRail article={article} sections={sections} />
+    </div>
     </ArticleTracking>
   );
 }

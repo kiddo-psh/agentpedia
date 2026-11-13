@@ -11,7 +11,7 @@ export function PersonCard({ person }: { person: Person }) {
       ) : (
         <span
           aria-hidden
-          className="grid size-12 shrink-0 place-items-center rounded-full bg-accent/10 text-lg font-semibold text-accent"
+          className="grid size-12 shrink-0 place-items-center rounded-full bg-soft text-lg font-semibold"
         >
           {person.nameKo.slice(0, 1)}
         </span>
