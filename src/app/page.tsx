@@ -52,7 +52,7 @@ export default function Home() {
           </h2>
           <CategoryChips articles={articles} active="all" />
         </div>
-        <ArticleList articles={articles} />
+        <ArticleList articles={articles} titleAs="h3" />
       </section>
     </WithIndex>
   );

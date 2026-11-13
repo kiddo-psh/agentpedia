@@ -14,7 +14,7 @@ export function ArticleBrief({ article }: { article: Article }) {
   const { brief } = article;
   return (
     <section className="mb-14 scroll-mt-24 rounded-2xl bg-soft px-6 pt-5 pb-2" aria-labelledby="brief">
-      <h2 id="brief" className="text-[13px] font-medium text-muted">
+      <h2 id="brief" className="scroll-mt-28 text-[13px] font-medium text-muted">
         30초 요약
       </h2>
       <dl className="mt-1">
