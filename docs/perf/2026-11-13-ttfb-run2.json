@@ -1,0 +1,139 @@
+{
+  "base": "http://localhost:3217",
+  "measuredAt": "2026-11-13T14:02:33.877Z",
+  "results": [
+    {
+      "route": "/",
+      "status": 200,
+      "cache": "HIT",
+      "bytes": 94284,
+      "runs": 30,
+      "ttfb": {
+        "p50": 15.3,
+        "p90": 31.4,
+        "min": 8.5,
+        "max": 36.4
+      },
+      "total": {
+        "p50": 16.6,
+        "p90": 34.8,
+        "min": 9.7,
+        "max": 40.5
+      }
+    },
+    {
+      "route": "/connect",
+      "status": 200,
+      "cache": "HIT",
+      "bytes": 16257,
+      "runs": 30,
+      "ttfb": {
+        "p50": 16.1,
+        "p90": 26,
+        "min": 6.7,
+        "max": 29.2
+      },
+      "total": {
+        "p50": 16.3,
+        "p90": 26.1,
+        "min": 7.1,
+        "max": 29.3
+      }
+    },
+    {
+      "route": "/login",
+      "status": 200,
+      "cache": "HIT",
+      "bytes": 10261,
+      "runs": 30,
+      "ttfb": {
+        "p50": 15.6,
+        "p90": 18.8,
+        "min": 5.9,
+        "max": 20.3
+      },
+      "total": {
+        "p50": 15.6,
+        "p90": 18.9,
+        "min": 5.9,
+        "max": 20.4
+      }
+    },
+    {
+      "route": "/likes",
+      "status": 200,
+      "cache": "1",
+      "bytes": 17340,
+      "runs": 30,
+      "ttfb": {
+        "p50": 21.6,
+        "p90": 51.6,
+        "min": 6.1,
+        "max": 53.7
+      },
+      "total": {
+        "p50": 46.1,
+        "p90": 84.1,
+        "min": 22.7,
+        "max": 105.7
+      }
+    },
+    {
+      "route": "/a/karpathy-software-3",
+      "status": 200,
+      "cache": "1",
+      "bytes": 165605,
+      "runs": 30,
+      "ttfb": {
+        "p50": 49.7,
+        "p90": 67.9,
+        "min": 12.2,
+        "max": 103
+      },
+      "total": {
+        "p50": 95.3,
+        "p90": 144.6,
+        "min": 67.4,
+        "max": 153.1
+      }
+    },
+    {
+      "route": "/a/anthropic-harness-design-long-running-apps",
+      "status": 200,
+      "cache": "1",
+      "bytes": 251507,
+      "runs": 30,
+      "ttfb": {
+        "p50": 49.2,
+        "p90": 88.3,
+        "min": 10.2,
+        "max": 101.4
+      },
+      "total": {
+        "p50": 112.5,
+        "p90": 159.1,
+        "min": 76.9,
+        "max": 189.6
+      }
+    },
+    {
+      "route": "/a/theo-coding-isnt-about-code-anymore",
+      "status": 200,
+      "cache": "1",
+      "bytes": 206332,
+      "runs": 30,
+      "ttfb": {
+        "p50": 52.3,
+        "p90": 84.2,
+        "min": 18.1,
+        "max": 129
+      },
+      "total": {
+        "p50": 118.7,
+        "p90": 171.6,
+        "min": 71.8,
+        "max": 186.3
+      }
+    }
+  ]
+}
