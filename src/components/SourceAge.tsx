@@ -13,11 +13,12 @@ const getServerNow = () => null;
  * "N개월 전" for the newest source. It depends on today's date, so it is computed in the
  * browser; the static page never bakes in the build date.
  */
-export function SourceAge({ newestIso }: { newestIso: string }) {
+export function SourceAge({ newestIso, staleOnly = false }: { newestIso: string; staleOnly?: boolean }) {
   const now = useSyncExternalStore(subscribe, getNow, getServerNow);
   if (now === null) return null;
   const months = monthsBetween(new Date(newestIso), new Date(now));
   const stale = months >= STALE_AFTER_MONTHS;
+  if (staleOnly && !stale) return null;
   return (
     <>
       <span aria-hidden>·</span>

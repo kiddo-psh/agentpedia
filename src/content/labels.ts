@@ -24,6 +24,8 @@ export const formatDate = (d: Date) => dateFormat.format(d);
 
 const monthFormat = new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "long", timeZone: "Asia/Seoul" });
 
+export const formatMonth = (d: Date) => monthFormat.format(d);
+
 type Dated = { publishedAt?: Date; accessedAt?: Date; dateNote?: string };
 
 /** Newest publication date; undated sources (accessedAt only) do not count. */

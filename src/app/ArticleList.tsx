@@ -1,64 +1,43 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
 import { SourceAge } from "@/components/SourceAge";
-import { CATEGORY_LABEL, DIFFICULTY_LABEL, newestPublished, sourcePeriod } from "@/content/labels";
-import type { ArticleMeta, Category } from "@/content/schema";
+import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatMonth, newestPublished } from "@/content/labels";
+import type { ArticleMeta } from "@/content/schema";
 
 export function ArticleList({ articles }: { articles: ArticleMeta[] }) {
-  const [category, setCategory] = useState<Category | "all">("all");
-  const present = Object.keys(CATEGORY_LABEL).filter((c) =>
-    articles.some((a) => a.category === c),
-  ) as Category[];
-  const shown = category === "all" ? articles : articles.filter((a) => a.category === category);
-
+  if (articles.length === 0) {
+    return <p className="py-16 text-center text-muted">아직 공개된 기사가 없습니다.</p>;
+  }
   return (
-    <>
-      <div className="mb-6 flex flex-wrap gap-2" role="tablist" aria-label="카테고리">
-        {(["all", ...present] as const).map((c) => (
-          <button
-            key={c}
-            type="button"
-            role="tab"
-            aria-selected={category === c}
-            onClick={() => setCategory(c)}
-            className="rounded-full border border-foreground/15 px-3 py-1 text-sm aria-selected:border-foreground aria-selected:bg-foreground aria-selected:text-background"
-          >
-            {c === "all" ? "전체" : CATEGORY_LABEL[c]}
-          </button>
-        ))}
-      </div>
-
-      {shown.length === 0 ? (
-        <p className="py-16 text-center text-muted">아직 공개된 기사가 없습니다.</p>
-      ) : (
-        <ul className="divide-y divide-foreground/10 border-y border-foreground/10">
-          {shown.map((a) => (
-            <li key={a.slug}>
-              <Link href={`/a/${a.slug}`} className="group block py-6">
-                <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-muted">
-                  <span className="font-medium text-accent">{CATEGORY_LABEL[a.category]}</span>
-                  <span>·</span>
-                  <span>{DIFFICULTY_LABEL[a.difficulty]}</span>
-                  <span>·</span>
-                  <span>{sourcePeriod(a.sources)}</span>
-                  <SourceAge newestIso={newestPublished(a.sources).toISOString()} />
-                  {a.draft && (
-                    <span className="rounded bg-amber-500/15 px-1.5 py-0.5 font-medium text-amber-600 dark:text-amber-400">
-                      초안
-                    </span>
-                  )}
-                </div>
-                <h2 className="text-lg font-semibold leading-snug group-hover:underline group-hover:underline-offset-4">
-                  {a.title}
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted">{a.summary}</p>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </>
+    <ul className="border-b border-line">
+      {articles.map((a) => (
+        <li key={a.slug} className="border-t border-line">
+          <Link href={`/a/${a.slug}`} className="group grid gap-x-8 gap-y-2 py-7 sm:grid-cols-[minmax(0,1fr)_auto]">
+            <div className="min-w-0">
+              <p className="flex items-center gap-2 text-[13px] font-medium text-muted">
+                {CATEGORY_LABEL[a.category]}
+                {a.draft && (
+                  <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-amber-700 dark:text-amber-400">초안</span>
+                )}
+              </p>
+              <h3 className="mt-1 text-lg leading-snug font-semibold tracking-tight group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+                {a.title}
+              </h3>
+              <p className="mt-1.5 line-clamp-2 text-[14.5px] leading-relaxed text-muted">{a.summary}</p>
+            </div>
+            <dl className="flex flex-wrap gap-x-3 text-[13px] text-muted sm:flex-col sm:items-end sm:text-right sm:leading-7">
+              <dt className="sr-only">난이도</dt>
+              <dd className="font-medium text-foreground">{DIFFICULTY_LABEL[a.difficulty]}</dd>
+              <dt className="sr-only">적용 시간</dt>
+              <dd>적용 {a.apply.time}</dd>
+              <dt className="sr-only">출처 시점</dt>
+              <dd className="flex gap-1.5">
+                {formatMonth(newestPublished(a.sources))} 자료
+                <SourceAge newestIso={newestPublished(a.sources).toISOString()} staleOnly />
+              </dd>
+            </dl>
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }
