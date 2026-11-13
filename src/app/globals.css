@@ -38,17 +38,12 @@ body {
     font-size: 1.0625rem;
     line-height: 1.85;
   }
-  .prose-article :where(h2):not(:where(.not-prose *)) {
-    margin: 2.75rem 0 1rem;
-    font-size: 1.5rem;
-    font-weight: 700;
-    line-height: 1.35;
-    letter-spacing: -0.01em;
-  }
-  .prose-article :where(h3):not(:where(.not-prose *)) {
-    margin: 2rem 0 0.75rem;
-    font-size: 1.2rem;
-    font-weight: 650;
+  /* Scene break: the body has no headings, so a short centered rule marks a change of scene. */
+  .prose-article :where(hr):not(:where(.not-prose *)) {
+    width: 4rem;
+    margin: 2.75rem auto;
+    border: 0;
+    border-top: 1px solid color-mix(in srgb, var(--foreground) 20%, transparent);
   }
   .prose-article :where(p, ul, ol, table):not(:where(.not-prose *)) {
     margin: 1rem 0;
