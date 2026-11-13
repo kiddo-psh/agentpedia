@@ -53,13 +53,14 @@ Production runs on Vercel with Neon Postgres. Pushes to `master` deploy to produ
    | `METRICS_TOKEN` | Production | A long random string |
    | `SHOW_DRAFTS` | Preview | `1` |
 
-5. Apply the migrations to the production database:
+5. Add Upstash for Redis from the Vercel Marketplace and connect it to the project. It sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`, which turn on the rate limit of 60 requests per minute per IP on `/mcp` and `/api/events`. A database created on upstash.com works too: set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` instead. Without either pair, nothing is rate limited.
+6. Apply the migrations to the production database:
 
    ```bash
    DATABASE_URL_UNPOOLED="<direct Neon URL>" npm run db:migrate
    ```
 
-Run step 5 again whenever `drizzle/` gets a new migration, before you push the code that needs it.
+Run step 6 again whenever `drizzle/` gets a new migration, before you push the code that needs it.
 
 GitHub login works only on the production domain, because the OAuth app has one callback URL. Preview deploys can show comments but cannot sign in.
 

@@ -292,7 +292,8 @@ export function trackAfterResponse(request: Request, e: Omit<TrackedEvent, "visi
 ### 오류 처리
 
 - 없는 slug: 오류를 내지 않고 `search_articles` 결과 상위 3개를 "이것을 찾으셨나요?"로 반환한다. 에이전트가 스스로 복구할 수 있게 하기 위해서다.
-- 레이트 리밋: IP 기준으로 분당 60회. Vercel 미들웨어로 처리한다.
+- 레이트 리밋: IP 기준으로 분당 60회. `/mcp`와 `/api/events`에만 건다. `src/proxy.ts`(Next 16의 Proxy, 예전 middleware)가 요청마다 Upstash Redis의 고정 윈도우 카운터(`rl:<ip>:<분>`)를 올리고, 61번째 요청부터 429와 `Retry-After`(윈도우가 끝날 때까지 남은 초)를 돌려준다. 함수 인스턴스마다 메모리가 따로라서 카운터는 공유 저장소에 둔다. IP는 Vercel이 덮어쓰는 `x-forwarded-for` 첫 값, 없으면 `x-real-ip`다. 저장소 env가 없으면(로컬 dev, 테스트) 제한하지 않고, 저장소 오류 시에도 요청을 통과시킨다(fail open).
+  - Vercel WAF 레이트 리밋 규칙도 검토했다. Hobby에서 규칙 1개를 쓸 수 있지만 `vercel.json`의 `mitigate`는 deny·challenge만 지원해 규칙을 저장소에 남길 수 없고, 테스트도 붙일 수 없어서 코드 방식을 택했다.
 
 ---
 
