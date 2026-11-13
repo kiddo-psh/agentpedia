@@ -1,11 +1,17 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { CopyButton } from "@/components/CopyButton";
 import { McpSnippet } from "@/components/McpEndpoint";
 import { SERVER_NAME } from "@/mcp/name";
 import { orderedKit } from "@/content/kit";
-import { REQUIRED_KIT_FILE, type Article } from "@/content/schema";
+import type { Article } from "@/content/schema";
 
+/**
+ * Two steps stay open: diagnose, then apply. What the kit changes and the kit files
+ * fold away so the section reads as one goal and two actions.
+ */
 export function KitSection({ article }: { article: Article }) {
+  const { apply } = article;
   const files = orderedKit(article.kit);
 
   return (
@@ -14,95 +20,41 @@ export function KitSection({ article }: { article: Article }) {
       className="mt-16 rounded-2xl border border-accent/30 bg-accent/[.04] p-6 sm:p-8"
       aria-labelledby="kit-title"
     >
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h2 id="kit-title" className="text-xl font-bold">
-            내 프로젝트에 적용하기
-          </h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted">
-            에이전트에게 <code className="font-mono">{REQUIRED_KIT_FILE}</code>를 건네고 진행하게 하세요. 끝나면{" "}
-            <code className="font-mono">checklist.md</code>로 점검합니다.
-          </p>
+      <h2 id="kit-title" className="text-xl font-bold">
+        내 프로젝트에 적용하기
+      </h2>
+      <p className="mt-2 leading-relaxed">{apply.goal}</p>
+      <p className="mt-1 text-sm text-muted">
+        {apply.time} · {apply.fitsWhen}
+      </p>
+
+      <Step n={1} title="맞는지 먼저 진단하기" note="파일을 바꾸지 않습니다">
+        <div className="overflow-hidden rounded-xl border border-foreground/15 bg-background">
+          <div className="flex items-center justify-between gap-3 border-b border-foreground/10 bg-foreground/[.03] px-4 py-2">
+            <span className="text-xs font-medium text-muted">아무 코딩 에이전트에나 붙여 넣으세요</span>
+            <CopyButton text={article.tryIt} label="프롬프트 복사" />
+          </div>
+          <p className="whitespace-pre-wrap px-4 py-3 font-mono text-sm leading-relaxed">{article.tryIt}</p>
         </div>
-        <a
-          href={`/a/${article.slug}/kit`}
-          download
-          className="shrink-0 rounded-lg bg-foreground px-4 py-2 text-sm font-semibold text-background hover:opacity-90"
-        >
-          키트 다운로드 (.zip)
-        </a>
-      </div>
+      </Step>
 
-      <TryIt prompt={article.tryIt} />
-
-      <ApplySummary apply={article.apply} />
-
-      <div className="mt-6">
-        <p className="text-sm font-semibold">에이전트에서 바로 적용하기</p>
-        <McpSnippet
-          template={`/mcp__${SERVER_NAME}__apply_article ${article.slug}`}
-          label="Claude Code 안에서"
-        />
-        <p className="text-xs text-muted">
-          처음이라면{" "}
+      <Step n={2} title="적용하기" note="바꾸기 전에 계획을 보여 주고 승인을 받습니다">
+        <McpSnippet template={`/mcp__${SERVER_NAME}__apply_article ${article.slug}`} label="Claude Code에서" />
+        <p className="text-sm text-muted">
+          MCP를 쓰지 않는다면{" "}
+          <a href={`/a/${article.slug}/kit`} download className="font-medium text-foreground underline underline-offset-2">
+            키트(.zip)
+          </a>
+          를 받아 에이전트에게 <code className="font-mono">prompt.md</code>를 건네세요. 처음이라면{" "}
           <Link href="/connect" className="underline underline-offset-2">
             에이전트 연결 방법
           </Link>
-          을 먼저 확인하세요.
+          을 보세요.
         </p>
-      </div>
+      </Step>
 
-      <div className="mt-6 grid gap-3">
-        {files.map((f) => (
-          <details
-            key={f.path}
-            open={f.path === REQUIRED_KIT_FILE}
-            className="group overflow-hidden rounded-xl border border-foreground/10 bg-background"
-          >
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3">
-              <span className="font-mono text-sm">
-                <span className="mr-2 inline-block text-muted transition-transform group-open:rotate-90">▸</span>
-                {f.path}
-              </span>
-              <CopyButton text={f.content} />
-            </summary>
-            <pre className="max-h-96 overflow-auto border-t border-foreground/10 bg-foreground/[.03] px-4 py-3 font-mono text-[0.8rem] leading-relaxed whitespace-pre-wrap">
-              {f.content}
-            </pre>
-          </details>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/** Read-only first step: the reader checks fit in a minute before running the kit. */
-function TryIt({ prompt }: { prompt: string }) {
-  return (
-    <div className="mt-6 overflow-hidden rounded-xl border border-foreground/15 bg-background">
-      <div className="flex items-center justify-between gap-3 border-b border-foreground/10 bg-foreground/[.03] px-4 py-2">
-        <span className="text-sm font-semibold">
-          먼저 진단만 해 보기 <span className="font-normal text-muted">· 파일을 바꾸지 않습니다</span>
-        </span>
-        <CopyButton text={prompt} label="프롬프트 복사" />
-      </div>
-      <p className="whitespace-pre-wrap px-4 py-3 font-mono text-sm leading-relaxed">{prompt}</p>
-      <p className="border-t border-foreground/10 px-4 py-2 text-xs text-muted">
-        아무 코딩 에이전트에나 붙여 넣으세요. 진단 결과가 맞으면 아래 키트로 적용합니다.
-      </p>
-    </div>
-  );
-}
-
-/** What the kit will do, stated before the reader runs anything. */
-function ApplySummary({ apply }: { apply: Article["apply"] }) {
-  return (
-    <div className="mt-6 rounded-xl bg-background p-5">
-      <p className="text-xs font-semibold uppercase tracking-wider text-accent">이 키트가 하는 일</p>
-      <p className="mt-1 text-lg font-semibold leading-snug">{apply.goal}</p>
-      <div className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
-        <div>
-          <p className="mb-1 font-semibold">바뀔 수 있는 것</p>
+      <div className="mt-6 grid gap-2">
+        <Fold title="키트가 바꾸는 것과 하지 않는 것">
           <ul className="grid gap-1">
             {apply.changes.map((c) => (
               <li key={c} className="flex gap-2">
@@ -110,29 +62,54 @@ function ApplySummary({ apply }: { apply: Article["apply"] }) {
                 <span>{c}</span>
               </li>
             ))}
-          </ul>
-        </div>
-        <div>
-          <p className="mb-1 font-semibold">하지 않는 것</p>
-          <ul className="grid gap-1 text-muted">
             {apply.doesNotDo.map((c) => (
-              <li key={c} className="flex gap-2">
+              <li key={c} className="flex gap-2 text-muted">
                 <span>−</span>
                 <span>{c}</span>
               </li>
             ))}
           </ul>
-        </div>
+        </Fold>
+        <Fold title={`키트 파일 보기 (${files.length}개)`}>
+          <div className="grid gap-4">
+            {files.map((f) => (
+              <div key={f.path}>
+                <div className="mb-1 flex items-center justify-between gap-3">
+                  <span className="font-mono">{f.path}</span>
+                  <CopyButton text={f.content} />
+                </div>
+                <pre className="max-h-80 overflow-auto rounded-lg bg-foreground/[.04] px-3 py-2 font-mono text-[0.8rem] leading-relaxed whitespace-pre-wrap">
+                  {f.content}
+                </pre>
+              </div>
+            ))}
+          </div>
+        </Fold>
       </div>
-      <dl className="mt-4 grid gap-1 border-t border-foreground/10 pt-3 text-sm sm:grid-cols-[auto_1fr] sm:gap-x-4">
-        <dt className="text-muted">이런 프로젝트에 맞아요</dt>
-        <dd>{apply.fitsWhen}</dd>
-        <dt className="text-muted">예상 시간</dt>
-        <dd>{apply.time}</dd>
-      </dl>
-      <p className="mt-3 text-xs text-muted">
-        에이전트는 먼저 레포를 읽고 맞지 않으면 멈춥니다. 파일을 바꾸기 전에는 항상 계획을 보여주고 승인을 받습니다.
+    </section>
+  );
+}
+
+function Step({ n, title, note, children }: { n: number; title: string; note: string; children: ReactNode }) {
+  return (
+    <div className="mt-6">
+      <p className="mb-2 text-sm font-semibold">
+        <span className="mr-2 font-mono text-accent">{n}</span>
+        {title} <span className="font-normal text-muted">· {note}</span>
       </p>
+      {children}
     </div>
+  );
+}
+
+function Fold({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <details className="group rounded-xl border border-foreground/10 bg-background text-sm">
+      <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 font-medium">
+        <span className="inline-block text-muted transition-transform group-open:rotate-90">▸</span>
+        {title}
+      </summary>
+      <div className="border-t border-foreground/10 px-4 py-3">{children}</div>
+    </details>
   );
 }
