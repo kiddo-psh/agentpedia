@@ -56,3 +56,23 @@
   name: Harrison Chase
   nameKo: 해리슨 체이스
   role: LangChain 공동 창업자이자 CEO
+
+- id: prithvi-rajasekaran
+  name: Prithvi Rajasekaran
+  nameKo: 프리트비 라자세카란
+  role: Anthropic Labs 팀 소속
+
+- id: lance-martin
+  name: Lance Martin
+  nameKo: 랜스 마틴
+  role: Anthropic Engineering 블로그 필자
+
+- id: john-hughes
+  name: John Hughes
+  nameKo: 존 휴스
+  role: Anthropic Engineering 블로그 필자
+
+- id: theo-browne
+  name: Theo Browne
+  nameKo: 테오 브라운
+  role: 유튜브 채널 'Theo - t3.gg' 운영자, T3 Stack 창시자, T3 Code 개발자, 전 Twitch 개발자
