@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "validate:content": "tsx scripts/validate-content.ts",
+    "render:article": "tsx scripts/render-article.ts",
     "prebuild": "npm run validate:content",
     "prepare": "simple-git-hooks",
     "mcp:smoke": "tsx scripts/mcp-smoke.mts",
