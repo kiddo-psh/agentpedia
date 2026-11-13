@@ -9,6 +9,7 @@ import { PersonCard } from "@/components/PersonCard";
 import { RelatedArticles } from "@/components/RelatedArticles";
 import { SourceAge } from "@/components/SourceAge";
 import { Comments } from "@/components/comments/Comments";
+import { LikeButton, LikeButtonSkeleton } from "@/components/likes/LikeButton";
 import { ArticleBody } from "@/components/mdx/ArticleBody";
 import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatDate, newestPublished, sourcePeriod } from "@/content/labels";
 import { getArticle, getRelatedGraph, listArticles } from "@/content/loader";
@@ -98,6 +99,12 @@ async function ArticleView({ slug }: { slug: string }) {
         <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{article.title}</h1>
         {/* `summary` feeds the list and metadata; here the 30-second brief below says the same thing. */}
         {article.persons.length > 0 && <People persons={article.persons} />}
+        <div className="mt-6 flex items-center gap-2">
+          {/* The like count is request-time; a fixed-size placeholder keeps the header from shifting. */}
+          <Suspense fallback={<LikeButtonSkeleton />}>
+            <LikeButton slug={article.slug} />
+          </Suspense>
+        </div>
       </header>
 
       <ArticleBrief article={article} />
