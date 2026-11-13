@@ -23,7 +23,7 @@ apply:
   fitsWhen: "git 저장소에 CLAUDE.md나 AGENTS.md가 있고, 합쳐서 비어 있지 않은 줄 10줄 이상이고, 그 파일에 커밋되지 않은 변경이 없으며 `docs/context-file-audit.md`가 아직 없는 프로젝트"
   time: "20~40분"
 tryIt: "이 레포(하위 폴더 포함)의 CLAUDE.md와 AGENTS.md를 모두 찾아 파일별 줄 수를 알려줘. 각 파일의 앞 15줄 중 코드나 설정 파일을 열어 실제로 확인되는 줄이 몇 개인지 세어줘. 목록 보기, 파일 열기, `git status --short 대상 파일`, `--help`·`--version` 외의 명령은 실행하지 마. docs/context-file-audit.md가 이미 있는지, 대상 파일에 미커밋 변경이 있는지도 알려줘. `@`로 가져오는 파일과 '자동 생성' 표시 블록은 경로와 위치만 알려줘. 파일이 없거나 비어 있지 않은 줄이 합쳐 10줄 미만이거나 git 저장소가 아니면 그렇게만 말하고 멈춰. 아무 파일도 바꾸지 마."
-draft: true
+draft: false
 publishedAt: 2026-11-12
 keyIdeas:
   - "2026년 2월 처음 공개돼 9월에 개정된(v3) Gloaguen 연구에서 LLM이 만든 컨텍스트 파일은 SWE-bench에서 약 -0.5%p, CTXbench에서 약 -2%p로 성공률을 올리지 못했고, 비용은 약 20% 늘렸습니다."

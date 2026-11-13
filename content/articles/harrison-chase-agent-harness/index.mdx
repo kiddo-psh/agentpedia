@@ -23,7 +23,7 @@ apply:
   fitsWhen: "코딩 에이전트를 쓰고, 테스트나 린트 같은 검증 명령이 하나 이상 있는 프로젝트"
   time: "20~40분"
 tryIt: "이 레포의 에이전트 설정(CLAUDE.md, AGENTS.md, .claude/, .codex/, .cursor/)을 읽고 표로 알려줘. 1) 항상 주는 고정 컨텍스트 2) 필요할 때 읽는 동적 컨텍스트 3) 검증 명령 후보(테스트, 린트, 타입 검사)가 CLAUDE.md, AGENTS.md, package.json, Makefile, CI 설정 중 어디 있는지(실행하지 마). 키·토큰 값은 출력하지 마. 시작과 끝의 git status --short를 비교해 줘. 마지막 줄 판정: 설정 파일이나 검증 명령 후보가 없으면 '키트 부적합', 고정 컨텍스트나 검증 명령이 빠졌으면 '키트 실행 권장', 다 있으면 '키트 불필요', 그리고 이유. 아무 파일도 바꾸지 마."
-draft: true
+draft: false
 publishedAt: 2026-11-12
 keyIdeas:
   - "체이스는 에이전트를 모델, 이를 조율하는 하네스, 컨텍스트 세 요소로 나눕니다(2026년 8월 Saytrace 요약 기준)."
