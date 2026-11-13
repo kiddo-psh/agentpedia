@@ -4,6 +4,7 @@ import remarkMdx from "remark-mdx";
 import remarkParse from "remark-parse";
 import { unified } from "unified";
 import { orderedKit } from "./kit";
+import { applyCommand } from "../mcp/name";
 import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatDate, sourcePeriod } from "./labels";
 import type { Article } from "./schema";
 
@@ -40,7 +41,7 @@ export function readerText(article: Article): string {
     `[복사용 프롬프트] ${article.tryIt}`,
     "",
     "2 적용하기 · 바꾸기 전에 계획을 보여 주고 승인을 받습니다",
-    `[복사용 명령] /mcp__agentpedia__apply_article ${article.slug}`,
+    `[복사용 명령] ${applyCommand(article.slug)}`,
     "MCP를 쓰지 않는다면 키트(.zip)를 받아 에이전트에게 prompt.md를 건네세요. 처음이라면 에이전트 연결 방법을 보세요.",
     "",
     folded("키트가 바꾸는 것과 하지 않는 것", [...apply.changes.map((c) => `+ ${c}`), ...apply.doesNotDo.map((c) => `− ${c}`)].join("\n")),

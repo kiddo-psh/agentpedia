@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { CopyButton } from "@/components/CopyButton";
 import { McpSnippet } from "@/components/McpEndpoint";
-import { SERVER_NAME } from "@/mcp/name";
+import { applyCommand } from "@/mcp/name";
 import { orderedKit } from "@/content/kit";
 import type { Article } from "@/content/schema";
 
@@ -43,7 +43,7 @@ export function KitSection({ article }: { article: Article }) {
       </Step>
 
       <Step n={2} title="적용하기" note="바꾸기 전에 계획을 보여 주고 승인을 받습니다">
-        <McpSnippet template={`/mcp__${SERVER_NAME}__apply_article ${article.slug}`} label="Claude Code에서" />
+        <McpSnippet template={applyCommand(article.slug)} label="Claude Code에서" />
         <p className="text-sm text-muted">
           MCP를 쓰지 않는다면{" "}
           <a href={`/a/${article.slug}/kit`} download className="font-medium text-foreground underline underline-offset-2">

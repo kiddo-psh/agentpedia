@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { McpSnippet } from "@/components/McpEndpoint";
-import { SERVER_NAME } from "@/mcp/name";
+import { applyCommand, SERVER_NAME } from "@/mcp/name";
 
 export const metadata: Metadata = {
   title: "에이전트 연결",
@@ -25,7 +25,7 @@ export default function ConnectPage() {
         그다음 Claude Code 안에서 슬래시 명령으로 기사를 적용합니다. slug는 기사 주소{" "}
         <code>/a/</code> 뒤의 값입니다.
       </p>
-      <McpSnippet template={`/mcp__${SERVER_NAME}__apply_article <slug>`} label="Claude Code 안에서" />
+      <McpSnippet template={applyCommand("<slug>")} label="Claude Code 안에서" />
 
       <h2>Cursor</h2>
       <p>
