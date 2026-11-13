@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, type ReactNode } from "react";
 import { ApplyRail } from "@/components/ApplyRail";
 import { ArticleBrief } from "@/components/ArticleBrief";
 import { ArticleTracking } from "@/components/ArticleTracking";
@@ -48,9 +48,25 @@ export async function generateMetadata({ params }: PageProps<"/a/[slug]">): Prom
 export default function ArticlePage({ params }: PageProps<"/a/[slug]">) {
   return (
     <Suspense fallback={<ArticleSkeleton />}>
-      {params.then(({ slug }) => (
-        <ArticleView slug={slug} />
-      ))}
+      {params.then(({ slug }) => {
+        if (!getArticle(slug)) notFound();
+        return (
+          <ArticleView
+            slug={slug}
+            likes={
+              // The like count is request-time; a fixed-size placeholder keeps the row from shifting.
+              <Suspense fallback={<LikeButtonSkeleton />}>
+                <LikeButton slug={slug} />
+              </Suspense>
+            }
+            comments={
+              <Suspense fallback={<p className="text-sm text-muted">토론을 불러오는 중…</p>}>
+                <Comments slug={slug} />
+              </Suspense>
+            }
+          />
+        );
+      })}
     </Suspense>
   );
 }
@@ -91,9 +107,13 @@ function People({ persons }: { persons: Article["persons"] }) {
   );
 }
 
-async function ArticleView({ slug }: { slug: string }) {
-  const article = getArticle(slug);
-  if (!article) notFound();
+/**
+ * Cached so the article, MDX compile included, lands in the prerendered page instead of
+ * rendering per request. Request-time parts arrive as `likes` and `comments` pass-through slots.
+ */
+async function ArticleView({ slug, likes, comments }: { slug: string; likes: ReactNode; comments: ReactNode }) {
+  "use cache";
+  const article = getArticle(slug)!;
   const related = getRelatedGraph(article);
   const sections: [string, string][] = [
     ["brief", "30초 요약"],
@@ -142,10 +162,7 @@ async function ArticleView({ slug }: { slug: string }) {
 
       {/* Reactions come once the reader has finished the article. */}
       <div className="mt-14 flex items-center justify-center gap-2">
-        {/* The like count is request-time; a fixed-size placeholder keeps the row from shifting. */}
-        <Suspense fallback={<LikeButtonSkeleton />}>
-          <LikeButton slug={article.slug} />
-        </Suspense>
+        {likes}
         <ShareButton slug={article.slug} title={article.title} text={article.summary} />
       </div>
 
@@ -154,10 +171,7 @@ async function ArticleView({ slug }: { slug: string }) {
       <RelatedArticles graph={related} />
 
       <section id="comments" className="mt-24 scroll-mt-24" aria-labelledby="comments-title">
-        {/* Comments are request-time data; the article above stays in the static shell. */}
-        <Suspense fallback={<p className="text-sm text-muted">토론을 불러오는 중…</p>}>
-          <Comments slug={article.slug} />
-        </Suspense>
+        {comments}
       </section>
 
       <section className="mt-24 scroll-mt-24" id="sources" aria-labelledby="sources-title">
