@@ -6,11 +6,12 @@ import { ArticleTracking } from "@/components/ArticleTracking";
 import { GlossaryList } from "@/components/GlossaryList";
 import { KitSection } from "@/components/KitSection";
 import { PersonCard } from "@/components/PersonCard";
+import { RelatedArticles } from "@/components/RelatedArticles";
 import { SourceAge } from "@/components/SourceAge";
 import { Comments } from "@/components/comments/Comments";
 import { ArticleBody } from "@/components/mdx/ArticleBody";
 import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatDate, newestPublished, sourcePeriod } from "@/content/labels";
-import { getArticle, listArticles } from "@/content/loader";
+import { getArticle, getRelatedGraph, listArticles } from "@/content/loader";
 
 // Cache Components requires at least one param; a placeholder 404s when nothing is published.
 const PLACEHOLDER = "__none__";
@@ -85,6 +86,8 @@ async function ArticleView({ slug }: { slug: string }) {
       <GlossaryList terms={article.terms} />
 
       <KitSection article={article} />
+
+      <RelatedArticles graph={getRelatedGraph(article)} />
 
       <section id="comments" className="mt-16 border-t border-foreground/10 pt-10" aria-labelledby="comments-title">
         {/* Comments are request-time data; the article above stays in the static shell. */}
