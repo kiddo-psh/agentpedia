@@ -1,0 +1,136 @@
+---
+slug: anthropic-components-of-agent-memory
+title: "413개 파일 대 10개 파일: Anthropic이 에이전트 메모리에서 짚은 차이"
+summary: "2026년 11월 Anthropic Engineering이 '에이전트 메모리의 구성 요소'를 냈습니다. 많이 적은 에이전트보다 남길 것을 고른 에이전트가 더 멀리 간 사례와, 나중에 고쳐 쓰는 드리밍이 성적과 함께 움직였다는 내용입니다. 원문 자체 보고 수치와 한계, Claude Code 자동 메모리 점검법을 정리합니다."
+category: trends
+people: [lance-martin]
+tags: ["agent-memory", "dreaming", "claude-code", "llm-wiki", "anthropic"]
+difficulty: practical
+brief:
+  what: "2026년 11월 6일 Anthropic이 Lance Martin의 글에서, 메모리 폴더와 기록을 고쳐 쓰는 드리밍이 성능을 올린 실험과 그렇지 않은 반례를 함께 보고했습니다."
+  why: "메모리는 많이 쌓기보다 무엇을 남기고 언제 고치느냐가 성능과 함께 움직였고, 매 세션 불러오는 노트가 틀리면 그 오류가 모든 세션에 따라갑니다."
+  action: "키트로 MEMORY.md의 200줄·25KB 한도와 CLAUDE.md 길이를 점검해 보고서를 남기고, 승인하면 CLAUDE.md의 중복·낡은 줄을 정리합니다."
+apply:
+  goal: "본문의 '맨 위층을 작게 두라'는 조언대로 MEMORY.md 한도와 CLAUDE.md(또는 AGENTS.md) 길이를 점검해 보고서로 남기고, 승인하면 정리합니다."
+  changes:
+    - "`docs/agent-memory-audit.md`에 점검 보고서 추가 (`docs/`가 없으면 폴더도 만듭니다. 줄 수, 크기, 낡거나 중복된 항목, 정리 제안. 파일이 이미 있으면 승인한 이름으로)"
+    - "승인한 경우에만 레포의 `CLAUDE.md`(또는 `AGENTS.md`)에서 중복·낡은 줄을 줄이거나 항목을 정리 (`.claude/CLAUDE.md`와 `CLAUDE.local.md`는 점검만 하고 고치지 않음. 미커밋 변경이 있는 파일은 별도 승인 없이 고치지 않음)"
+  doesNotDo:
+    - "홈 디렉터리 등 레포 밖에 있는 자동 메모리 파일(기본 `~/.claude/projects/`)은 고치지 않습니다. 정리안만 보고서에 적습니다."
+    - "자동 메모리 파일과 `settings.json` 계열 설정(`~/.claude/settings.json`, `.claude/settings.json`, `.claude/settings.local.json`)은 바꾸지 않고, 커밋하거나 푸시하지 않습니다."
+    - "메모리 항목의 원문과 비밀 값을 보고서에 옮겨 적지 않습니다."
+  fitsWhen: "Claude Code를 쓰며 자동 메모리나 CLAUDE.md가 쌓여 가는 프로젝트"
+  time: "15~30분"
+tryIt: "자동 메모리 폴더 경로는 <붙여넣기>야(/memory의 폴더 열기로 확인). 읽기 전용으로 MEMORY.md, CLAUDE.md, .claude/CLAUDE.md, CLAUDE.local.md, AGENTS.md, .claude/AGENTS.md 중 있는 파일의 줄 수(grep -c '')와 바이트(wc -c)를 알려줘. MEMORY.md는 200줄 또는 25KB(25,000·25,600바이트) 초과 여부, 나머지는 200줄 이상인지 표시해. AGENTS.md가 있는데 레포의 CLAUDE.md류가 @AGENTS.md를 가져오지 않으면 '로드 안 될 수 있음'으로 표시해. 파일이 하나도 없거나 grep·wc가 없으면 그렇게만 말하고 멈춰. 끝에 키트를 돌릴 만한지 한 줄로 판단해. 아무 파일도 바꾸지 마."
+draft: true
+publishedAt: 2026-11-06
+keyIdeas:
+  - "Anthropic은 에이전트 메모리를 세션 사이에 이어지는 경험 기반 지식으로 정의하고, 가중치 변경·컨텍스트 안 학습·컴팩션은 제외합니다."
+  - "Pokémon Red에서 모델마다 한 번씩 돌린 실행에서, 가리지 않고 적은 Sonnet 3.7보다 남길 것을 고른 Fable 5가 배지를 더 땄습니다. 서로 다른 모델이라 폴더 크기만의 효과로 볼 수는 없습니다."
+  - "드리밍은 틀린 노트를 고치고 위키를 새로 만들 수 있지만, 위키가 원본보다 커지거나 검색보다 나을 게 없는 과제도 있었습니다."
+  - "항상 로드되는 맨 위층은 작아야 합니다. 2026년 11월 13일 공식 문서 기준 Claude Code 자동 메모리는 MEMORY.md의 첫 200줄 또는 25KB만 불러옵니다."
+  - "수치는 Anthropic이 직접 고른 과제에서 직접 보고한 것이며, 원문에 독립 검증 결과는 나오지 않습니다."
+sources:
+  - id: anthropic-memory
+    title: "The components of agent memory"
+    url: https://www.anthropic.com/research/components-of-agent-memory
+    author: "Lance Martin"
+    kind: blog
+    publishedAt: 2026-11-06
+    dateNote: "저자 Lance Martin의 이력은 원문에서 확인하지 못했습니다. 페이지에 Published Nov 6, 2026과 분류 표시 Engineering이 적혀 있고, 바이라인은 Written by Lance Martin입니다. 본문은 게시 페이지(https://www.anthropic.com/research/components-of-agent-memory)에서 읽었고, 일부 수치(CL-Bench 평균 보상 0.330·0.364·0.564·0.641·0.828·−0.234, 행동 1,935, Fable 5 파일 10개, 문서 10개·115KB, 68쪽·255링크·203KB)는 페이지 그림 설명(alt 텍스트)에서 읽었습니다."
+  - id: docs-dreams
+    title: "Dreams (Claude Managed Agents 공식 문서)"
+    url: https://platform.claude.com/docs/en/managed-agents/dreams
+    author: Anthropic
+    kind: blog
+    accessedAt: 2026-11-13
+    dateNote: "페이지에 날짜가 없어 열람일을 기록했습니다. 열람 시점에 research preview(Claude API 전용, 접근 신청 필요)이며 베타 헤더는 managed-agents-2026-04-01과 dreaming-2026-04-21입니다."
+  - id: docs-ma-memory
+    title: "Using agent memory (Claude Managed Agents 공식 문서)"
+    url: https://platform.claude.com/docs/en/managed-agents/memory
+    author: Anthropic
+    kind: blog
+    accessedAt: 2026-11-13
+    dateNote: "페이지에 날짜가 없어 열람일을 기록했습니다. 열람 시점에 beta이며 베타 헤더는 agent-memory-2026-07-22입니다."
+  - id: docs-claude-code-memory
+    title: "How Claude remembers your project (Claude Code 공식 문서)"
+    url: https://code.claude.com/docs/en/memory
+    author: Anthropic
+    kind: blog
+    accessedAt: 2026-11-13
+    dateNote: "페이지에 날짜가 없어 열람일을 기록했습니다."
+  - id: karpathy-llm-wiki
+    title: "llm-wiki (GitHub gist)"
+    url: https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f
+    author: Andrej Karpathy
+    kind: blog
+    publishedAt: 2026-04-04
+    dateNote: "gist 페이지의 시간 표시에서 생성일(2026-04-04)을 읽었습니다. Anthropic 글에서 wiki라는 낱말이 이 gist로 링크돼 있습니다."
+---
+
+약 10,000번 행동한 뒤, 포켓몬 게임 Pokémon Red를 하던 두 Claude 모델의 메모리 폴더는 이렇게 달랐습니다. Sonnet 3.7의 폴더에는 파일 413개가 폴더 225개에 흩어져 있었고, 배지(체육관 관장을 이기면 받는 증표)는 1개였습니다. 반면 Fable 5는 폴더 2개에 파일 9개, 최상위의 `global.md` 하나가 전부였는데 배지는 4개였습니다. 2026년 11월 6일 Anthropic Engineering 글이 이 두 폴더를 나란히 보여 줍니다. 글쓴이는 Lance Martin입니다.
+
+메모리라고 하면 많이 적어 둘수록 좋다고 떠올리기 쉽습니다. 이 장면은 그 직관과 반대로 보입니다. 다만 모델도 다르고 한 번씩만 돌린 결과라, 폴더 크기 때문이라고 단정할 수는 없습니다. 원문이 짚는 것은 무엇을 적을 만하다고 봤느냐입니다. 이 글의 실험 수치는 모두 2026년 11월 6일 글에 실린 Anthropic 자체 보고이고, 각 실험이 언제 돌았는지는 원문에 나오지 않습니다.
+
+<Quote source="anthropic-memory">
+Sonnet 3.7 assumed everything might matter and wrote to memory indiscriminately.
+</Quote>
+
+Sonnet 3.7은 모든 게 중요할 수 있다고 보고 가리지 않고 적었습니다. 전투, 아이템, 만난 인물마다 파일을 따로 만드는 일이 잦았습니다. 게임 상태는 계속 바뀌니 그 기록은 금세 낡았고, 낡은 기록을 뒤지는 데 시간과 자원을 점점 더 쓰게 됐습니다. 10,000번째 행동 무렵에는 17번의 행동 동안 파일 6개를 만들고 9개를 지웠으며 게임 안에서는 아무것도 하지 않았습니다. Sonnet 3.7이 적은 소지금이나 현재 위치는 화면에서 매번 읽을 수 있어, 원문은 이를 적을 필요가 없는 정보로 봅니다. Fable 5는 직접 알아내야 하고 적지 않으면 사라지는 전략, 계획, 검증한 규칙을 주로 남겼습니다.
+
+이번에는 다른 실행의 장면입니다. 원문은 모델을 밝히지 않았지만, 노트에 오류가 섞이면 어떻게 되는지 보여 줍니다. Mt. Moon은 지도 서쪽 입구로 들어가 동쪽으로 나오는 동굴이고, 입구 근처에는 한쪽으로만 내려갈 수 있는 낭떠러지가 있습니다. Claude는 산 입구의 포켓센터를 길잡이로 삼았습니다. 포켓센터는 실제로 산 서쪽 입구에 있는데, Claude는 노트에 포켓센터가 산 동쪽에 있다고 잘못 적었습니다. 그래서 포켓센터에서 나오자 이미 산을 넘었다고 믿고 이렇게 말한 뒤, 노트에 "Mt Moon DONE"이라고 적었습니다.
+
+<Quote source="anthropic-memory">
+Mt Moon is behind me.
+</Quote>
+
+산이 뒤에 있다는 말이지만, 산은 뒤에 있지 않았습니다. 몇 번의 행동 뒤 Claude는 낭떠러지로 떨어져 왔던 길로 돌아왔습니다.
+
+이 오류를 고치는 일이 <Term id="dreaming">드리밍</Term>입니다. 에이전트가 쉬는 동안 과거 로그와 세션 기록을 다시 읽고 노트를 고치거나 새로 씁니다. 고치지 않은 노트로 이어 간 실행에서 Claude는 이 낭떠러지에서 모두 세 번 떨어졌습니다. 세 번째 뒤에는 이만 멈추겠다고 썼지만, 실험 설정의 자동 응답이 계속하라고 하자 산 앞 마을 Pewter City까지 되돌아갔고 끝내 Cerulean City에 닿지 못했습니다. 드리밍으로 노트를 세션 기록과 대조해 고친 실행은 곧장 동굴로 돌아가, 1,935번째 행동에서 Mt. Moon 너머의 도시 Cerulean City에 닿았습니다. 메모리 없이 돌린 실행도 거기까지 가지 못했습니다.
+
+여기서 메모리는 경험에서 얻어 세션 사이에 이어지는 지식만 가리킵니다. 모델 가중치를 바꾸는 학습, 컨텍스트 안에서 일어나는 학습, <Term id="compaction">컴팩션</Term>은 넣지 않습니다. <Term id="agent-memory">에이전트 메모리</Term>에 대해 원문은 메모리가 때로 예측이라고 말합니다. 규칙 하나를 적는 것은 그 패턴이 다시 쓸모 있으리라 내다보는 일이고, 그 예측은 처음부터 틀리거나 환경이 바뀌며 낡을 수 있습니다.
+
+<KeyIdea title="노트를 고치려면 대조할 기록이 있어야 합니다">
+처음부터 틀린 노트도 다음 세션의 Claude가 읽고 믿을 수 있습니다. 드리밍이 포켓센터 오류를 잡을 수 있었던 것은 세션 기록이라는 정답지가 있었기 때문입니다.
+</KeyIdea>
+
+그렇다면 무엇을 적으라고 미리 정해 주면 어떨까요? Anthropic은 CL-Bench(Continual Learning Bench) 1.0의 데이터베이스 질의 과제로 이를 시험했습니다. CL-Bench는 에이전트가 메모리를 써서 긴 과제를 풀어 가는 능력을 재는 벤치마크이고, 이 과제의 점수는 평균 보상입니다. Claude Opus 5는 메모리 없이 0.564, 메모리를 쓰면 0.828이었습니다. 그런데 "실패만 기록하라"는 규칙을 주자 메모리로 얻던 이득이 0.234 줄었습니다. 원문 표현으로는 메모리가 준 이득의 상당 부분을 잃었습니다.
+
+도움이 된 쪽은 다른 유도였습니다. 이전 세대 모델인 Sonnet 4.6은 메모리 파일을 자주 읽지 않았고, 왜 틀렸는지에 대한 가설도 검증하지 않았습니다. 답하기 전에 메모리 파일을 읽고 가설을 직접 검증하라고 하자 점수가 0.364에서 0.641로 두 배 가까이 올랐습니다(메모리 없이는 0.330). 정리하면, 무엇을 적을지 정한 규칙은 강한 모델에게 오히려 해가 될 수 있었고, 이전 세대 모델에게는 읽고 검증하라는 행동 지시가 도움이 됐습니다.
+
+---
+
+위키를 만드는 일도 드리밍의 몫이었습니다. Anthropic이 위키라고 부르는 이 구조는 Claude가 쓰고 관리하는, 서로 링크된 페이지 모음입니다. 위키라는 낱말에는 AI 연구자 Andrej Karpathy가 2026년 4월 4일 GitHub에 올린 글(gist)이 링크돼 있습니다.
+
+이 gist는 질문할 때마다 원문 문서에서 검색하는 대신, LLM이 지속되는 위키를 조금씩 쌓고 유지하자고 제안합니다. Anthropic은 드리밍으로 만든 자체 <Term id="llm-wiki">LLM 위키</Term>가 실제로 쓸모 있는지 시험했습니다.
+
+시험 대상은 소프트웨어 회사 Stainless의 내부 문서 약 35만 개였습니다. Anthropic이 5월에 인수한 회사입니다. 질문 25개를 두고 드리밍 세션을 2개에서 128개로 늘리자, 위키만 쓴 경우 채점 기준을 충족한 비율이 13%에서 48%로 올랐습니다.
+
+<Quote source="anthropic-memory">
+The more it dreams, the richer its knowledge map grows, like that of a seasoned employee.
+</Quote>
+
+Anthropic은 드리밍을 거듭할수록 위키가 신입에서 베테랑 직원의 지식 지도로 자란다고 비유합니다. 그래도 위키만으로는 최고 48%에 그쳐, 검색 도구만 준 경우보다 낮았습니다. 위키가 가장 도움이 된 것은 검색과 함께 쓸 때였습니다.
+
+<Compare
+  before="검색만 쓴 경우: 채점 기준의 53%를 맞혔습니다."
+  after="위키에 검색을 더한 경우: 위키가 자라며 54%에서 61%로 올랐습니다."
+/>
+
+---
+
+정리한다고 늘 이기지는 않았습니다. 원문이 든 반례는 둘입니다. 먼저 Harvey LAB입니다. 문서 묶음을 주고 법률 브리프를 쓰게 한 뒤 기준별로 채점하는 벤치마크입니다. 이 가운데 한 과제에서 위키가 페이지 68개, 링크 255개, 203KB로 자랐습니다. 원본 문서 10개는 115KB였으니 원본의 1.77배입니다. 원문은 이를 보르헤스의 한 문단짜리 소설 속 지도 제작자에 빗댑니다. 제국만큼 큰 지도를 그려, 아주 자세하지만 아무것도 줄이지 못한 지도라는 뜻입니다. 같은 벤치마크의 다른 과제에서는 대부분의 기준을 문서 하나에서 텍스트 검색으로 찾을 수 있어, 위키가 검색보다 뚜렷하게 나은 점이 없었습니다.
+
+위키가 앞선 쪽은 따로 있었습니다. 별도 실험에서는 합병 관련 문서 묶음으로 질문 24개를 던졌습니다. 절반이 넘는 질문은 문서 여러 개를 함께 봐야 답할 수 있었고, 판단이나 계산이 필요한 질문도 많았습니다. 이런 항목에서 위키를 쓴 점수는 87%, 검색만 쓴 점수는 73%였습니다. 위키가 값을 하는 때는 답이 여러 문서에 흩어져 있을 때였습니다.
+
+---
+
+위키를 어떻게 쌓을지 정한 지시문도 고칠 수 있었습니다. 계약서 묶음을 다루는 과제에서는 여러 에이전트가 공유 표 하나에 동시에 쓰다가 서로의 내용을 덮어써, 채점 대상 사실 57개 중 41개만 남았습니다. Anthropic이 Claude에게 실패를 돌아보고 지시 수정안을 내 위키를 다시 만드는 루프를 돌리게 하자, 계약마다 에이전트 하나가 자기 페이지에 조항을 글자 그대로 옮겼고 57개가 모두 남았습니다.
+
+드리밍이 하는 일은 하나 더 있습니다. 쌓은 노트 가운데 일부를 맨 위로 올리는 일입니다. 에이전트 메모리는 세션을 시작할 때 컨텍스트에 미리 넣어 두는 맨 위층과, 필요할 때 검색해 읽는 아래층으로 나뉩니다. 맨 위층은 매번 토큰을 쓰고, 틀린 노트가 있으면 모든 세션에 따라갑니다. 그래서 원문은 맨 위층을 작게 둬야 한다고 말합니다.
+
+지금 쓰는 도구에서는 이 원칙이 어떻게 보일까요? Claude Code의 <Term id="auto-memory">자동 메모리</Term>도 맨 위층을 작게 유지합니다. 다만 드리밍이 아니라 Claude가 세션 중에 직접 관리합니다. 세션 시작에 불러오는 파일은 색인 역할을 하는 `MEMORY.md` 하나입니다. 공식 문서(2026년 11월 13일 확인)에 따르면 이 파일의 첫 200줄이나 25KB까지만 불러오고, 둘 중 먼저 닿는 쪽이 한도입니다. 그 뒤 내용은 세션을 시작할 때 Claude가 읽지 않습니다. 이 한도는 `MEMORY.md`에만 적용됩니다. 같은 문서는 `CLAUDE.md`도 200줄 아래를 목표로 하라고 합니다.
+
+같은 날 확인한 공식 문서에 따르면 Claude Managed Agents(에이전트 호스팅 서비스)에는 드리밍 기능이 있습니다. 기존 <Term id="memory-store">메모리 스토어</Term>와 과거 세션 기록을 받아 중복을 합치고 낡은 항목을 바꾼 새 스토어를 만들며, 입력 스토어는 고치지 않습니다. 아직 신청해야 쓸 수 있는 Claude API 미리보기(research preview) 기능입니다.
+
+위의 숫자는 모두 Anthropic이 고른 과제에서 직접 보고한 것이고, 원문에 독립 검증 결과는 나오지 않습니다. 원문도 드리밍에는 계산 자원이 들어 모든 메모리를 계속 점검하기는 어려울 수 있고, 결과가 바로 쓰이지 않을 수 있다고 인정합니다. 그리고 어떤 모델도 앞으로 무슨 일이 일어날지 알 수 없으며, 메모리 시스템을 설계하는 법은 아직 배울 것이 많다고 맺습니다.
