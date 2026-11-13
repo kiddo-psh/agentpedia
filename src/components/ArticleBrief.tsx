@@ -6,9 +6,12 @@ const ROWS = [
   ["action", "지금 할 수 있는 일"],
 ] as const;
 
-/** The one summary above the story: three facts open, the key ideas folded beneath them. */
+/**
+ * The one summary above the story. `keyIdeas` stay in MCP responses only: on the page
+ * they repeated this brief and the body's <KeyIdea> box.
+ */
 export function ArticleBrief({ article }: { article: Article }) {
-  const { brief, keyIdeas } = article;
+  const { brief } = article;
   return (
     <section className="mb-12 rounded-xl bg-foreground/[.03] p-6" aria-labelledby="brief">
       <h2 id="brief" className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted">
@@ -18,24 +21,17 @@ export function ArticleBrief({ article }: { article: Article }) {
         {ROWS.map(([key, label]) => (
           <div key={key} className="contents">
             <dt className="text-sm font-semibold text-accent sm:pt-0.5">{label}</dt>
-            <dd className="mb-2 leading-relaxed sm:mb-0">{brief[key]}</dd>
+            <dd className="mb-2 leading-relaxed sm:mb-0">
+              {brief[key]}
+              {key === "action" && (
+                <a href="#kit" className="ml-2 whitespace-nowrap text-sm text-accent underline underline-offset-2">
+                  적용 방법 보기 ↓
+                </a>
+              )}
+            </dd>
           </div>
         ))}
       </dl>
-      <details className="group mt-5 border-t border-foreground/10 pt-4">
-        <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-muted hover:text-foreground">
-          <span className="inline-block transition-transform group-open:rotate-90">▸</span>
-          핵심 {keyIdeas.length}가지 더 보기
-        </summary>
-        <ol className="mt-3 grid gap-3">
-          {keyIdeas.map((idea, i) => (
-            <li key={i} className="flex gap-3 leading-relaxed">
-              <span className="font-mono text-sm font-semibold text-accent">{String(i + 1).padStart(2, "0")}</span>
-              <span>{idea}</span>
-            </li>
-          ))}
-        </ol>
-      </details>
     </section>
   );
 }
