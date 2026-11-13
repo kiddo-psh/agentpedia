@@ -64,7 +64,7 @@ sources:
 The amount of software I can create is now mostly limited by inference time and hard thinking.
 </Quote>
 
-이제 그가 만들 수 있는 소프트웨어의 양은 주로 추론 시간과 깊은 고민에 달려 있다는 말입니다. 모든 소프트웨어에 깊은 고민이 필요한 건 아니라고도 했습니다. 대부분의 앱은 데이터를 다른 형태로 바꾸고, 저장하고, 보여 주는 일을 할 뿐이라는 설명입니다.
+그가 만들 수 있는 소프트웨어의 양을 이제 주로 정하는 건 추론 시간과 깊은 고민입니다. 그렇다고 모든 소프트웨어에 깊은 고민이 필요한 건 아니라고도 했습니다. 대부분의 앱은 데이터를 다른 형태로 바꾸고, 저장하고, 보여 주는 일을 할 뿐이라고 봅니다.
 
 이런 변화를 그가 확실히 느낀 건 GPT 5부터입니다. 소프트웨어를 공장처럼 빠르게 만들어 내기 시작한 계기였다고 씁니다. GPT 5 이후 그는 코드를 거의 읽지 않습니다. 에이전트가 일하는 과정을 지켜보다가 가끔 중요한 부분만 열어 봅니다.
 
@@ -76,7 +76,7 @@ The amount of software I can create is now mostly limited by inference time and 
 The important decisions these days are language/ecosystem and dependencies.
 </Quote>
 
-요즘 중요한 결정은 언어와 생태계, 그리고 의존성이라는 뜻입니다.
+그가 요즘 중요하다고 꼽는 결정은 언어와 생태계, 그리고 의존성입니다.
 
 2025년 12월 기준으로 그는 웹에는 TypeScript, <Term id="cli">CLI</Term>에는 Go를 씁니다. macOS 기능이 필요하거나 UI가 있으면 Swift를 씁니다. Go는 몇 달 전만 해도 고려하지 않던 언어입니다. 에이전트가 Go를 잘 쓰고, 타입 시스템이 단순해서 린트가 빠르다는 이유로 골랐다고 합니다.
 
@@ -93,7 +93,7 @@ Mac과 iOS 개발에서도 Xcode는 크게 필요 없고, xcodeproj 파일도 �
 The simplest form is text, so by default, whatever I wanna build, it starts as CLI. Agents can call it directly and verify output - closing the loop.
 </Quote>
 
-가장 단순한 형태는 텍스트라서, 무엇을 만들든 CLI로 시작하면 에이전트가 직접 호출하고 출력을 확인할 수 있다는 설명입니다. 인용문의 "closing the loop"는 에이전트가 만들고, 실행하고, 결과를 확인하는 과정을 사람 없이 혼자 끝낸다는 뜻입니다. 그가 드는 예는 YouTube 영상을 요약하는 크롬 확장 프로그램입니다. 먼저 summarize라는 CLI로 핵심 기능을 완성했고, 그다음 확장 프로그램 전체를 하루 만에 만들었다고 합니다. 글의 다른 부분에서도 무엇을 만들든 모델과 CLI부터 시작하라고 권합니다.
+가장 단순한 형태가 텍스트이니 무엇을 만들든 CLI로 시작합니다. 그러면 에이전트가 직접 호출하고 출력을 확인할 수 있습니다. 인용문의 "closing the loop"는 에이전트가 만들고, 실행하고, 결과를 확인하는 과정을 사람 없이 혼자 마무리하는 것을 가리킵니다. 그가 드는 예는 YouTube 영상을 요약하는 크롬 확장 프로그램입니다. 먼저 summarize라는 CLI로 핵심 기능을 완성했고, 그다음 확장 프로그램 전체를 하루 만에 만들었다고 합니다. 글의 다른 부분에서도 무엇을 만들든 모델과 CLI부터 시작하라고 권합니다.
 
 <Compare
   before="UI부터 만들고, 동작은 사람이 화면을 눌러 보며 확인한다"
@@ -124,7 +124,7 @@ The simplest form is text, so by default, whatever I wanna build, it starts as C
 After all, I don’t design codebases to be easy to navigate for me, I engineer them so agents can work in it efficiently.
 </Quote>
 
-코드베이스를 자기가 둘러보기 편하게가 아니라 에이전트가 효율적으로 일할 수 있게 설계한다는 말입니다.
+그는 코드베이스를 자기가 둘러보기 편하게 짜지 않습니다. 에이전트가 효율적으로 일할 수 있게 설계합니다.
 
 일하는 방식도 과감합니다. 되돌리기나 체크포인트는 거의 쓰지 않고, 문제가 생기면 모델에게 고쳐 달라고 합니다. main 브랜치에 바로 커밋하고, 워크트리는 가끔만 씁니다. 그리고 바로 이 대목에서 직접 조건을 붙입니다.
 
@@ -132,7 +132,7 @@ After all, I don’t design codebases to be easy to navigate for me, I engineer 
 Caveat: I usually work alone, if you work in a bigger team that workflow obv won’t fly.
 </Quote>
 
-자신은 보통 혼자 일하니 큰 팀에서는 이 방식이 통하지 않을 거라는 단서입니다. 리뷰와 브랜치 규칙이 있는 팀이라면 그대로 따라 하기 어렵습니다. CLI로 에이전트가 스스로 확인하게 하는 습관처럼 팀 규칙과 부딪히지 않는 부분만 골라 쓰는 편이 낫습니다.
+보통 혼자 일하는 사람의 방식이라, 큰 팀에서는 통하지 않을 거라고 스스로 단서를 붙인 것입니다. 리뷰와 브랜치 규칙이 있는 팀이라면 그대로 따라 하기 어렵습니다. CLI로 에이전트가 스스로 확인하게 하는 습관처럼 팀 규칙과 부딪히지 않는 부분만 골라 쓰는 편이 낫습니다.
 
 시점도 감안해야 합니다. 이 글은 그가 OpenAI에 합류하기 전, gpt-5.2-codex를 기본 모델로 쓰던 2025년 12월의 기록입니다. codex와 Opus 비교, oracle 사용 빈도, 지식 컷오프 차이는 모두 당시 모델을 쓴 한 사람의 경험입니다. 모델이 바뀌면 이 비교도 쉽게 달라질 수 있습니다.
 
