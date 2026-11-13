@@ -3,6 +3,7 @@ import path from "node:path";
 import { parse as parseYaml } from "yaml";
 import type { z } from "zod";
 import { GlossaryRegistry, PeopleRegistry, type Article, type ArticleMeta, type Category, type KitFile } from "./schema";
+import { relatedGraph, type RelatedGraph } from "./related";
 import { parseArticle } from "./validate";
 
 /** The single content entry point shared by web pages and the MCP server. */
@@ -118,6 +119,17 @@ export function listArticles(filter: {
         ),
     )
     .map(({ bodyMarkdown, kit, persons, terms, ...meta }) => meta);
+}
+
+/** Articles close to `article`, drawn from the same visibility pool the article list uses. */
+export function getRelatedGraph(
+  article: Article,
+  { includeDrafts = includeDraftsByDefault() }: { includeDrafts?: boolean } = {},
+): RelatedGraph {
+  return relatedGraph(
+    article,
+    all().filter((a) => includeDrafts || !a.draft),
+  );
 }
 
 export function getArticle(
