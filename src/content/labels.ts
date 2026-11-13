@@ -36,7 +36,7 @@ export function sourcePeriod(sources: Dated[]): string {
   const dated = sources.filter((s): s is Dated & { publishedAt: Date } => Boolean(s.publishedAt));
   const times = dated.map((s) => s.publishedAt.getTime());
   const [from, to] = [monthFormat.format(Math.min(...times)), monthFormat.format(Math.max(...times))];
-  const estimated = dated.some((s) => s.dateNote) ? " (일부 날짜 간접 확인)" : "";
+  const estimated = dated.some((s) => s.dateNote) ? " (일부 날짜는 원문 밖에서 확인)" : "";
   return (from === to ? from : `${from} ~ ${to}`) + estimated;
 }
 

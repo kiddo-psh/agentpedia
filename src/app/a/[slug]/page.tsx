@@ -130,7 +130,7 @@ async function ArticleView({ slug }: { slug: string }) {
                 {" "}
                 · {s.author} ·{" "}
                 {s.publishedAt ? formatDate(s.publishedAt) : `날짜 없음 (${formatDate(s.accessedAt!)} 열람)`}
-                {s.publishedAt && s.dateNote && <span title={s.dateNote}> (날짜 간접 확인)</span>}
+                {s.publishedAt && s.dateNote && <span title={s.dateNote}> (날짜는 원문 밖에서 확인)</span>}
               </span>
             </li>
           ))}

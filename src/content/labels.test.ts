@@ -8,7 +8,7 @@ describe("sourcePeriod", () => {
     expect(sourcePeriod([at("2025-06-17"), at("2025-06-19")])).toBe("2025년 6월");
   });
   it("shows a range across months and flags estimated dates", () => {
-    expect(sourcePeriod([at("2026-01-10"), at("2025-12-28", "추정")])).toBe("2025년 12월 ~ 2026년 1월 (일부 날짜 간접 확인)");
+    expect(sourcePeriod([at("2026-01-10"), at("2025-12-28", "추정")])).toBe("2025년 12월 ~ 2026년 1월 (일부 날짜는 원문 밖에서 확인)");
   });
 });
 
