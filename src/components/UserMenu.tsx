@@ -10,22 +10,25 @@ export function UserMenu() {
   const pathname = usePathname();
   const router = useRouter();
 
-  if (isPending) return <span className="inline-block h-4 w-14" aria-hidden />;
+  if (isPending) return <span className="inline-block h-9 w-16" aria-hidden />;
 
   if (!data) {
     return (
-      <Link href={`/login?next=${encodeURIComponent(pathname)}`} className="hover:text-foreground">
+      <Link
+        href={`/login?next=${encodeURIComponent(pathname)}`}
+        className="inline-flex h-9 items-center rounded-full bg-foreground px-4 font-medium text-background hover:opacity-85"
+      >
         로그인
       </Link>
     );
   }
 
   return (
-    <span className="flex items-center gap-3">
+    <span className="flex items-center gap-4 text-muted">
       <Link href="/likes" className="hover:text-foreground">
         좋아요한 글
       </Link>
-      <span className="text-foreground">{data.user.name}</span>
+      <span className="text-foreground max-sm:hidden">{data.user.name}</span>
       <button
         type="button"
         className="hover:text-foreground"

@@ -55,7 +55,7 @@ export default function ArticlePage({ params }: PageProps<"/a/[slug]">) {
 
 function ArticleSkeleton() {
   return (
-    <div className="animate-pulse" aria-busy="true" aria-label="기사를 불러오는 중">
+    <div className="mx-auto max-w-3xl animate-pulse" aria-busy="true" aria-label="기사를 불러오는 중">
       <div className="mb-4 h-4 w-40 rounded bg-foreground/10" />
       <div className="mb-3 h-9 w-full rounded bg-foreground/10" />
       <div className="mb-10 h-9 w-2/3 rounded bg-foreground/10" />
@@ -95,7 +95,7 @@ async function ArticleView({ slug }: { slug: string }) {
 
   return (
     <ArticleTracking slug={article.slug}>
-    <article>
+    <article className="mx-auto max-w-3xl">
       <header className="mb-10">
         <div className="mb-3 flex flex-wrap items-center gap-2 text-sm text-muted">
           <span className="font-medium text-accent">{CATEGORY_LABEL[article.category]}</span>

@@ -13,12 +13,12 @@ export const metadata: Metadata = { title: "좋아요한 글" };
 
 export default function LikesPage() {
   return (
-    <>
+    <div className="mx-auto max-w-3xl">
       <h1 className="mb-8 text-3xl font-bold tracking-tight">좋아요한 글</h1>
       <Suspense fallback={<p className="text-sm text-muted">불러오는 중…</p>}>
         <LikedArticles />
       </Suspense>
-    </>
+    </div>
   );
 }
 

@@ -11,7 +11,7 @@ const cursorConfig = JSON.stringify({ mcpServers: { [SERVER_NAME]: { url: "{url}
 
 export default function ConnectPage() {
   return (
-    <article className="prose-article">
+    <article className="prose-article mx-auto max-w-3xl">
       <h1 className="text-3xl font-bold tracking-tight">에이전트에 연결하기</h1>
       <p className="text-muted">
         Agentpedia는 <strong>MCP 서버</strong>를 제공합니다. 연결하면 에이전트가 기사를 검색하고 읽고, 적용 키트를

@@ -16,25 +16,30 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className={`${GeistSans.variable} ${GeistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        <header className="border-b border-foreground/10">
-          <div className="mx-auto flex h-14 w-full max-w-3xl items-center justify-between px-4 sm:px-6">
-            <Link href="/" className="font-semibold tracking-tight">
+        <header className="sticky top-0 z-20 bg-background/90 backdrop-blur">
+          <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center gap-8 px-4 sm:px-8">
+            <Link href="/" className="text-[17px] font-semibold tracking-tight">
               Agentpedia
             </Link>
-            <nav className="flex gap-5 text-sm text-muted">
-              <Link href="/" className="hover:text-foreground">
+            <nav className="flex gap-6 text-sm text-muted">
+              <Link href="/" className="max-sm:hidden hover:text-foreground">
                 기사
               </Link>
               <Link href="/connect" className="hover:text-foreground">
                 에이전트 연결
               </Link>
-              <UserMenu />
             </nav>
+            <div className="ml-auto text-sm">
+              <UserMenu />
+            </div>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10 sm:px-6">{children}</main>
-        <footer className="border-t border-foreground/10 py-6 text-center text-xs text-muted">
-          모든 기사는 원문 출처를 밝히고 요약·해석한 글입니다.
+        <main className="mx-auto w-full max-w-[1280px] flex-1 px-4 pt-8 pb-32 sm:px-8">{children}</main>
+        <footer className="border-t border-line">
+          <div className="mx-auto flex w-full max-w-[1280px] flex-wrap items-center justify-between gap-2 px-4 py-8 text-xs text-muted sm:px-8">
+            <span className="font-semibold text-foreground">Agentpedia</span>
+            <span>모든 기사는 원문 출처를 밝히고 요약·해석한 글입니다.</span>
+          </div>
         </footer>
       </body>
     </html>
