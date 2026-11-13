@@ -6,7 +6,9 @@ import { monthsBetween, sourceAge } from "@/content/labels";
 const STALE_AFTER_MONTHS = 6;
 
 const subscribe = () => () => {};
-const getNow = () => Date.now();
+// Rounded to the day so the snapshot is stable between renders; ages are counted in months.
+const DAY = 86_400_000;
+const getNow = () => Math.floor(Date.now() / DAY) * DAY;
 const getServerNow = () => null;
 
 /**
