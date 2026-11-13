@@ -38,28 +38,28 @@ export function LoginForm({ github, devPassword }: { github: boolean; devPasswor
         <button
           type="button"
           onClick={() => authClient.signIn.social({ provider: "github", callbackURL: next })}
-          className="rounded-lg bg-foreground px-4 py-2.5 font-semibold text-background hover:opacity-90"
+          className="h-11 rounded-full bg-foreground px-5 font-medium text-background hover:opacity-85"
         >
           GitHub로 로그인
         </button>
       )}
 
       {devPassword && (
-        <form onSubmit={devLogin} className="grid gap-3 rounded-xl border border-dashed border-amber-500/50 p-4">
+        <form onSubmit={devLogin} className="grid gap-3 rounded-2xl p-5 ring-1 ring-amber-500/40 ring-inset">
           <p className="text-xs text-amber-600 dark:text-amber-400">
             개발용 로그인입니다. GitHub OAuth 설정이 없을 때 개발 환경에서만 보입니다. 처음이면 계정이 만들어집니다.
           </p>
-          <input name="name" placeholder="이름" required className="rounded-md border border-foreground/15 bg-background px-3 py-2" />
-          <input name="email" type="email" placeholder="이메일" required className="rounded-md border border-foreground/15 bg-background px-3 py-2" />
+          <input name="name" placeholder="이름" required className="rounded-xl bg-soft px-4 py-2.5 outline-none focus:ring-2 focus:ring-foreground/20" />
+          <input name="email" type="email" placeholder="이메일" required className="rounded-xl bg-soft px-4 py-2.5 outline-none focus:ring-2 focus:ring-foreground/20" />
           <input
             name="password"
             type="password"
             placeholder="비밀번호 (8자 이상)"
             minLength={8}
             required
-            className="rounded-md border border-foreground/15 bg-background px-3 py-2"
+            className="rounded-xl bg-soft px-4 py-2.5 outline-none focus:ring-2 focus:ring-foreground/20"
           />
-          <button disabled={busy} className="rounded-lg bg-foreground px-4 py-2 font-semibold text-background disabled:opacity-50">
+          <button disabled={busy} className="h-11 rounded-full bg-foreground px-5 font-medium text-background hover:opacity-85 disabled:opacity-50">
             {busy ? "처리 중…" : "개발용 로그인"}
           </button>
         </form>
