@@ -26,7 +26,20 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/a/[slug]">): Promise<Metadata> {
   const article = getArticle((await params).slug);
-  return article ? { title: article.title, description: article.summary } : {};
+  if (!article) return {};
+  return {
+    title: article.title,
+    description: article.summary,
+    openGraph: {
+      type: "article",
+      siteName: "Agentpedia",
+      locale: "ko_KR",
+      title: article.title,
+      description: article.summary,
+      url: `/a/${article.slug}`,
+    },
+    twitter: { card: "summary", title: article.title, description: article.summary },
+  };
 }
 
 // params is URL data: keep it behind Suspense so client navigation can show the shell instantly.

@@ -15,6 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  // Share previews need absolute URLs; BETTER_AUTH_URL is the public site URL.
+  metadataBase: new URL(process.env.BETTER_AUTH_URL || "http://localhost:3000"),
   title: { default: "Agentpedia", template: "%s · Agentpedia" },
   description: "AI 에이전트 시대의 인사이트를 읽고, 내 프로젝트에 바로 적용해 보세요.",
 };
