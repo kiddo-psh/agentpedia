@@ -113,19 +113,21 @@ async function ArticleView({ slug }: { slug: string }) {
         <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{article.title}</h1>
         {/* `summary` feeds the list and metadata; here the 30-second brief below says the same thing. */}
         {article.persons.length > 0 && <People persons={article.persons} />}
-        <div className="mt-6 flex items-center gap-2">
-          {/* The like count is request-time; a fixed-size placeholder keeps the header from shifting. */}
-          <Suspense fallback={<LikeButtonSkeleton />}>
-            <LikeButton slug={article.slug} />
-          </Suspense>
-          <ShareButton slug={article.slug} title={article.title} text={article.summary} />
-        </div>
       </header>
 
       <ArticleBrief article={article} />
 
       <ArticleBody article={article} />
       <GlossaryList terms={article.terms} />
+
+      {/* Reactions come once the reader has finished the article. */}
+      <div className="mt-12 flex items-center justify-center gap-2">
+        {/* The like count is request-time; a fixed-size placeholder keeps the row from shifting. */}
+        <Suspense fallback={<LikeButtonSkeleton />}>
+          <LikeButton slug={article.slug} />
+        </Suspense>
+        <ShareButton slug={article.slug} title={article.title} text={article.summary} />
+      </div>
 
       <KitSection article={article} />
 
