@@ -23,7 +23,7 @@ apply:
   fitsWhen: "Claude Code를 쓰면서 권한 요청이 잦거나, auto 모드를 쓰고 있거나 쓰려는 프로젝트"
   time: "15~30분"
 tryIt: "이 레포의 .claude/settings.json, settings.local.json과 ~/.claude/settings.json에서 permissions(allow, ask, deny, defaultMode, disableAutoMode)와 최상위 disableAutoMode, autoMode만 읽어 표로 정리해줘. token·key·secret·password 단어나 sk-·ghp_ 접두어가 든 규칙은 전체를 ***로 가리고, disableAutoMode가 있으면 맨 위에 적어줘. 끝에 'Bash(*)·python* 같은 넓은 규칙 N개, 인자가 열린 좁은 규칙 M개, ask·deny 규칙 K개'를 한 줄로 요약하고, 셋 다 0개면 점검할 것이 거의 없다고 알려줘. 파일 읽기 말고는 아무것도 하지 마."
-draft: true
+draft: false
 publishedAt: 2026-03-25
 keyIdeas:
   - "Anthropic은 사용자가 수동 권한 요청의 93%를 승인한다고 밝혔습니다. 요청이 잦아 내용을 주의 깊게 보지 않게 되는 현상을 승인 피로라고 부릅니다."

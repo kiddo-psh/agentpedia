@@ -22,7 +22,7 @@ apply:
   fitsWhen: "Claude Code를 쓰며 자동 메모리나 CLAUDE.md가 쌓여 가는 프로젝트"
   time: "15~30분"
 tryIt: "자동 메모리 폴더 경로는 <붙여넣기>야(/memory의 폴더 열기로 확인). 읽기 전용으로 MEMORY.md, CLAUDE.md, .claude/CLAUDE.md, CLAUDE.local.md, AGENTS.md, .claude/AGENTS.md 중 있는 파일의 줄 수(grep -c '')와 바이트(wc -c)를 알려줘. MEMORY.md는 200줄 또는 25KB(25,000·25,600바이트) 초과 여부, 나머지는 200줄 이상인지 표시해. AGENTS.md가 있는데 레포의 CLAUDE.md류가 @AGENTS.md를 가져오지 않으면 '로드 안 될 수 있음'으로 표시해. 파일이 하나도 없거나 grep·wc가 없으면 그렇게만 말하고 멈춰. 끝에 키트를 돌릴 만한지 한 줄로 판단해. 아무 파일도 바꾸지 마."
-draft: true
+draft: false
 publishedAt: 2026-11-06
 keyIdeas:
   - "Anthropic은 에이전트 메모리를 세션 사이에 이어지는 경험 기반 지식으로 정의하고, 가중치 변경·컨텍스트 안 학습·컴팩션은 제외합니다."

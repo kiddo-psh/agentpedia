@@ -23,7 +23,7 @@ apply:
   fitsWhen: "Claude Code를 쓰고, 테스트나 린트 같은 검증 명령이 하나 이상 있는 프로젝트"
   time: "20~40분"
 tryIt: "이 레포에서 변경을 검증하는 명령(테스트·린트·타입 검사)의 이름만 나열하고, CI 설정에서 timeout-minutes와 job 사이 needs(GitHub Actions)·stages(GitLab) 연결을 찾아 알려줘. 아무것도 실행하지 말고 읽기와 파일 목록 조회만 해. 마지막 줄 판정: 검증 명령이 없거나 git 레포가 아니면 '키트 부적합', CI 설정이 없거나 검증 명령이 CI에서 도는지 확인되지 않으면 '키트 실행 권장(CI 공백)', timeout-minutes 10 이상(상한값이라 느릴 가능성으로만 봐)이 있거나 3단계 이상 이어지면 '키트 실행 권장', 그 외 '키트 불필요'. 아무 파일도 바꾸지 마."
-draft: true
+draft: false
 publishedAt: 2026-11-08
 keyIdeas:
   - "Theo는 에이전트 시대 엔지니어를 코드를 직접 키우는 사람이 아니라 코드가 잘 자라는 환경을 짓는 정원사로 봅니다."
