@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { GeistMono } from "geist/font/mono";
+import { geistMono } from "./fonts";
 import Link from "next/link";
 import { UserMenu } from "@/components/UserMenu";
 // Split into unicode-range subsets: a page downloads only the glyphs it uses.
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ko" className={`${GeistMono.variable} h-full antialiased`}>
+    <html lang="ko" className={`${geistMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <header className="sticky top-0 z-20 bg-background/90 backdrop-blur">
           <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center gap-8 px-4 sm:px-8">
