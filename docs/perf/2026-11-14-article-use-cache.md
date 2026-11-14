@@ -18,9 +18,13 @@ Article HTML grew to 178-266 KB.
 ## What the article spent its time on
 
 A CPU profile of 200 requests to the harness article put 21% of samples under the MDX
-`evaluate` call in `ArticleBody`. The article is not in the prerendered HTML: the shell holds
-only `ArticleSkeleton`, because `params` is URL data under Partial Prefetching, so the whole
-article rendered and compiled its MDX on every request.
+`evaluate` call in `ArticleBody`. The prerendered HTML already holds the article, but each
+request resumes the render to produce the inline RSC payload, and that resume re-ran the article
+tree, MDX compile included.
+
+(An earlier version of this note said the shell held only `ArticleSkeleton`. That came from
+finding the skeleton's text in the serialized Suspense fallback. A byte diff of the served page
+against the prerendered file shows the article HTML is in the shell.)
 
 ## Fix: `"use cache"` on `ArticleView`
 
@@ -39,6 +43,7 @@ Wall per request moved from 52-60 ms to 35-40 ms. The ranges do not overlap.
 
 ## Still open
 
-The prerendered HTML for a listed slug still holds the skeleton, not the article, so each
-request still streams the cached article (most of the remaining ~38 ms CPU and the 74% inline
-RSC share of the HTML). Getting the article into the shell is the next lever.
+Each request still appends about 119 KB of inline RSC payload after the 47 KB shell, and that
+accounts for most of the remaining ~38 ms CPU. About 34 KB of it is a Uint8Array stream on the
+root payload's `p` field that repeats page content for the client router. Browser-side findings
+are in `2026-11-14-first-paint.md`.
