@@ -1,0 +1,139 @@
+{
+  "base": "https://agentpedia-flax.vercel.app",
+  "measuredAt": "2026-11-14T10:11:05.191Z",
+  "results": [
+    {
+      "route": "/",
+      "status": 200,
+      "cache": "1",
+      "bytes": 65310,
+      "runs": 20,
+      "ttfb": {
+        "p50": 40.3,
+        "p90": 52.9,
+        "min": 27.6,
+        "max": 56.7
+      },
+      "total": {
+        "p50": 40.5,
+        "p90": 53.9,
+        "min": 28.1,
+        "max": 57.4
+      }
+    },
+    {
+      "route": "/connect",
+      "status": 200,
+      "cache": "1",
+      "bytes": 16572,
+      "runs": 20,
+      "ttfb": {
+        "p50": 37.6,
+        "p90": 44.4,
+        "min": 24.6,
+        "max": 55.5
+      },
+      "total": {
+        "p50": 37.8,
+        "p90": 45,
+        "min": 24.8,
+        "max": 55.8
+      }
+    },
+    {
+      "route": "/login",
+      "status": 200,
+      "cache": "1",
+      "bytes": 10912,
+      "runs": 20,
+      "ttfb": {
+        "p50": 32.4,
+        "p90": 49.8,
+        "min": 24.4,
+        "max": 108.1
+      },
+      "total": {
+        "p50": 32.6,
+        "p90": 50,
+        "min": 24.6,
+        "max": 108.4
+      }
+    },
+    {
+      "route": "/likes",
+      "status": 200,
+      "cache": "1",
+      "bytes": 18905,
+      "runs": 20,
+      "ttfb": {
+        "p50": 44.5,
+        "p90": 54.9,
+        "min": 25.5,
+        "max": 55.1
+      },
+      "total": {
+        "p50": 267.3,
+        "p90": 442.1,
+        "min": 232.8,
+        "max": 486.1
+      }
+    },
+    {
+      "route": "/a/karpathy-software-3",
+      "status": 200,
+      "cache": "",
+      "bytes": 180461,
+      "runs": 20,
+      "ttfb": {
+        "p50": 44.4,
+        "p90": 56.9,
+        "min": 24.4,
+        "max": 269.9
+      },
+      "total": {
+        "p50": 805.2,
+        "p90": 873.6,
+        "min": 630.2,
+        "max": 1012.2
+      }
+    },
+    {
+      "route": "/a/anthropic-harness-design-long-running-apps",
+      "status": 200,
+      "cache": "",
+      "bytes": 274505,
+      "runs": 20,
+      "ttfb": {
+        "p50": 40.6,
+        "p90": 113.5,
+        "min": 30.2,
+        "max": 119.2
+      },
+      "total": {
+        "p50": 837.7,
+        "p90": 1006.3,
+        "min": 764.3,
+        "max": 1007.3
+      }
+    },
+    {
+      "route": "/a/theo-coding-isnt-about-code-anymore",
+      "status": 200,
+      "cache": "1",
+      "bytes": 227924,
+      "runs": 20,
+      "ttfb": {
+        "p50": 42.3,
+        "p90": 72.5,
+        "min": 27.5,
+        "max": 266.3
+      },
+      "total": {
+        "p50": 846.4,
+        "p90": 1022.5,
+        "min": 778.5,
+        "max": 1577.7
+      }
+    }
+  ]
+}
