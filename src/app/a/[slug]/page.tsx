@@ -44,41 +44,27 @@ export async function generateMetadata({ params }: PageProps<"/a/[slug]">): Prom
   };
 }
 
-// params is URL data: keep it behind Suspense so client navigation can show the shell instantly.
-export default function ArticlePage({ params }: PageProps<"/a/[slug]">) {
+// params is awaited outside Suspense on purpose: every slug is prerendered, so the article paints in
+// the first frame. Behind a boundary it sat hidden under a skeleton until a later reveal and a
+// second layout (docs/perf/2026-11-14-first-paint.md).
+export default async function ArticlePage({ params }: PageProps<"/a/[slug]">) {
+  const { slug } = await params;
+  if (!getArticle(slug)) notFound();
   return (
-    <Suspense fallback={<ArticleSkeleton />}>
-      {params.then(({ slug }) => {
-        if (!getArticle(slug)) notFound();
-        return (
-          <ArticleView
-            slug={slug}
-            likes={
-              // The like count is request-time; a fixed-size placeholder keeps the row from shifting.
-              <Suspense fallback={<LikeButtonSkeleton />}>
-                <LikeButton slug={slug} />
-              </Suspense>
-            }
-            comments={
-              <Suspense fallback={<p className="text-sm text-muted">토론을 불러오는 중…</p>}>
-                <Comments slug={slug} />
-              </Suspense>
-            }
-          />
-        );
-      })}
-    </Suspense>
-  );
-}
-
-function ArticleSkeleton() {
-  return (
-    <div className="mx-auto max-w-[720px] animate-pulse" aria-busy="true" aria-label="기사를 불러오는 중">
-      <div className="mb-5 h-4 w-40 rounded bg-soft" />
-      <div className="mb-3 h-11 w-full rounded bg-soft" />
-      <div className="mb-10 h-11 w-2/3 rounded bg-soft" />
-      <div className="h-48 rounded-2xl bg-soft" />
-    </div>
+    <ArticleView
+      slug={slug}
+      likes={
+        // The like count is request-time; a fixed-size placeholder keeps the row from shifting.
+        <Suspense fallback={<LikeButtonSkeleton />}>
+          <LikeButton slug={slug} />
+        </Suspense>
+      }
+      comments={
+        <Suspense fallback={<p className="text-sm text-muted">토론을 불러오는 중…</p>}>
+          <Comments slug={slug} />
+        </Suspense>
+      }
+    />
   );
 }
 
