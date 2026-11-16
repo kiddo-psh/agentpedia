@@ -75,4 +75,13 @@ npm run ideas:collect -- --source hn --limit 10 --verbose
 
 ## 스케줄
 
-[`.github/workflows/collect-ideas.yml`](../.github/workflows/collect-ideas.yml)이 주 1회 `ideas:collect`를 돌리고, 변경이 있으면 `content/ideas.yaml`을 master에 커밋합니다.
+[`.github/workflows/collect-ideas.yml`](../.github/workflows/collect-ideas.yml)이 주 1회 `npm run ideas:collect`를 돌립니다.
+
+| | |
+|---|---|
+| cron (UTC) | `0 0 * * 1` |
+| 시각 | **월요일 09:00 Asia/Seoul (KST)** (= 월요일 00:00 UTC) |
+| 결과 | 변경이 있으면 `content/ideas.yaml`만 master에 커밋 (`content: refresh ideas backlog from weekly collect`). 변경 없으면 커밋 생략 |
+| 수동 실행 | Actions → **collect-ideas** → **Run workflow** (`workflow_dispatch`) |
+
+비밀키는 필요 없습니다(HN / RSS / YouTube Atom).
