@@ -76,10 +76,11 @@ export function parseArticle({ dirName, raw, kit, people, glossary }: ArticleInp
         `line ${line}: "**" did not become bold and will show as literal asterisks. Move punctuation outside the markers: "**...**"이라고`,
       );
     });
-    // The 30-second brief already outlines the article; body headings repeated it.
+    // The page title is the only h1, and deeper than h3 is a sign the article needs splitting.
     visit(tree, "heading", (node) => {
+      if (node.depth === 2 || node.depth === 3) return;
       const line = (node.position?.start.line ?? 0) + bodyOffset;
-      issues.push(`line ${line}: body headings are not allowed. Bridge with a sentence, or use "---" for a scene break`);
+      issues.push(`line ${line}: body headings must be "##" or "###" (the title is the only "#")`);
     });
   }
 

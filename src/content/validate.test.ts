@@ -119,10 +119,12 @@ describe("parseArticle", () => {
     expect(!bad.ok && bad.issues.join("\n")).toMatch(/frontmatter\.title: no ":" in titles/);
   });
 
-  it("rejects body headings but allows a scene break", () => {
-    const bad = parse(mdx("첫 문단입니다.\n\n## 소제목\n\n둘째 문단입니다."));
-    expect(!bad.ok && bad.issues.join("\n")).toMatch(/body headings are not allowed/);
-    expect(parse(mdx("첫 문단입니다.\n\n---\n\n둘째 문단입니다.")).ok).toBe(true);
+  it("allows ## and ### subheadings and scene breaks, rejects # and ####", () => {
+    expect(parse(mdx("첫 문단입니다.\n\n## 소제목\n\n### 작은 제목\n\n---\n\n둘째 문단입니다.")).ok).toBe(true);
+    for (const h of ["# 제목", "#### 너무 깊은 제목"]) {
+      const bad = parse(mdx(`첫 문단입니다.\n\n${h}\n\n둘째 문단입니다.`));
+      expect(!bad.ok && bad.issues.join("\n")).toMatch(/body headings must be "##" or "###"/);
+    }
   });
 
   it("accepts a pyramid with a shape and layers, rejects a malformed one", () => {

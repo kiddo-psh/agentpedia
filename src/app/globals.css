@@ -45,7 +45,7 @@ body {
     font-size: 1.125rem;
     line-height: 1.85;
   }
-  /* Scene break: the body has no headings, so a short centered rule marks a change of scene. */
+  /* Scene break: a short centered rule marks a change of scene inside a section. */
   .prose-article :where(hr):not(:where(.not-prose *)) {
     width: 4rem;
     margin: 2.75rem auto;
@@ -58,6 +58,13 @@ body {
     font-weight: 600;
     letter-spacing: -0.02em;
     line-height: 1.35;
+  }
+  .prose-article :where(h3):not(:where(.not-prose *)) {
+    margin: 2.25rem 0 0.5rem;
+    font-size: 1.1875rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.4;
   }
   .prose-article :where(p, ul, ol, table):not(:where(.not-prose *)) {
     margin: 1rem 0;

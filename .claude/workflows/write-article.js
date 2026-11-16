@@ -90,7 +90,7 @@ const RESEARCH = {
         required: ['id', 'term', 'definition'],
       },
     },
-    storyAngle: { type: 'string', description: 'The scene to open with and the tension the article resolves' },
+    storyAngle: { type: 'string', description: 'The claim to open with (who said what, when), the scene that follows it, and the tension the article resolves' },
     gaps: { type: 'array', items: { type: 'string' }, description: 'What could not be verified' },
   },
   required: ['sources', 'claims', 'quotes', 'people', 'terms', 'storyAngle', 'gaps'],
@@ -196,7 +196,7 @@ Look at content/articles/agent-tools-trust-boundary/ for the file format and sec
 Use only these verified facts and quotes; anything not here must not appear:
 ${JSON.stringify(r, null, 2)}
 Open with this angle: ${r.storyAngle}
-Only <Quote> the quotes listed above, with their source id and at. Only use KeyIdea, Quote, Compare, Term.
+Only <Quote> the quotes listed above, with their source id and at. Only use KeyIdea, Quote, Compare, Term, Pyramid, PyramidLayer. Give each section a ## subheading that states its point, and add a <Pyramid> when the source describes layers.
 Only edit files inside content/articles/${it.slug}/. Run \`npm run validate:content\` and fix until it passes for this article.`,
       { label: `write:${label(it)}`, phase: 'Write', model: MODELS.write })
     return { it, research: r }
