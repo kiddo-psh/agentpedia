@@ -146,6 +146,16 @@ describe("parseArticle", () => {
     expect(parse(mdx("Ada는 이렇게 말했습니다. 에이다이어트는 다른 말입니다.")).ok).toBe(true);
   });
 
+  it("checks the kit and the definitions of terms the body uses for transliterated names", () => {
+    const badKit = [{ path: "prompt.md", content: "에이다의 원칙을 적용한다." }];
+    const r1 = parse(mdx("body"), "sample", badKit);
+    expect(!r1.ok && r1.issues.join("\n")).toMatch(/kit\/prompt\.md: write "Ada" instead of "에이다"/);
+
+    const terms = new Map([["t", { id: "t", term: "틀", definition: "에이다가 만든 틀입니다." }]]);
+    const r2 = parseArticle({ dirName: "sample", raw: mdx('<Term id="t">틀</Term>'), kit, people, glossary: terms });
+    expect(!r2.ok && r2.issues.join("\n")).toMatch(/glossary\.yaml "t": write "Ada"/);
+  });
+
   it("rejects bold that cannot close before Korean text", () => {
     const bad = parse(mdx('그는 **"에이전트의 10년"**이라고 부릅니다.'));
     expect(!bad.ok && bad.issues.join("\n")).toMatch(/literal asterisks/);

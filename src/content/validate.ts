@@ -66,6 +66,10 @@ export function parseArticle({ dirName, raw, kit, people, glossary }: ArticleInp
       const m = text.match(pattern);
       if (m) issues.push(`line ${bodyStart + i + 1}: write "${person.name}" instead of "${m[0]}"`);
     });
+    for (const file of kit) {
+      const m = file.content.match(pattern);
+      if (m) issues.push(`kit/${file.path}: write "${person.name}" instead of "${m[0]}"`);
+    }
   }
 
   if (!kit.some((f) => f.path === REQUIRED_KIT_FILE)) {
@@ -162,6 +166,15 @@ export function parseArticle({ dirName, raw, kit, people, glossary }: ArticleInp
         issues.push(`line ${line}: <Quote at="${at}"> must look like mm:ss or h:mm:ss`);
       }
     });
+  }
+
+  // A popover definition is page text too.
+  for (const id of termIds) {
+    const { definition } = glossary.get(id)!;
+    for (const person of people.values()) {
+      const m = definition.match(koreanNamePattern(person.nameKo));
+      if (m) issues.push(`content/glossary.yaml "${id}": write "${person.name}" instead of "${m[0]}"`);
+    }
   }
 
   if (issues.length > 0 || !meta.success) return { ok: false, issues };
