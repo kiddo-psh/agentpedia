@@ -138,6 +138,14 @@ describe("parseArticle", () => {
     expect(issues).toMatch(/must sit directly inside <Pyramid>/);
   });
 
+  it("rejects a Korean transliteration of a registered person's name", () => {
+    const bad = parse(mdx("에이다는 이렇게 말했습니다.", { title: `"에이다 이야기"` }));
+    const issues = !bad.ok && bad.issues.join("\n");
+    expect(issues).toMatch(/line \d+: write "Ada" instead of "에이다"/);
+    expect(issues).toMatch(/frontmatter: write "Ada" instead of "에이다"/);
+    expect(parse(mdx("Ada는 이렇게 말했습니다. 에이다이어트는 다른 말입니다.")).ok).toBe(true);
+  });
+
   it("rejects bold that cannot close before Korean text", () => {
     const bad = parse(mdx('그는 **"에이전트의 10년"**이라고 부릅니다.'));
     expect(!bad.ok && bad.issues.join("\n")).toMatch(/literal asterisks/);

@@ -85,7 +85,7 @@ function People({ persons }: { persons: Article["persons"] }) {
         <span key={p.id}>
           {i > 0 && " · "}
           <span className="font-medium text-foreground" title={p.role}>
-            {p.nameKo}
+            {p.name}
           </span>
         </span>
       ))}

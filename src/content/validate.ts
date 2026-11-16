@@ -53,6 +53,21 @@ export function parseArticle({ dirName, raw, kit, people, glossary }: ArticleInp
     issues.push(`frontmatter.people: "${id}" is not in content/people.yaml`);
   }
 
+  // People are named in English everywhere; the Korean transliteration exists only for search.
+  const { sources: _sources, ...readerFields } = data as Record<string, unknown>;
+  const frontmatterText = JSON.stringify(readerFields);
+  const bodyLines = content.split("\n");
+  const bodyStart = raw.split("\n").length - bodyLines.length;
+  for (const person of people.values()) {
+    const pattern = koreanNamePattern(person.nameKo);
+    const match = frontmatterText.match(pattern);
+    if (match) issues.push(`frontmatter: write "${person.name}" instead of "${match[0]}"`);
+    bodyLines.forEach((text, i) => {
+      const m = text.match(pattern);
+      if (m) issues.push(`line ${bodyStart + i + 1}: write "${person.name}" instead of "${m[0]}"`);
+    });
+  }
+
   if (!kit.some((f) => f.path === REQUIRED_KIT_FILE)) {
     issues.push(`kit/${REQUIRED_KIT_FILE} is missing`);
   }
@@ -153,6 +168,18 @@ export function parseArticle({ dirName, raw, kit, people, glossary }: ArticleInp
   const persons = meta.data.people.map((id) => people.get(id)!);
   const terms = [...termIds].map((id) => glossary.get(id)!);
   return { ok: true, article: { ...meta.data, bodyMarkdown: content.trim(), kit, persons, terms } };
+}
+
+/**
+ * The full transliteration, or any one part of it standing as a word: "로렌 탄", "탄은", "카파시의".
+ * A part counts only when it stands alone, optionally followed by a particle and then no more
+ * Hangul, so "존재", "마틴게일" and "에이다이어트" do not match "존", "마틴" or "에이다".
+ */
+function koreanNamePattern(nameKo: string): RegExp {
+  const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const parts = [nameKo, ...nameKo.split(/\s+/)].map(escape).join("|");
+  const particles = "은|는|이|가|의|을|를|도|와|과|에게|에서|에|께|로|으로|이라는|라는|이라고|라고|처럼|보다|만|까지|부터|조차";
+  return new RegExp(`(?<![가-힣])(?:${parts})(?=(?:${particles})?(?![가-힣]))`);
 }
 
 /** "1:02:03" -> 3723. Used to build `?t=` links. Assumes the input passed validation. */

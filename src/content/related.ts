@@ -26,7 +26,7 @@ export const MAX_RELATED = 4;
 
 function signals(a: Candidate): SharedSignal[] {
   return [
-    ...a.persons.map((p) => ({ kind: "person" as const, id: p.id, label: p.nameKo })),
+    ...a.persons.map((p) => ({ kind: "person" as const, id: p.id, label: p.name })),
     ...a.tags.map((t) => ({ kind: "tag" as const, id: t, label: t })),
     ...a.terms.map((t) => ({ kind: "term" as const, id: t.id, label: t.term })),
   ];

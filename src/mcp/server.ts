@@ -82,7 +82,7 @@ export function articleText(a: Article, origin: string): string {
     "",
     `URL: ${origin}/a/${a.slug}`,
     `카테고리: ${CATEGORY_LABEL[a.category]}${a.draft ? " · 초안(검수 전)" : ""}`,
-    ...a.persons.map((p) => `인물: ${p.nameKo} (${p.name}) — ${p.role}`),
+    ...a.persons.map((p) => `인물: ${p.name} — ${p.role}`),
     "",
     a.summary,
     "",

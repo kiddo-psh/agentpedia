@@ -17,7 +17,7 @@ export function readerText(article: Article): string {
   const out: string[] = [];
   const meta = [CATEGORY_LABEL[article.category], DIFFICULTY_LABEL[article.difficulty], sourcePeriod(article.sources)];
   out.push(meta.join(" · "), "", `# ${article.title}`, "");
-  for (const p of article.persons) out.push(`${p.nameKo} (${p.name}) — ${p.role}`);
+  for (const p of article.persons) out.push(`${p.name} — ${p.role}`);
   if (article.persons.length > 0) out.push("");
 
   const { brief } = article;
