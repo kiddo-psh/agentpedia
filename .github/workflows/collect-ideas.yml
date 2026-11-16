@@ -1,0 +1,33 @@
+name: collect-ideas
+
+on:
+  schedule:
+    # Monday 09:00 UTC
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run ideas:collect -- --limit 30
+      - name: Commit inbox updates
+        run: |
+          if git diff --quiet -- content/ideas.yaml; then
+            echo "no idea changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content/ideas.yaml
+          git commit -m "content: append collected article ideas"
+          git push
