@@ -74,7 +74,7 @@ function block(node: RootContent, article: Article): string {
     case "thematicBreak":
       return "———";
     case "heading":
-      return `## ${inline(node, article)}`;
+      return `${"#".repeat(node.depth)} ${inline(node, article)}`;
     case "list":
       return node.children.map((li, i) => `${node.ordered ? `${(node.start ?? 1) + i}.` : "•"} ${blocks(li.children, article).join(" ")}`).join("\n");
     case "code":

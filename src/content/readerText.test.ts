@@ -19,6 +19,8 @@ const article: Article = {
   publishedAt: new Date("2026-01-03"),
   bodyMarkdown: [
     '첫 문단에 <Term id="mcp">MCP</Term>가 나옵니다.',
+    "## 큰 제목",
+    "### 작은 제목",
     "---",
     '<Quote source="talk" at="1:02">Original words.</Quote>',
     '<KeyIdea title="박스 제목">\n박스 본문입니다.\n</KeyIdea>',
@@ -51,6 +53,7 @@ describe("readerText", () => {
 
   it("renders body components the way the page labels them", () => {
     expect(text).toContain("———");
+    expect(text).toContain("## 큰 제목\n\n### 작은 제목");
     expect(text).toContain("[인용] Original words.\n— Ada, A talk (1:02)");
     expect(text).toContain("[핵심 아이디어 상자] 박스 제목\n박스 본문입니다.");
     expect(text).toContain("[도식: 거꾸로 선 피라미드, 위가 가장 넓음]\n1. 코드 — API 설계\n2. 글\n도식 설명");
