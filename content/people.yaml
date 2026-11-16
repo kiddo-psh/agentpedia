@@ -81,3 +81,13 @@
   name: Lauren Tan
   nameKo: 로렌 탄
   role: SpaceXSI Principal Engineer, Grok Bot 팀
+
+- id: rodrigo-roim
+  name: Rodrigo Roim
+  nameKo: 로드리고 로임
+  role: OpenAI Core Experimentation 팀 엔지니어, GPT-6 소프트웨어 유지보수 글 저자
+
+- id: anthropic-engineering-source-control-team
+  name: Anthropic Source Control Team
+  nameKo: 소스컨트롤팀
+  role: Scion과 Antique를 만든 Anthropic Engineering 7인 팀(글 작성자 Nick G., 성 미공개)
