@@ -1,4 +1,4 @@
-# AI 학습 플랫폼 MVP 설계
+# Agentpedia MVP 설계
 
 > 상태: 초안 · 2026-11-11
 > 핵심 가설: **"기사를 읽은 개발자가 그 방법을 자기 프로젝트에 실제로 적용한다."**
@@ -17,11 +17,11 @@
 ### 흐름 B: 에이전트에서 적용 (핵심 차별점)
 
 ```bash
-claude mcp add --transport http ai-learn https://<도메인>/mcp
+claude mcp add --transport http agentpedia https://agentpedia-flax.vercel.app/mcp
 ```
 
 ```
-> /mcp__ai-learn__apply_article karpathy-software-3
+> /mcp__agentpedia__apply_article karpathy-software-3
 ```
 
 1. MCP 프롬프트가 기사 핵심 내용, 적용 키트, 단계별 지시를 에이전트에게 넘긴다.
@@ -240,7 +240,7 @@ events {
 | tool | `get_apply_kit` | `slug` | 키트 파일 전체 (`path`, `content`) |
 | prompt | `apply_article` | `slug` | 레포에 적용하는 작업 지시 (아래) |
 
-`apply_article`은 MCP **prompt**로 만든다. Claude Code에서는 `/mcp__ai-learn__apply_article`이라는 슬래시 명령으로 바로 나타나기 때문에, 사용자가 도구 이름을 몰라도 시작할 수 있다.
+`apply_article`은 MCP **prompt**로 만든다. Claude Code에서는 `/mcp__agentpedia__apply_article`이라는 슬래시 명령으로 바로 나타나기 때문에, 사용자가 도구 이름을 몰라도 시작할 수 있다.
 
 ### `apply_article` 프롬프트 골격
 
@@ -337,5 +337,5 @@ side-pjt/
 
 1. **기사 작성 방식:** AI 초안을 사람이 검수할지, 직접 쓸지. 둘 다 출처 검증 규칙은 같다.
 2. **언어:** 한국어 전용으로 시작할지, 처음부터 영어도 함께 할지. (권장: 한국어 전용)
-3. **도메인과 서비스 이름**
+3. ~~**도메인과 서비스 이름**~~ → 결정: 서비스 이름 Agentpedia, 도메인 `agentpedia-flax.vercel.app`, MCP 서버 이름 `agentpedia` (`src/mcp/name.ts`).
 4. **저작권 기준:** 직접 인용 분량 한도 (권장: 인용 하나에 2~3문장, 기사당 5개 이하)
