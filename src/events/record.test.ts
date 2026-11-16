@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { events } from "@/db/schema";
 import { createTestDb } from "@/db/testing";
-import { recordEvent, visitorHash } from "./record";
+import { recordEvent, VISITOR_COOKIE_MAX_AGE, visitorHash, visitorId } from "./record";
 
 const h = (init: Record<string, string>) => new Headers(init);
 
@@ -24,6 +24,25 @@ describe("visitorHash", () => {
 
   it("returns null with nothing to identify", () => {
     expect(visitorHash(h({}))).toBeNull();
+  });
+});
+
+describe("visitorId", () => {
+  const id = "3f2c8a1e-4b5d-4c6e-9f70-123456789abc";
+  const req = (url: string, cookie?: string) => new Request(url, { headers: cookie ? { cookie } : {} });
+
+  it("reuses the ID from the cookie without setting it again", () => {
+    expect(visitorId(req("https://x.test/api/events", `theme=dark; ap_vid=${id}`))).toEqual({ id, setCookie: null });
+  });
+
+  it("issues a fresh random ID with a fixed 28-day cookie when none or a bad one is sent", () => {
+    for (const cookie of [undefined, "ap_vid=not-a-uuid"]) {
+      const v = visitorId(req("https://x.test/api/events", cookie));
+      expect(v.id).toMatch(/^[0-9a-f-]{36}$/);
+      expect(v.setCookie).toBe(`ap_vid=${v.id}; Path=/; Max-Age=${VISITOR_COOKIE_MAX_AGE}; HttpOnly; SameSite=Lax; Secure`);
+    }
+    expect(visitorId(req("http://localhost:3000/api/events")).setCookie).not.toContain("Secure");
+    expect(visitorId(req("https://x.test/")).id).not.toBe(visitorId(req("https://x.test/")).id);
   });
 });
 
