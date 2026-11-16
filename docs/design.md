@@ -216,7 +216,11 @@ events {
 
 - `articleSlug`에 FK를 걸지 않는다. 콘텐츠의 원천은 git이고, slug는 빌드 시 존재 여부를 검증한다.
 - 적용률을 구하려면 분모(조회)가 필요해서, 처음 설계의 `apply_events`를 `events`로 바꾸고 `view`를 추가했다.
-  적용률 = 같은 날 웹에서 적용(복사·다운로드)한 방문자 수 / 조회한 방문자 수. `GET /api/metrics`로 본다.
+  적용률 = 같은 날 웹에서 적용(복사·다운로드)한 방문자 수 / 조회한 방문자 수.
+  운영자는 `/admin/metrics` 화면에서 보고, 스크립트는 `GET /api/metrics`(Bearer `METRICS_TOKEN`)로 받는다.
+  화면은 `METRICS_ADMINS`에 적힌 GitHub 숫자 ID로 로그인한 사용자만 열 수 있고, 나머지는 `proxy.ts`가 404로 막는다.
+  페이지는 스트리밍 뒤에 `notFound()`를 부르면 상태 코드가 200으로 남기 때문이다. 페이지도 같은 검사를 한 번 더 한다.
+  `METRICS_ADMINS`가 비어 있으면 API와 같이 개발 환경에서만 열린다.
 - `events`는 append-only다. 기록은 응답을 보낸 뒤(`after()`) 하며, 실패해도 요청을 막지 않는다.
 - 방문자 해시는 날마다 바뀌어 날짜를 넘어 이어 붙일 수 없다.
 - 로컬 개발은 `DATABASE_URL` 없이 임베디드 PGlite(`.data/`)를 쓰고, 프로덕션은 Neon Postgres를 쓴다. 앱은 풀러 URL(`DATABASE_URL`), 마이그레이션은 직접 URL(`DATABASE_URL_UNPOOLED`)로 붙는다.
@@ -305,17 +309,26 @@ side-pjt/
   src/
     app/
       page.tsx                 # 목록
+      c/[category]/page.tsx    # 카테고리별 목록
       a/[slug]/page.tsx        # 기사 (SSG)
       a/[slug]/kit/route.ts    # 키트 zip 다운로드
       connect/page.tsx         # MCP 연결 가이드
+      login/, likes/           # 로그인, 좋아요한 글
+      admin/metrics/page.tsx   # 운영자 지표 뷰 (noindex, 권한 없으면 404)
       mcp/route.ts             # MCP 엔드포인트
-      api/comments/route.ts
-      api/events/route.ts
-    content/{schema.ts, loader.ts, validate.ts}
-    components/mdx/{KeyIdea,Quote,Compare,Term}.tsx
+      api/auth/[...all]/route.ts
+      api/events/route.ts      # 조회·복사·공유 이벤트 수집
+      api/metrics/route.ts     # 지표 JSON (Bearer METRICS_TOKEN)
+      api/suggestions/route.ts
+    proxy.ts                   # /mcp, /api/events 속도 제한, /admin 접근 제어(404)
+    admin/metrics.ts           # 지표 뷰 권한(METRICS_ADMINS), 기간, 합계
+    content/{schema,loader,validate,kit,...}.ts
+    components/{mdx,comments,likes,reactions}/
+    comments/, likes/, suggestions/   # 서버 액션 + 서비스
+    events/{record,track,metrics}.ts
     mcp/server.ts
-    db/{schema.ts, client.ts}
-    events.ts
+    db/{schema,auth-schema,client}.ts
+    lib/auth.ts                # Better Auth (GitHub)
   docs/design.md
 ```
 
@@ -328,7 +341,7 @@ side-pjt/
 | 1 | 콘텐츠 파이프라인 | 스키마 검증, 인용 검증 빌드 실패 테스트, 기사 3개 |
 | 2 | 기사 페이지 + 컴포넌트 + 키트 | 웹에서 읽고 키트를 받을 수 있음 |
 | 3 | MCP 서버 | Claude Code에서 `apply_article`로 실제 레포 적용 성공 |
-| 4 | 로그인, 댓글, 이벤트 로깅 + 기사 15개 | 지표 뷰에서 적용률 확인 |
+| 4 | 로그인, 댓글, 이벤트 로깅 + 기사 15개 | `/admin/metrics`에서 기간별(7/28/90일) 기사별·전체 적용률 확인 |
 | 5 | 비공개 베타 (지인 개발자 20~30명) | 피드백 수집, 적용률 측정 |
 
 ---
