@@ -9,7 +9,7 @@
 ## 알려진 침해 흔적
 - [ ] Claude Code 확장 2.1.312·2.1.313 버전이 없는지 확인했다.
 - [ ] `authorized_keys`에 `svc-telemetry` 키가 없는지 확인했다.
-- [ ] `com.apple.sysmond.plist`, `~/.config/.smt`, `~/.config/.smtk`, `/tmp/.stk_*`이 없는지 확인했다(해당 OS만).
+- [ ] `com.apple.sysmond.plist`, `~/.config/.smt`, `~/.config/.smtk`, 임시 폴더의 `.stk_*`(macOS는 `$TMPDIR/.stk_*`, Linux는 `/tmp/.stk_*`)이 없는지 확인했다(해당 OS만). Linux는 `@reboot`로 `~/.config/.smt`를 실행하는 crontab 줄, Windows는 예약 작업 `SysMon`, 시작 폴더의 `sysmon.cmd`, `~/.config/smt.cmd`도 확인했다.
 - [ ] 다른 앱이 설치한 플러그인·훅(예: Postman 플러그인)이 있는지 확인했다.
 
 ## 키

@@ -19,7 +19,7 @@ Harrison Chase의 인터뷰를 다룬 2026년 8월 Saytrace 요약은 에이전�
 
 ## 1. 컨텍스트 공급 점검 (읽기 전용)
 
-- **고정 컨텍스트**: 에이전트가 항상 읽는 파일(`CLAUDE.md`, `AGENTS.md`, `.cursor/rules` 등)과 그 안의 핵심 지시를 정리한다.
+- **고정 컨텍스트**: 매 세션 항상 로드되는 파일(`CLAUDE.md`, `AGENTS.md`, `.cursor/rules` 중 `alwaysApply: true`인 규칙)과 그 안의 핵심 지시를 정리한다. 경로나 조건이 붙은 규칙(`.claude/rules/`의 paths 지정 규칙, Cursor의 globs·description 규칙)은 동적 컨텍스트로 분류한다.
 - **동적 컨텍스트**: 작업 중 필요할 때 읽게 하는 것(`docs/`의 문서, 스킬, MCP 서버)을 정리한다.
 - 고정 컨텍스트의 지시가 실제 레포와 어긋나는 곳(없는 경로, 바뀐 명령)을 표시한다.
 

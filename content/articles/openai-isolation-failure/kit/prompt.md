@@ -37,7 +37,7 @@
 
 각 제한에 유형을 붙인다. 판단이 확실하지 않으면 해당 도구의 공식 문서를 확인하고, 확인하지 못했으면 "미확인"으로 적는다.
 
-- **강제**: 도구의 권한 차단 규칙이나 샌드박스 설정으로 실행 자체가 막힌다.
+- **강제**: 도구의 권한 차단 규칙이나 샌드박스 설정으로 실행 자체가 막힌다. 단, Claude Code의 `Read(...)` deny 규칙만 있고 샌드박스가 꺼져 있으면 스크립트를 거친 읽기는 막지 못하므로 '강제(부분)'로 적고 위험 항목으로 표시한다(근거: https://code.claude.com/docs/en/permissions).
 - **지시**: `AGENTS.md`, `CLAUDE.md`, 프롬프트 문장에만 적혀 있다. 에이전트가 따르길 기대할 뿐이다.
 - **구멍**: 허용 목록에 있는 서비스나 명령. 임의의 요청을 대신 보내거나 파일을 쓸 수 있는지 함께 적는다. 서브에이전트나 MCP 서버처럼 여러 에이전트가 함께 쓰는 폴더나 저장소도 구멍 후보로 적는다.
 
@@ -68,6 +68,6 @@
 ## 5. 실행해서 확인하기
 
 - 수정한 설정 파일이 올바른 JSON 또는 TOML인지 파서로 확인한다. 예: `node -e "JSON.parse(require('fs').readFileSync('.claude/settings.json','utf8'))"`, TOML은 `python -c "import tomllib,sys;tomllib.load(open(sys.argv[1],'rb'))" .codex/config.toml`
-- 추가한 규칙이 실제로 적용되는지 확인할 방법을 사용자에게 안내한다. Claude Code는 `/permissions`, Codex는 해당 설정 조회 명령으로 규칙이 읽혔는지 확인하게 한다. 직접 우회를 시도해 보지 않는다.
+- 추가한 규칙이 실제로 적용되는지 확인할 방법을 사용자에게 안내한다. Claude Code는 `/permissions`로 규칙과 규칙이 나온 settings 파일을 확인하게 한다. Codex는 `/debug-config`로 `.codex/config.toml` 레이어가 읽혔는지, `/status`로 승인 정책과 쓰기 가능 경로를 확인하게 한다. Codex는 신뢰한 프로젝트에서만 프로젝트 `.codex/config.toml`을 읽으므로, 레이어가 보이지 않으면 프로젝트 신뢰 여부를 먼저 확인하게 한다. 직접 우회를 시도해 보지 않는다.
 - 보고서와 수정한 설정 파일에 키·토큰 값이 들어가지 않았는지 `grep -nEi -e '(^|[^a-z])sk-[a-z0-9]{16,}|ghp_[A-Za-z0-9]{20,}|github_pat_|xox[bp]-|AKIA[0-9A-Z]{12,}|Bearer +[A-Za-z0-9._-]{16,}|-----BEGIN' docs/agent-isolation-audit.md <수정한 설정 파일>`로 확인한다. `grep`이 없으면 `Select-String -Pattern '<같은 패턴>' -Path <파일들>`을 쓴다. 결과가 없어야 통과이며, 걸리면 값을 `***`로 가린 뒤 다시 실행한다.
 - `checklist.md`의 항목을 하나씩 점검하고 결과를 보고한다.

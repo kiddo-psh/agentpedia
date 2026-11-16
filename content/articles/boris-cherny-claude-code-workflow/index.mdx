@@ -1,13 +1,13 @@
 ---
 slug: boris-cherny-claude-code-workflow
-title: "Claude Code를 만든 사람의 설정은 평범했습니다"
-summary: "2026년 1월, Claude Code를 만든 Boris Cherny가 자기 작업 방식을 공개했습니다. 특별한 설정은 없었습니다. 세션을 여러 개 동시에 돌리고, 실수를 CLAUDE.md에 적고, 계획부터 세우고, Claude가 결과를 스스로 확인하게 합니다."
+title: "Claude Code를 만든 Boris Cherny의 작업 방식"
+summary: "2026년 1월, Claude Code를 만든 Boris Cherny가 자기 작업 방식을 공개했습니다. 설정보다 매일 되풀이하는 습관이 중심이었습니다. 세션을 여러 개 동시에 돌리고, 실수를 CLAUDE.md에 적고, 계획부터 세우고, Claude가 결과를 스스로 확인하게 합니다."
 category: people
 people: [boris-cherny]
 tags: ["claude-code", "workflow", "verification", "claude-md"]
 difficulty: practical
 brief:
-  what: "2026년 1월 2일, Claude Code를 만든 Boris Cherny가 X 스레드로 자기 작업 방식을 공개했는데, 설정은 거의 기본값이었습니다."
+  what: "2026년 1월 2일, Claude Code를 만든 Boris Cherny가 X 스레드로 자기 작업 방식을 공개하며 설정이 '의외로 평범할 수 있다'고 말했습니다."
   why: "Cherny는 Claude에게 스스로 결과를 검증할 수단을 주는 일을 아마 가장 중요한 팁으로 꼽고, 그러면 품질이 2~3배 좋아진다고 말합니다."
   action: "키트로 내 레포의 검증 명령을 CLAUDE.md와 허용 목록에 넣고, Claude가 작업을 끝내기 전에 스스로 확인하게 합니다."
 apply:
@@ -27,11 +27,11 @@ tryIt: "이 레포에서 네가 스스로 작업 결과를 검증할 때 쓸 수
 draft: false
 publishedAt: 2026-11-11
 keyIdeas:
-  - "창시자의 설정은 거의 기본값이었고, 차이는 설정이 아니라 습관에서 나왔다."
+  - "Cherny는 Claude Code를 많이 바꾸지 않는다고 했고, 스레드의 팁은 대부분 매일 반복하는 습관이다."
   - "Claude가 스스로 결과를 확인할 수단을 주는 일이 아마 가장 중요하다. Cherny는 이것으로 결과 품질이 2~3배 좋아진다고 말한다."
   - "Claude가 실수할 때마다 팀이 함께 쓰는 CLAUDE.md에 적어 두고, 같은 실수를 되풀이하지 않게 한다."
   - "Plan 모드로 계획을 충분히 다듬은 뒤 auto-accept edits로 바꾸면 대개 한 번에 구현이 끝난다."
-  - "매일 하는 작업은 슬래시 명령·서브에이전트·훅으로 만든다. 권한 확인은 끄지 않고, 안전한 명령만 미리 허용한다."
+  - "매일 하는 작업은 슬래시 명령·서브에이전트·훅으로 만든다. 평소에는 권한 확인을 끄지 않고 안전한 명령만 미리 허용하며, 샌드박스 안의 긴 작업에서만 건너뛴다."
 sources:
   - id: thread
     title: "Boris Cherny의 Claude Code 사용법 스레드 (X, 15개 게시물)"
@@ -67,18 +67,30 @@ sources:
     kind: thread
     publishedAt: 2026-01-03
     dateNote: "x.com은 로그인 장벽으로 직접 열리지 않음. 날짜와 본문은 같은 게시물 ID의 fxtwitter API 응답(created_at: Sat Jan 03 03:18:23 +0000 2026)으로 확인"
+  - id: docs-cloud
+    title: "Use Claude Code in the cloud (Claude Code 공식 문서)"
+    url: https://code.claude.com/docs/en/claude-code-on-the-web
+    author: Anthropic
+    kind: blog
+    accessedAt: 2026-11-16
+    dateNote: "페이지에 날짜가 없어 열람일을 기록했습니다. CLI의 세션 이동은 한 방향이며 --teleport로 클라우드 세션을 터미널로 가져올 수 있지만 기존 터미널 세션을 클라우드로 보낼 수는 없다는 설명, 새 클라우드 세션은 claude --cloud로 시작한다는 설명을 확인했습니다. 본문의 이 설명은 2026년 11월 공식 문서 기준입니다."
+  - id: docs-github-actions
+    title: "Claude Code GitHub Actions (Claude Code 공식 문서)"
+    url: https://code.claude.com/docs/en/github-actions
+    author: Anthropic
+    kind: blog
+    accessedAt: 2026-11-16
+    dateNote: "페이지에 날짜가 없어 열람일을 기록했습니다. PR이나 이슈 댓글에서 @claude를 언급하면 Action이 응답하고 기본 trigger_phrase가 @claude라는 설명을 확인했습니다. 본문의 이 설명은 2026년 11월 공식 문서 기준입니다."
 ---
 
-{/* 초안: 인용문은 Thread Reader App 미러에서 글자 그대로 확인함. 공개 전에 x.com 원문과 한 번 더 대조할 것. */}
-
-2026년 1월 2일, Boris Cherny는 X에 올린 15개짜리 스레드에서 자기 Claude Code 설정이 의외로 평범할 수 있다고 말했습니다. Cherny는 Anthropic에서 일하며 첫 게시물에서 자신을 Claude Code를 만든 사람이라고 소개했습니다. Claude Code가 기본 상태로도 잘 동작해서 따로 많이 바꾸지 않는다는 이유였습니다.
+2026년 1월 2일, Boris Cherny는 X에 올린 15개짜리 스레드에서 자기 Claude Code 설정이 의외로 평범할 수 있다고 말했습니다. Cherny는 첫 게시물에서 자신을 Claude Code를 만든 사람이라고 소개했고, InfoQ는 그가 Anthropic에서 Claude Code를 쓰는 방식을 전했습니다. Claude Code가 기본 상태로도 잘 동작해서 따로 많이 바꾸지 않는다는 이유였습니다.
 
 ## 가장 중요한 팁은 Claude가 자기 일을 스스로 검증하게 하는 것이다
 
 도구를 만든 사람이라면 남들이 모르는 설정을 쓸 거라고 기대하기 쉽습니다. 숨은 플래그나 공들인 프롬프트, 복잡한 자동화 같은 것 말입니다. Cherny의 스레드에는 그런 내용이 거의 없습니다. 대신 매일 되풀이하는 습관이 나옵니다. 세션을 여러 개 동시에 돌리고, 실수를 적어 두고, 계획부터 세우고, 반복 작업은 명령으로 만듭니다. 스레드 마지막에는 아마 가장 중요할 거라며 한 가지를 따로 꼽습니다.
 
 <KeyIdea title="나머지 습관을 묶는 원칙">
-Cherny가 마지막에 꼽은 팁은 Claude에게 자기 작업을 검증할 방법을 주라는 것입니다. 이런 <Term id="feedback-loop">피드백 루프</Term>가 있으면 최종 결과의 품질이 좋아진다고 말합니다. 품질이 얼마나 좋아지는지에 대한 Cherny의 숫자는 본인 경험에서 나온 것이고, 스레드에 측정 근거는 없습니다.
+Cherny가 마지막에 꼽은 팁은 Claude에게 자기 작업을 검증할 방법을 주라는 것입니다. 이런 <Term id="feedback-loop">피드백 루프</Term>가 있으면 최종 결과의 품질이 좋아진다고 말합니다. 스레드에는 이 숫자를 어떻게 얻었는지에 대한 설명이나 측정 근거가 없습니다.
 </KeyIdea>
 
 <Quote source="thread">
@@ -91,7 +103,7 @@ give Claude a way to verify its work. If Claude has that feedback loop, it will 
 
 가장 먼저 눈에 띄는 습관은 세션을 여러 개 동시에 돌리는 것입니다. 스레드를 올릴 무렵 Cherny는 터미널에서 Claude 세션 5개를 병렬로 돌렸습니다. 탭마다 번호를 붙이고, Claude가 입력을 기다리면 시스템 알림을 받습니다.
 
-웹에서도 마찬가지입니다. 로컬 세션과 별도로 claude.ai/code에서 세션 5~10개를 동시에 돌립니다. 로컬 세션은 `&`로 웹에 넘기고, 가끔은 `--teleport`로 로컬과 웹을 오갑니다.
+웹에서도 마찬가지였습니다. 로컬 세션과 함께 claude.ai/code에서 세션 5~10개를 동시에 돌렸고, 스레드 당시에는 로컬 세션을 `&`로 웹에 넘기거나 `--teleport`로 오갔다고 썼습니다. 2026년 11월 공식 문서 기준으로는 CLI에서 터미널 세션을 클라우드로 보낼 수 없습니다. `claude --cloud`로 새 클라우드 세션을 시작하고, `--teleport`로 클라우드 세션을 터미널로 가져오는 한 방향만 지원합니다.
 
 스레드에 달린 질문에 답하면서 두 가지를 덧붙이기도 했습니다. 로컬 세션 5개는 같은 레포를 따로 받은 git checkout 5개에서 각각 돕니다. 시작한 세션 중 중간에 버리는 비율을 묻자 "대략 10~20%쯤"이라고 어림했습니다.
 
@@ -105,7 +117,7 @@ give Claude a way to verify its work. If Claude has that feedback loop, it will 
 Anytime we see Claude do something incorrectly we add it to the CLAUDE.md, so Claude knows not to do it next time.
 </Quote>
 
-코드 리뷰에서도 같은 일을 합니다. 동료 PR에 `@.claude`를 태그하면 Claude Code GitHub Action이 `CLAUDE.md`에 규칙을 추가합니다. InfoQ에 따르면 2026년 1월 기준 팀의 `CLAUDE.md`는 약 2.5k 토큰이었습니다. 다만 이 수치는 스레드 본문에서는 확인하지 못했습니다. 실수를 한 번 적어 두면 팀원 모두의 다음 세션이 그만큼 덜 틀립니다. 검증 쪽에서 보면 `CLAUDE.md`는 Claude가 무엇을 틀렸는지 알려 주는 느린 피드백 루프입니다.
+코드 리뷰에서도 같은 일을 합니다. Cherny는 동료의 PR에서 Claude를 자주 태그해, 그 PR 안에서 `CLAUDE.md`에 내용을 더하게 한다고 썼습니다. 여기에는 Claude Code GitHub Action을 씁니다. 2026년 11월 공식 문서 기준으로 이 Action은 PR이나 이슈 댓글의 `@claude` 언급에 반응합니다. InfoQ에 따르면 2026년 1월 기준 팀의 `CLAUDE.md`는 약 2.5k 토큰이었습니다. 다만 이 수치는 스레드 본문에서는 확인하지 못했습니다. 실수를 한 번 적어 두면 팀원 모두의 다음 세션이 그만큼 덜 틀립니다. 검증 쪽에서 보면 `CLAUDE.md`는 Claude가 무엇을 틀렸는지 알려 주는 느린 피드백 루프입니다.
 
 ## 계획부터 맞추고, 구현은 한 번에 맡긴다
 
@@ -121,7 +133,7 @@ From there, I switch into auto-accept edits mode and Claude can usually 1-shot i
 
 하루에도 몇 번씩 하는 작업은 `.claude/commands/`에 <Term id="slash-command">슬래시 명령</Term>으로 만들어 둡니다. 대표적인 예가 `/commit-push-pr`입니다. Cherny는 자신과 Claude가 이 명령을 하루에 수십 번 쓴다고 합니다. 이 명령은 inline bash로 `git status` 같은 정보를 미리 계산해 둡니다. 덕분에 모델과 주고받는 횟수가 줄어듭니다. 코드 단순화와 검증은 슬래시 명령 대신 <Term id="subagent">서브에이전트</Term>(`code-simplifier`, `verify-app`)가 맡습니다. 검증만 하는 역할을 따로 둔 셈입니다.
 
-<Term id="agent-hook">훅</Term>도 씁니다. PostToolUse 훅으로 Claude가 쓴 코드를 포맷해서, CI에서 포맷 오류가 나지 않게 합니다. InfoQ는 이 명령이 `bun run format || true`라고 전합니다. 오래 걸리는 작업에는 Stop 훅과 백그라운드 검증 에이전트를 붙입니다. Slack, BigQuery, Sentry 같은 외부 도구도 Claude가 직접 다루게 합니다.
+<Term id="agent-hook">훅</Term>도 씁니다. PostToolUse 훅으로 Claude가 쓴 코드를 포맷해서, CI에서 포맷 오류가 나지 않게 합니다. InfoQ는 이 명령이 `bun run format || true`라고 전합니다. 아주 오래 걸리는 작업은 끝날 때 백그라운드 에이전트로 검증하라고 Claude에게 지시하거나, 같은 일을 Stop 훅으로 더 확실하게 처리하거나, ralph-wiggum 플러그인을 쓴다고 합니다. Slack, BigQuery, Sentry 같은 외부 도구도 Claude가 직접 다루게 합니다.
 
 ## 권한 확인은 끄지 않고 안전한 명령만 미리 허용한다
 
@@ -146,7 +158,7 @@ I don't use --dangerously-skip-permissions.
 
 둘째, 모델 선택에도 대가가 있습니다. Cherny도 Opus 4.5가 Sonnet보다 크고 느리다고 인정합니다. 결국 거의 항상 더 빠르다는 말은 자기 작업을 두고 한 판단입니다. 게다가 2026년 1월 기준 이야기라서, 모델 이름과 기능은 그 뒤에 바뀌었을 수 있습니다.
 
-셋째, 검증 루프의 효과로 든 숫자는 측정값이 아니라 Cherny의 경험에서 나온 것입니다. 검증 루프가 얼마나 효과를 낼지는 레포에 믿을 만한 테스트나 실행 수단이 얼마나 있느냐에 달려 있습니다.
+셋째, 검증 루프의 효과로 든 '2~3배'는 스레드에서 측정 방법이 밝혀지지 않은 숫자입니다. 검증 루프가 얼마나 효과를 낼지는 레포에 믿을 만한 테스트나 실행 수단이 얼마나 있느냐에 달려 있습니다.
 
 마지막으로, Cherny 본인도 스레드 첫머리에서 정해진 사용법은 없고 팀원마다 쓰는 방식이 다르다고 말합니다.
 

@@ -39,7 +39,7 @@
 - **높음**
   - `anthropic.claude-code` 확장의 2.1.312 또는 2.1.313 버전
   - `authorized_keys`에 주석이 `svc-telemetry`인 키
-  - `~/Library/LaunchAgents/com.apple.sysmond.plist`, `~/.config/.smt`, `~/.config/.smtk`, `/tmp/.stk_*`
+  - `~/Library/LaunchAgents/com.apple.sysmond.plist`, `~/.config/.smt`, `~/.config/.smtk`, 임시 폴더의 `.stk_*`(macOS는 `$TMPDIR/.stk_*`, Linux는 `/tmp/.stk_*`), Linux의 `@reboot`로 `~/.config/.smt`를 실행하는 crontab 줄, Windows의 예약 작업 `SysMon`·시작 폴더의 `sysmon.cmd`·`~/.config/smt.cmd`
   - 사용자가 설치한 기억이 없다고 답한 훅
 - **확인 필요**
   - 다른 앱이 설치한 것으로 보이는 플러그인·마켓플레이스 (예: Postman 마켓플레이스 `postmanlabs/postman-plugin`)

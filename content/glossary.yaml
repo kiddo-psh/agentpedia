@@ -118,7 +118,7 @@
 - id: permission-deny-rule
   term: 권한 차단 규칙
   en: permission deny rule
-  definition: 코딩 에이전트 설정에서 특정 명령, 파일, 네트워크 접근을 실행 자체가 안 되도록 막는 규칙입니다. 프롬프트 지시와 달리 도구가 강제합니다.
+  definition: 코딩 에이전트 설정에서 특정 도구, 명령, 파일 접근을 도구가 거부하도록 하는 규칙입니다. 모델이 따르길 기대하는 프롬프트 지시와 달리 도구가 강제하지만, 적용 범위는 도구마다 다릅니다.
 
 - id: agent-harness
   term: 하네스

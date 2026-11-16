@@ -10,7 +10,7 @@
 - id: boris-cherny
   name: Boris Cherny
   nameKo: 보리스 체르니
-  role: Anthropic 엔지니어, Claude Code 창시자
+  role: Anthropic에서 Claude Code를 만든 사람
 
 - id: peter-steinberger
   name: Peter Steinberger
@@ -20,7 +20,7 @@
 - id: nevo-david
   name: Nevo David
   nameKo: 네보 데이비드
-  role: Postiz 창업자(오픈소스 SNS 예약 도구), 이전 Gitroom 설립. 공동창업 여부는 출처마다 다름
+  role: Postiz 창업자(오픈소스 SNS 예약 도구)
 
 - id: john-rush
   name: John Rush
