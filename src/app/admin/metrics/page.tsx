@@ -9,12 +9,13 @@ import {
   METRICS_PERIODS,
   parsePeriod,
   periodStart,
+  returnCohort,
   totalMetrics,
   type MetricsTotals,
 } from "@/admin/metrics";
 import { listArticles } from "@/content/loader";
 import { getDb } from "@/db/client";
-import { articleMetrics } from "@/events/metrics";
+import { articleMetrics, RETURN_WINDOW_DAYS, returnRate, type ReturnRate } from "@/events/metrics";
 
 export const metadata: Metadata = {
   title: "지표",
@@ -41,7 +42,10 @@ async function MetricsView({ searchParams }: Pick<PageProps<"/admin/metrics">, "
   if (!(await canViewMetrics(await headers()))) notFound();
 
   const days = parsePeriod((await searchParams).days);
-  const rows = await articleMetrics(await getDb(), periodStart(days));
+  const db = await getDb();
+  const rows = await articleMetrics(db, periodStart(days));
+  const cohort = returnCohort(days);
+  const returning = await returnRate(db, cohort.from, cohort.to);
   const titles = new Map(listArticles().map((a) => [a.slug, a.title]));
   const total = totalMetrics(rows);
   rows.sort((a, b) => b.viewers - a.viewers || b.mcpCalls - a.mcpCalls);
@@ -68,6 +72,8 @@ async function MetricsView({ searchParams }: Pick<PageProps<"/admin/metrics">, "
         <Stat label="MCP 호출" value={total.mcpCalls} />
         <Stat label="MCP 클라이언트" value={total.mcpClients} />
       </dl>
+
+      <ReturnRateCard r={returning} />
 
       {rows.length === 0 ? (
         <p className="py-16 text-center text-muted">최근 {days}일 동안 기록된 이벤트가 없습니다.</p>
@@ -116,6 +122,22 @@ function Row({ title, slug, m }: { title: string | undefined; slug: string; m: M
       <Num>{m.mcpCalls}</Num>
       <Num>{m.mcpClients}</Num>
     </tr>
+  );
+}
+
+function ReturnRateCard({ r }: { r: ReturnRate }) {
+  const day = (d: Date) => d.toISOString().slice(0, 10);
+  return (
+    <section aria-labelledby="return-rate" className="mb-10 rounded-xl border border-line px-5 py-4">
+      <h2 id="return-rate" className="text-[13px] text-muted">
+        {RETURN_WINDOW_DAYS / 7}주 재방문율
+      </h2>
+      <p className="mt-1 text-2xl font-semibold tabular-nums tracking-tight">{formatRate(r.rate)}</p>
+      <p className="mt-2 text-[13px] text-muted">
+        {day(r.cohortFrom)} ~ {day(r.cohortTo)}에 처음 온 방문자 {r.visitors}명 중 {r.returning}명이 {RETURN_WINDOW_DAYS}일
+        안에 다른 날 다시 왔습니다. 방문자는 익명 쿠키 기준입니다.
+      </p>
+    </section>
   );
 }
 

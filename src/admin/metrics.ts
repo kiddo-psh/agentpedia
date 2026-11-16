@@ -1,7 +1,7 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { getDb, type Db } from "@/db/client";
 import { account } from "@/db/schema";
-import type { ArticleMetrics } from "@/events/metrics";
+import { RETURN_WINDOW_DAYS, type ArticleMetrics } from "@/events/metrics";
 import { getSession } from "@/lib/auth";
 
 export const METRICS_PERIODS = [7, 28, 90] as const;
@@ -66,4 +66,10 @@ export function totalMetrics(rows: ArticleMetrics[]): MetricsTotals {
 
 export function periodStart(days: MetricsPeriod, now = Date.now()): Date {
   return new Date(now - days * 86_400_000);
+}
+
+/** Return-rate cohort, as in /api/metrics: the `days` before the last 28, so everyone had four weeks to return. */
+export function returnCohort(days: MetricsPeriod, now = Date.now()): { from: Date; to: Date } {
+  const to = now - RETURN_WINDOW_DAYS * 86_400_000;
+  return { from: new Date(to - days * 86_400_000), to: new Date(to) };
 }

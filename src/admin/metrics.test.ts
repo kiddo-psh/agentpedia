@@ -2,7 +2,17 @@ import { beforeEach, describe, expect, it } from "vitest";
 import type { Db } from "@/db/client";
 import { account } from "@/db/schema";
 import { createTestDb, insertUser } from "@/db/testing";
-import { isMetricsAdmin, parseAdminIds, parsePeriod, totalMetrics } from "./metrics";
+import { isMetricsAdmin, parseAdminIds, parsePeriod, returnCohort, totalMetrics } from "./metrics";
+
+describe("returnCohort", () => {
+  it("ends 28 days ago and spans the chosen period before that", () => {
+    const now = Date.UTC(2026, 10, 16);
+    expect(returnCohort(7, now)).toEqual({
+      from: new Date(Date.UTC(2026, 9, 12)),
+      to: new Date(Date.UTC(2026, 9, 19)),
+    });
+  });
+});
 
 describe("parsePeriod", () => {
   it("accepts only the listed periods and defaults to 7", () => {
