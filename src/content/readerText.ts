@@ -90,6 +90,12 @@ function block(node: RootContent, article: Article): string {
 function component(node: Node, inner: string, article: Article): string {
   const name = "name" in node ? node.name : undefined;
   if (name === "KeyIdea") return `[핵심 아이디어 상자] ${attr(node, "title") ?? ""}\n${inner}`.trim();
+  if (name === "Pyramid") {
+    const head = attr(node, "shape") === "inverted" ? "[도식: 거꾸로 선 피라미드, 위가 가장 넓음]" : "[도식: 피라미드, 아래가 가장 넓음]";
+    const layers = "children" in node ? (node.children as Node[]).filter((c) => "name" in c && c.name === "PyramidLayer") : [];
+    const rows = layers.map((l, i) => `${i + 1}. ${attr(l, "name") ?? ""}${attr(l, "detail") ? ` — ${attr(l, "detail")}` : ""}`);
+    return [`${head} ${attr(node, "title") ?? ""}`.trim(), ...rows, attr(node, "caption") ?? ""].filter(Boolean).join("\n");
+  }
   if (name === "Compare") return `[비교 상자]\n이전: ${attr(node, "before") ?? ""}\n이제: ${attr(node, "after") ?? ""}`;
   if (name === "Quote") {
     const s = article.sources.find((x) => x.id === attr(node, "source"));

@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 import type { Article, MdxComponentName } from "@/content/schema";
 import { Compare } from "./Compare";
 import { KeyIdea } from "./KeyIdea";
+import { Pyramid, PyramidLayer } from "./Pyramid";
 import { makeQuote } from "./Quote";
 import { makeTerm } from "./Term";
 
@@ -15,6 +16,8 @@ function componentsFor(article: Article) {
     Quote: makeQuote(article.sources),
     Compare,
     Term: makeTerm(article.terms),
+    Pyramid,
+    PyramidLayer,
   } satisfies Record<MdxComponentName, unknown>;
 }
 

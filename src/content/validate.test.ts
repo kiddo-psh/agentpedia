@@ -125,6 +125,17 @@ describe("parseArticle", () => {
     expect(parse(mdx("첫 문단입니다.\n\n---\n\n둘째 문단입니다.")).ok).toBe(true);
   });
 
+  it("accepts a pyramid with a shape and layers, rejects a malformed one", () => {
+    const layer = (name: string) => `<PyramidLayer name="${name}" detail="설명" />`;
+    const good = parse(mdx(`<Pyramid shape="inverted">\n${layer("위")}\n${layer("아래")}\n</Pyramid>`));
+    expect(good.ok).toBe(true);
+    const bad = parse(mdx(`<Pyramid>\n${layer("하나")}\n</Pyramid>\n\n${layer("밖")}`));
+    const issues = !bad.ok && bad.issues.join("\n");
+    expect(issues).toMatch(/needs shape="inverted" or shape="upright"/);
+    expect(issues).toMatch(/at least two <PyramidLayer>/);
+    expect(issues).toMatch(/must sit directly inside <Pyramid>/);
+  });
+
   it("rejects bold that cannot close before Korean text", () => {
     const bad = parse(mdx('그는 **"에이전트의 10년"**이라고 부릅니다.'));
     expect(!bad.ok && bad.issues.join("\n")).toMatch(/literal asterisks/);

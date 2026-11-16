@@ -86,7 +86,7 @@ export function parseArticle({ dirName, raw, kit, people, glossary }: ArticleInp
   const termIds = new Set<string>();
   if (tree && meta.success) {
     const sources = new Map(meta.data.sources.map((s) => [s.id, s]));
-    visit(tree, (node) => {
+    visit(tree, (node, _index, parent) => {
       if (node.type !== "mdxJsxFlowElement" && node.type !== "mdxJsxTextElement") return;
       const line = node.position?.start.line ?? "?";
       if (!node.name || !(MDX_COMPONENTS as readonly string[]).includes(node.name)) {
@@ -106,6 +106,22 @@ export function parseArticle({ dirName, raw, kit, people, glossary }: ArticleInp
         if (!id) issues.push(`line ${line}: <Term> needs a string "id" attribute`);
         else if (!glossary.has(id)) issues.push(`line ${line}: <Term id="${id}"> is not in content/glossary.yaml`);
         else termIds.add(id);
+        return;
+      }
+      if (node.name === "Pyramid") {
+        const shape = attr("shape");
+        if (shape !== "inverted" && shape !== "upright") {
+          issues.push(`line ${line}: <Pyramid> needs shape="inverted" or shape="upright"`);
+        }
+        const layers = node.children.filter((c) => "name" in c && c.name === "PyramidLayer");
+        if (layers.length < 2) issues.push(`line ${line}: <Pyramid> needs at least two <PyramidLayer> children`);
+        return;
+      }
+      if (node.name === "PyramidLayer") {
+        if (!attr("name")) issues.push(`line ${line}: <PyramidLayer> needs a string "name" attribute`);
+        if (!(parent && "name" in parent && parent.name === "Pyramid")) {
+          issues.push(`line ${line}: <PyramidLayer> must sit directly inside <Pyramid>`);
+        }
         return;
       }
       if (node.name !== "Quote") return;

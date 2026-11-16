@@ -22,6 +22,7 @@ const article: Article = {
     "---",
     '<Quote source="talk" at="1:02">Original words.</Quote>',
     '<KeyIdea title="박스 제목">\n박스 본문입니다.\n</KeyIdea>',
+    '<Pyramid shape="inverted" caption="도식 설명">\n<PyramidLayer name="코드" detail="API 설계" />\n<PyramidLayer name="글" />\n</Pyramid>',
   ].join("\n\n"),
   persons: [],
   terms: [{ id: "mcp", term: "MCP", definition: "도구를 연결하는 규약입니다." }],
@@ -52,5 +53,6 @@ describe("readerText", () => {
     expect(text).toContain("———");
     expect(text).toContain("[인용] Original words.\n— Ada, A talk (1:02)");
     expect(text).toContain("[핵심 아이디어 상자] 박스 제목\n박스 본문입니다.");
+    expect(text).toContain("[도식: 거꾸로 선 피라미드, 위가 가장 넓음]\n1. 코드 — API 설계\n2. 글\n도식 설명");
   });
 });
