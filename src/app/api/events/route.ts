@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { getArticle } from "@/content/loader";
-import { trackAfterResponse } from "@/events/track";
+import { trackBrowserAfterResponse } from "@/events/track";
 
 // Browsers may only report these; downloads and MCP calls are recorded server-side.
 const Body = z.object({
@@ -13,6 +13,9 @@ export async function POST(request: Request) {
   if (!parsed.success || !getArticle(parsed.data.slug)) {
     return new Response(null, { status: 400 });
   }
-  trackAfterResponse(request, { kind: parsed.data.kind, articleSlug: parsed.data.slug });
-  return new Response(null, { status: 204 });
+  return trackBrowserAfterResponse(
+    request,
+    { kind: parsed.data.kind, articleSlug: parsed.data.slug },
+    new Response(null, { status: 204 }),
+  );
 }

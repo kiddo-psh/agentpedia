@@ -77,7 +77,11 @@ export type EventKind = (typeof EVENT_KINDS)[number];
 /** Every kind except `view` and `share` counts toward the apply rate. */
 export const APPLY_KINDS = EVENT_KINDS.filter((k) => k !== "view" && k !== "share");
 
-/** Append-only. Raw IPs and user agents are never stored, only a daily salted hash. */
+/**
+ * Append-only. Raw IPs and user agents are never stored, only a daily salted hash.
+ * Browser events also carry `visitorId`, a random ID from a 28-day first-party cookie, so
+ * returning visitors can be counted without linking IP or user agent across days.
+ */
 export const events = pgTable(
   "events",
   {
@@ -85,8 +89,12 @@ export const events = pgTable(
     kind: text("kind", { enum: EVENT_KINDS }).notNull(),
     articleSlug: text("article_slug").notNull(),
     visitorHash: text("visitor_hash"),
+    visitorId: uuid("visitor_id"),
     userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().default(sql`now()`),
   },
-  (t) => [index("events_article_created_idx").on(t.articleSlug, t.createdAt)],
+  (t) => [
+    index("events_article_created_idx").on(t.articleSlug, t.createdAt),
+    index("events_visitor_created_idx").on(t.visitorId, t.createdAt),
+  ],
 );

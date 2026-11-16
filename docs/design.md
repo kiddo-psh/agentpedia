@@ -62,7 +62,7 @@ claude mcp add --transport http agentpedia https://agentpedia-flax.vercel.app/mc
 |---|---|
 | **적용률 (북극성)** | 기사 조회 중 적용 이벤트가 1건 이상 발생한 비율 |
 | MCP 활성 클라이언트 | 주간 MCP 호출이 발생한 고유 클라이언트 수 (익명 해시) |
-| 재방문 | 4주 안에 2회 이상 방문한 사용자 비율 |
+| 재방문 | 첫 방문 후 4주 안에 다른 날(한국 시간) 다시 방문한 브라우저 비율. 익명 쿠키 `ap_vid` 기준 |
 
 ---
 
@@ -206,9 +206,11 @@ events {
                                -- | 'mcp_get_article' | 'mcp_get_kit' | 'mcp_prompt'
   articleSlug   text not null
   visitorHash   text null      -- IP + user-agent의 일 단위 솔트 해시. 원문 저장 안 함
+  visitorId     uuid null      -- 익명 쿠키 ap_vid의 랜덤 ID. 브라우저 이벤트에만 있음
   userId        text null fk -> user.id (set null)
   createdAt     timestamptz default now()
   index (articleSlug, createdAt)
+  index (visitorId, createdAt)
 }
 ```
 
@@ -218,7 +220,10 @@ events {
 - 적용률을 구하려면 분모(조회)가 필요해서, 처음 설계의 `apply_events`를 `events`로 바꾸고 `view`를 추가했다.
   적용률 = 같은 날 웹에서 적용(복사·다운로드)한 방문자 수 / 조회한 방문자 수. `GET /api/metrics`로 본다.
 - `events`는 append-only다. 기록은 응답을 보낸 뒤(`after()`) 하며, 실패해도 요청을 막지 않는다.
-- 방문자 해시는 날마다 바뀌어 날짜를 넘어 이어 붙일 수 없다.
+- 방문자 해시는 날마다 바뀌어 날짜를 넘어 이어 붙일 수 없다. 적용률과 MCP 클라이언트 수는 이 해시로 세므로 "방문자-일" 단위다.
+- 재방문은 해시로 셀 수 없어서 1st-party 익명 쿠키 `ap_vid`를 따로 둔다. `/api/events`와 키트 다운로드 응답이 쿠키가 없는 브라우저에 랜덤 UUID를 발급한다(`HttpOnly`, `SameSite=Lax`, HTTPS에서 `Secure`). IP·user-agent와 무관한 값이라 해시와 이어 붙일 수 없다.
+- 쿠키 수명은 첫 방문부터 28일로 고정하고 갱신하지 않는다. 한 ID가 정확히 첫 방문 후 4주만 이어지고, 그 뒤에는 새 방문자로 센다. MCP 호출에는 쿠키가 없어 재방문에 들어가지 않는다.
+- 재방문율 = 코호트(첫 방문이 구간 안인 ID) 중 첫 방문 후 28일 안에 다른 날(Asia/Seoul) 이벤트가 있는 비율. `/api/metrics`는 최근 28일을 뺀 그 이전 `days`일을 코호트로 써서, 모든 코호트 방문자가 4주를 다 채운 값만 낸다. 쿠키 도입 전 데이터는 `visitorId`가 없어 들어가지 않으므로 도입 후 28일이 지나야 첫 값이 나온다.
 - 로컬 개발은 `DATABASE_URL` 없이 임베디드 PGlite(`.data/`)를 쓰고, 프로덕션은 Neon Postgres를 쓴다. 앱은 풀러 URL(`DATABASE_URL`), 마이그레이션은 직접 URL(`DATABASE_URL_UNPOOLED`)로 붙는다.
 
 ---
@@ -285,7 +290,11 @@ export { handler as GET, handler as POST };                // mcp-handler 래핑
 // src/events/record.ts
 export function recordEvent(db: Db, e: TrackedEvent): Promise<void>;  // 실패해도 throw하지 않는다
 // src/events/track.ts
-export function trackAfterResponse(request: Request, e: Omit<TrackedEvent, "visitorHash">): void;
+export function trackAfterResponse(request: Request, e: Tracked): void;              // MCP: 해시만
+export function trackBrowserAfterResponse(request: Request, e: Tracked, response: Response): Response;  // 쿠키 ID도 기록·발급
+// src/events/metrics.ts
+export function articleMetrics(db: Db, since: Date): Promise<ArticleMetrics[]>;
+export function returnRate(db: Db, cohortFrom: Date, cohortTo: Date): Promise<ReturnRate>;
 // MCP 서버는 이벤트 콜백을 받는다: createAgentpediaServer(origin, onEvent)
 ```
 
