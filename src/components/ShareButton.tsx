@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { sendEvent } from "@/components/ArticleTracking";
+import { railButton } from "@/components/reactions/railButton";
 
 /** The system share sheet where the browser has one (mostly mobile), otherwise copies the link. */
 export function ShareButton({ slug, title, text }: { slug: string; title: string; text: string }) {
@@ -32,12 +33,13 @@ export function ShareButton({ slug, title, text }: { slug: string; title: string
     <button
       type="button"
       onClick={share}
-      className="inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm ring-1 ring-line ring-inset hover:bg-soft"
+      className={railButton}
+      title="링크 공유"
     >
-      <svg viewBox="0 0 24 24" className="size-4" aria-hidden fill="none" stroke="currentColor" strokeWidth={2}>
+      <svg viewBox="0 0 24 24" className="size-[18px]" aria-hidden fill="none" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" />
       </svg>
-      <span aria-live="polite">{state === "copied" ? "링크 복사됨 ✓" : state === "failed" ? "복사 실패" : "공유"}</span>
+      <span aria-live="polite">{state === "copied" ? "복사됨" : state === "failed" ? "실패" : "공유"}</span>
     </button>
   );
 }

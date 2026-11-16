@@ -8,8 +8,8 @@ import { ArticleTracking } from "@/components/ArticleTracking";
 import { GlossaryList } from "@/components/GlossaryList";
 import { KitSection } from "@/components/KitSection";
 import { PersonCard } from "@/components/PersonCard";
+import { ReactionRail } from "@/components/reactions/ReactionRail";
 import { RelatedArticles } from "@/components/RelatedArticles";
-import { ShareButton } from "@/components/ShareButton";
 import { SourceAge } from "@/components/SourceAge";
 import { Comments } from "@/components/comments/Comments";
 import { LikeButton, LikeButtonSkeleton } from "@/components/likes/LikeButton";
@@ -49,22 +49,30 @@ export async function generateMetadata({ params }: PageProps<"/a/[slug]">): Prom
 // second layout (docs/perf/2026-11-14-first-paint.md).
 export default async function ArticlePage({ params }: PageProps<"/a/[slug]">) {
   const { slug } = await params;
-  if (!getArticle(slug)) notFound();
+  const article = getArticle(slug);
+  if (!article) notFound();
   return (
+    <>
     <ArticleView
       slug={slug}
-      likes={
-        // The like count is request-time; a fixed-size placeholder keeps the row from shifting.
-        <Suspense fallback={<LikeButtonSkeleton />}>
-          <LikeButton slug={slug} />
-        </Suspense>
-      }
       comments={
         <Suspense fallback={<p className="text-sm text-muted">토론을 불러오는 중…</p>}>
           <Comments slug={slug} />
         </Suspense>
       }
     />
+    <ReactionRail
+      slug={slug}
+      title={article.title}
+      text={article.summary}
+      likes={
+        // The like count is request-time; a fixed-size placeholder keeps the rail from shifting.
+        <Suspense fallback={<LikeButtonSkeleton />}>
+          <LikeButton slug={slug} />
+        </Suspense>
+      }
+    />
+    </>
   );
 }
 
@@ -95,9 +103,9 @@ function People({ persons }: { persons: Article["persons"] }) {
 
 /**
  * Cached so the article, MDX compile included, lands in the prerendered page instead of
- * rendering per request. Request-time parts arrive as `likes` and `comments` pass-through slots.
+ * rendering per request. The request-time `comments` part arrives as a pass-through slot.
  */
-async function ArticleView({ slug, likes, comments }: { slug: string; likes: ReactNode; comments: ReactNode }) {
+async function ArticleView({ slug, comments }: { slug: string; comments: ReactNode }) {
   "use cache";
   const article = getArticle(slug)!;
   const related = getRelatedGraph(article);
@@ -145,12 +153,6 @@ async function ArticleView({ slug, likes, comments }: { slug: string; likes: Rea
 
       <ArticleBody article={article} />
       <GlossaryList terms={article.terms} />
-
-      {/* Reactions come once the reader has finished the article. */}
-      <div className="mt-14 flex items-center justify-center gap-2">
-        {likes}
-        <ShareButton slug={article.slug} title={article.title} text={article.summary} />
-      </div>
 
       <KitSection article={article} />
 

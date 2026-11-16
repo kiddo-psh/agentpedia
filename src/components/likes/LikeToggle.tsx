@@ -4,9 +4,7 @@ import Link from "next/link";
 import { useOptimistic, useState, useTransition } from "react";
 import { setArticleLike } from "@/likes/actions";
 import type { LikeState } from "@/likes/service";
-
-const buttonClass =
-  "inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-sm ring-1 ring-line ring-inset hover:bg-soft";
+import { railButton as buttonClass } from "@/components/reactions/railButton";
 
 export function LikeToggle({ slug, initial, signedIn }: { slug: string; initial: LikeState; signedIn: boolean }) {
   const [state, setState] = useState(initial);
@@ -39,7 +37,7 @@ export function LikeToggle({ slug, initial, signedIn }: { slug: string; initial:
   }
 
   return (
-    <span className="inline-flex items-center gap-2">
+    <span className="relative">
       <button
         type="button"
         onClick={toggle}
@@ -50,14 +48,18 @@ export function LikeToggle({ slug, initial, signedIn }: { slug: string; initial:
         <Heart filled={optimistic.liked} />
         <span>{optimistic.count}</span>
       </button>
-      {error && <span className="text-xs text-muted">{error}</span>}
+      {error && (
+        <span role="alert" className="absolute top-1/2 right-full mr-2 -translate-y-1/2 rounded-lg bg-foreground px-2.5 py-1.5 text-xs whitespace-nowrap text-background">
+          {error}
+        </span>
+      )}
     </span>
   );
 }
 
 function Heart({ filled }: { filled: boolean }) {
   return (
-    <svg viewBox="0 0 24 24" className="size-4" aria-hidden fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2}>
+    <svg viewBox="0 0 24 24" className="size-[18px]" aria-hidden fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2}>
       <path
         strokeLinejoin="round"
         d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.6 4.5 7.1 4.5c2 0 3.6 1.1 4.9 2.9 1.3-1.8 2.9-2.9 4.9-2.9 3.5 0 5.7 3.5 4.4 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"
