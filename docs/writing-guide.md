@@ -179,6 +179,8 @@ frontmatter `apply`에 아래를 반드시 씁니다. 기사 페이지와 MCP `a
 
 ## 10. 에이전트 워크플로로 쓰기
 
+글감 후보를 모을 때는 [`content/ideas.yaml`](../content/ideas.yaml)과 [글감 수집 파이프라인](idea-pipeline.md)을 봅니다. shortlist한 항목의 `slug`·`topic`·`category`·`people`·`sources`를 그대로 아래 워크플로 인자로 넘깁니다.
+
 [`.claude/workflows/write-article.js`](../.claude/workflows/write-article.js)가 이 가이드를 여러 에이전트로 실행합니다.
 
 1. **조사** (기사마다 1명): 1차 출처, 원문에서 확인한 날짜, 원문 그대로의 인용, 인물 정보와 라이선스가 확인된 사진
