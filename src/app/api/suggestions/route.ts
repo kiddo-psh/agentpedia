@@ -1,0 +1,20 @@
+import { connection } from "next/server";
+import { getDb } from "@/db/client";
+import { listSuggestions } from "@/suggestions/service";
+
+/**
+ * Reader suggestions as JSON, newest first. Same guard as /api/metrics: requires
+ * `Authorization: Bearer $METRICS_TOKEN` when the token is set, otherwise development only.
+ */
+export async function GET(request: Request) {
+  await connection();
+  const token = process.env.METRICS_TOKEN;
+  const allowed = token
+    ? request.headers.get("authorization") === `Bearer ${token}`
+    : process.env.NODE_ENV !== "production";
+  if (!allowed) return new Response(null, { status: 404 });
+
+  const days = Math.min(Math.max(Number(new URL(request.url).searchParams.get("days")) || 30, 1), 365);
+  const since = new Date(Date.now() - days * 86_400_000);
+  return Response.json({ days, since, suggestions: await listSuggestions(await getDb(), since) });
+}

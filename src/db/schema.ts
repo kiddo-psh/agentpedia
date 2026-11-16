@@ -44,6 +44,26 @@ export const likes = pgTable(
   (t) => [primaryKey({ columns: [t.userId, t.articleSlug] }), index("likes_article_idx").on(t.articleSlug)],
 );
 
+/**
+ * Reader suggestions about an article. Signed-in readers are linked by user; anonymous ones
+ * carry only the daily visitor hash, which also caps how often one visitor can send.
+ */
+export const suggestions = pgTable(
+  "suggestions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    articleSlug: text("article_slug").notNull(),
+    body: text("body").notNull(),
+    userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
+    visitorHash: text("visitor_hash"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("suggestions_created_idx").on(t.createdAt),
+    index("suggestions_visitor_created_idx").on(t.visitorHash, t.createdAt),
+  ],
+);
+
 export const EVENT_KINDS = [
   "view",
   "web_copy",
