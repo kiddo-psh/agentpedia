@@ -152,7 +152,7 @@
 
 - id: software-3-0
   term: Software 3.0
-  definition: 카파시가 소프트웨어를 셋으로 나눈 틀입니다. 사람이 쓴 코드(1.0), 학습한 신경망 가중치(2.0)에 이어, 영어로 쓴 프롬프트가 LLM을 움직이는 프로그램이 됐다는 뜻입니다.
+  definition: Andrej Karpathy가 소프트웨어를 셋으로 나눈 틀입니다. 사람이 쓴 코드(1.0), 학습한 신경망 가중치(2.0)에 이어, 영어로 쓴 프롬프트가 LLM을 움직이는 프로그램이 됐다는 뜻입니다.
 
 - id: partial-autonomy
   term: 부분 자율
@@ -172,7 +172,7 @@
 - id: vibe-coding
   term: 바이브 코딩
   en: vibe coding
-  definition: 코드를 한 줄씩 직접 쓰지 않고, 원하는 것을 말로 설명해 AI가 코드를 만들게 하는 개발 방식입니다. 카파시가 붙인 이름입니다.
+  definition: 코드를 한 줄씩 직접 쓰지 않고, 원하는 것을 말로 설명해 AI가 코드를 만들게 하는 개발 방식입니다. Andrej Karpathy가 붙인 이름입니다.
 
 - id: llms-txt
   term: llms.txt
