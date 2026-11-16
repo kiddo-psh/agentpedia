@@ -1,0 +1,90 @@
+# Collector config for `npm run ideas:collect`.
+# Inbox output is content/ideas.yaml (write-article arg names).
+# X is deferred. YouTube uses public Atom feeds — no API key.
+
+blogs:
+  - id: openai
+    name: OpenAI News
+    kind: rss
+    url: https://openai.com/news/rss.xml
+    categoryHint: trends
+    includeKeywords:
+      - agent
+      - agents
+      - codex
+      - security
+      - sandbox
+      - mcp
+      - tool
+      - safety
+
+  # Anthropic has no public RSS; scrape listing pages for title+URL only.
+  - id: anthropic-engineering
+    name: Anthropic Engineering
+    kind: html-index
+    url: https://www.anthropic.com/engineering
+    baseUrl: https://www.anthropic.com
+    linkPattern: "^/(research|engineering)/[a-z0-9-]+$"
+    categoryHint: trends
+    includeKeywords:
+      - agent
+      - agents
+      - claude code
+      - harness
+      - memory
+      - mcp
+      - tool
+      - sandbox
+      - security
+      - source control
+
+  - id: anthropic-research
+    name: Anthropic Research
+    kind: html-index
+    url: https://www.anthropic.com/research
+    baseUrl: https://www.anthropic.com
+    linkPattern: "^/research/[a-z0-9-]+$"
+    categoryHint: trends
+    includeKeywords:
+      - agent
+      - agents
+      - claude code
+      - harness
+      - memory
+      - mcp
+      - tool
+      - sandbox
+      - security
+
+youtube:
+  - id: anthropic
+    name: Anthropic
+    channelId: UCrDwWp7EBBv4NwvScIpBDOA
+    categoryHint: people
+    includeKeywords:
+      - agent
+      - claude
+      - code
+      - security
+      - research
+
+  - id: openai
+    name: OpenAI
+    channelId: UCXZCJLdBC09xxGZ6gcdrc6A
+    categoryHint: people
+    includeKeywords:
+      - agent
+      - codex
+      - security
+      - research
+
+hn:
+  minPoints: 30
+  hitsPerQuery: 20
+  queries:
+    - query: "coding agent OR claude code OR agent harness OR MCP tools"
+      category: trends
+    - query: "agent SaaS OR indie hacker agent OR agent ARR OR monetiz"
+      category: startup
+    - query: "prompt injection OR agent security OR tool permission OR sandbox agent"
+      category: security
