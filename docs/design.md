@@ -122,7 +122,7 @@ content/articles/
       checklist.md     # goal 달성 여부 점검 (필수)
 ```
 
-키트는 **이 기사의 claim을 실행하는 지시**다. MCP `apply_article`은 본문 없이 키트를 넘기므로, 작성·리뷰 기준은 `docs/writing-guide.md` §8과 `docs/review-rubric.md` §D를 따른다. 선택 스니펫·스킬 파일을 더 둘 수는 있으나, 현재 기사들은 `prompt.md`+`checklist.md`만 둔다.
+키트는 **이 기사의 claim을 실행하는 지시**다. MCP `apply_article`은 `tryIt`·`apply` 요약·정제 본문 요약과 함께 키트를 넘기므로, 작성·리뷰 기준은 `docs/writing-guide.md` §8과 `docs/review-rubric.md` §D를 따른다. 선택 스니펫·스킬 파일을 더 둘 수는 있으나, 현재 기사들은 `prompt.md`+`checklist.md`만 둔다.
 
 ### Frontmatter 스키마
 
@@ -245,7 +245,7 @@ events {
 | 종류 | 이름 | 입력 | 반환 |
 |---|---|---|---|
 | tool | `search_articles` | `query?`, `category?`, `limit=10` | slug, 제목, 요약, 카테고리, 키트 유무 목록 |
-| tool | `get_article` | `slug` | 핵심 아이디어, 출처 링크, 본문(MDX 원문), 키트 파일 목록 |
+| tool | `get_article` | `slug` | 핵심 아이디어, 출처 링크, 정제된 본문(에이전트용 마크다운), 키트 파일 목록 |
 | tool | `get_apply_kit` | `slug` | 키트 파일 전체 (`path`, `content`) |
 | prompt | `apply_article` | `slug` | 레포에 적용하는 작업 지시 (아래) |
 
@@ -257,24 +257,31 @@ events {
 당신은 사용자의 현재 프로젝트에 아래 기사의 방법을 적용하려 합니다.
 
 ## 기사: {title}
+{url}
 핵심 아이디어:
 {keyIdeas}
 
+## 먼저 진단 (파일 수정 없음)
+{tryIt}
+
+## 이 키트가 하는 일 (이 범위를 벗어나지 마세요)
+{apply: goal / changes / doesNotDo / fitsWhen / time}
+
+## 본문 요약
+{정제된 본문 발췌 — MDX JSX 없음, 상한 ~3.5k자 또는 첫 2개 ## 절}
+
 ## 적용 키트
-{kit/prompt.md}
-{kit 파일 목록과 내용}
+{kit/prompt.md 먼저, 나머지 파일}
 
 ## 진행 방식
-1. 현재 레포 구조와 설정을 먼저 읽고, 이 방법이 맞는지 판단하세요.
-   맞지 않으면 이유를 말하고 멈추세요.
-2. 바꿀 파일과 이유를 담은 적용 계획을 제시하고 사용자 승인을 받으세요.
-3. 승인된 범위만 구현하세요.
-4. kit/checklist.md로 결과를 점검하세요.
+키트의 맞는지-판단 · 승인 · 실행-확인 단계를 따릅니다.
+(자세한 규칙은 kit/prompt.md와 checklist.md)
 
-출처: {sources}
+## 출처
+{sources}
 ```
 
-1단계에 "맞지 않으면 멈춰라"를 넣은 것이 중요하다. 모든 방법이 모든 프로젝트에 맞지는 않는다. 억지 적용은 사용자 신뢰를 잃게 만든다.
+안전 게이트(맞지 않으면 멈춤 / 승인 / 실행 확인)의 **상세 문장은 키트가 소유**한다. 래퍼는 한 블록으로만 위임한다. 모든 방법이 모든 프로젝트에 맞지는 않는다. 억지 적용은 사용자 신뢰를 잃게 만든다.
 
 ### 타입 스케치
 
