@@ -189,6 +189,7 @@ frontmatter `apply`에 아래를 반드시 씁니다. 기사 페이지와 MCP `a
 - [ ] 사진이 있다면 `credit`, `license`, `sourceUrl`이 있음
 - [ ] `apply`와 `tryIt` 필드가 채워져 있고 `kit/prompt.md`·`kit/checklist.md`가 있음
 - [ ] 키트가 이 기사의 claim을 구현하고, `apply`와 prompt·checklist가 일치함 (§8 충실도)
+- [ ] `npm run validate:content`의 키트 충실도 게이트 통과 (claim 단서 · stop/approve/verify · `apply` 경로 정합 · 형제 키트 침범 금지)
 - [ ] 사람 검수 전까지 `draft: true`
 
 ## 10. 에이전트 워크플로로 쓰기
