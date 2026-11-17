@@ -407,3 +407,48 @@
   term: 팩파일
   en: packfile
   definition: git이 객체를 압축해 묶어 저장하는 파일 형식입니다. 저장소가 커지면 유지 보수 비용이 커집니다.
+
+- id: persistent-agent
+  term: 지속 실행 에이전트
+  en: persistent agent
+  definition: 고정된 한 번의 목표와 사람 조향에 묶이지 않고, 넓은 범위로 24시간 돌며 입력 없이도 먼저 행동할 수 있는 에이전트입니다.
+
+- id: control-plane
+  term: 제어면
+  en: control plane
+  definition: 에이전트를 설정하고 네트워크·신원·샌드박스 같은 경계를 강제하는 결정적 쪽 코드와 서비스입니다. OpenAI 글에서는 게이트웨이처럼 신뢰하는 쪽에 둡니다.
+
+- id: credential-broker
+  term: 자격 증명 브로커
+  en: credential broker
+  definition: 비밀값을 에이전트에게 직접 보여 주지 않고, 허용된 요청에만 대리로 넣어 주는 중개 장치입니다.
+
+- id: network-allowlist
+  term: 네트워크 허용 목록
+  en: network allowlist
+  definition: 에이전트가 접속할 수 있는 호스트·도메인만 미리 정해 둔 목록입니다. 목록 밖 접속은 막습니다.
+
+- id: danger-full-access
+  term: danger-full-access
+  en: danger-full-access
+  definition: Codex 샌드박스에서 제한을 거의 풀고 돌리는 모드 이름입니다. OpenAI의 OpenClaw 배포 예시는 이 모드를 허용 목록에서 뺍니다.
+
+- id: auto-review
+  term: 자동 검토
+  en: Auto-review
+  definition: 주 에이전트의 행동을 다른 에이전트가 먼저 검토·승인하게 하는 장치입니다. OpenClaw와 Codex에 기본으로 있습니다.
+
+- id: static-context
+  term: 고정 컨텍스트
+  en: static context
+  definition: 매 턴마다 요청 앞에 붙는 시스템 지침과 고빈도 도구 정의처럼, 거의 바뀌지 않고 항상 실리는 컨텍스트입니다.
+
+- id: dynamic-context
+  term: 동적 컨텍스트
+  en: dynamic context
+  definition: 필요할 때만 불러오는 도구 정의·MCP 설명·가변 설정처럼, 매 턴에 전부 싣지 않는 컨텍스트입니다.
+
+- id: prompt-caching
+  term: 프롬프트 캐싱
+  en: prompt caching
+  definition: 요청의 앞부분이 이전 턴과 같으면 모델 제공자가 그 접두를 다시 계산하지 않고 재사용하는 기법입니다.

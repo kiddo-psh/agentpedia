@@ -91,3 +91,23 @@
   name: Anthropic Source Control Team
   nameKo: 소스컨트롤팀
   role: Scion과 Antique를 만든 Anthropic Engineering 7인 팀(글 작성자 Nick G., 성 미공개)
+
+- id: kevin-s-lin
+  name: Kevin S Lin
+  nameKo: 케빈 린
+  role: OpenAI에서 persistent agent 보안 글(OpenClaw)을 쓴 사람
+
+- id: jediah-katz
+  name: Jediah Katz
+  nameKo: 제다이아 캐츠
+  role: Cursor에서 장시간 에이전트 토큰 효율 글을 공동 집필한 사람
+
+- id: connor-okeefe
+  name: Connor O'Keefe
+  nameKo: 코너 오키프
+  role: Cursor에서 장시간 에이전트 토큰 효율 글을 공동 집필한 사람
+
+- id: calvin-yee
+  name: Calvin Yee
+  nameKo: 캘빈이
+  role: Cursor에서 장시간 에이전트 토큰 효율 글을 공동 집필한 사람
