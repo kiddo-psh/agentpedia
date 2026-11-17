@@ -13,11 +13,11 @@
 
 ## 0. 맞는지 먼저 판단하기
 
-아래를 확인한다. 아니면 **멈추고** 이유를 알린다.
+아래를 확인한다. 해당하지 않으면 **아무것도 바꾸지 말고 멈춘 뒤** 이유를 알린다.
 
 - 레포에 `CLAUDE.md`/`AGENTS.md`/`.mcp.json`/`.cursor/`/`.claude/` 중 지침·MCP·도구 정의가 하나 이상 있다.
 - 현재 디렉터리가 사용자 레포다.
-- `docs/token-context-budget-audit.md`가 있으면 덮어쓰지 말고 이름을 묻는다.
+- `docs/token-context-budget-audit.md`가 이미 있으면 덮어쓰지 말고 이름을 묻는다.
 
 시작 전 `git status --porcelain`과 `git rev-parse HEAD`를 기록한다.
 
