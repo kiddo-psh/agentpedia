@@ -9,19 +9,19 @@ difficulty: practical
 brief:
   what: "2026년 11월 6일 Anthropic이 Lance Martin의 글에서, 메모리 폴더와 기록을 고쳐 쓰는 드리밍이 성능을 올린 실험과 그렇지 않은 반례를 함께 보고했습니다."
   why: "메모리는 많이 쌓기보다 무엇을 남기고 언제 고치느냐가 성능과 함께 움직였고, 매 세션 불러오는 노트가 틀리면 그 오류가 모든 세션에 따라갑니다."
-  action: "키트로 MEMORY.md의 200줄·25KB 한도와 CLAUDE.md 길이를 점검해 보고서를 남기고, 승인하면 CLAUDE.md의 중복·낡은 줄을 정리합니다."
+  action: "키트로 MEMORY.md 한도와 지시 파일 길이를 재고, 선별·덤프·드리밍 후보로 분류한 뒤 승인하면 낡은 줄을 정리합니다."
 apply:
-  goal: "본문의 '맨 위층을 작게 두라'는 조언대로 MEMORY.md 한도와 CLAUDE.md(또는 AGENTS.md) 길이를 점검해 보고서로 남기고, 승인하면 정리합니다."
+  goal: "본문의 '맨 위층을 작게 두라'는 조언대로 MEMORY.md 한도와 CLAUDE.md(또는 AGENTS.md) 길이를 재고, 선별·덤프·드리밍 후보로 분류해 보고서로 남긴 뒤, 승인하면 정리합니다."
   changes:
-    - "`docs/agent-memory-audit.md`에 점검 보고서 추가 (`docs/`가 없으면 폴더도 만듭니다. 줄 수, 크기, 낡거나 중복된 항목, 정리 제안. 파일이 이미 있으면 승인한 이름으로)"
-    - "승인한 경우에만 레포의 `CLAUDE.md`(또는 `AGENTS.md`)에서 중복·낡은 줄을 줄이거나 항목을 정리 (`.claude/CLAUDE.md`와 `CLAUDE.local.md`는 점검만 하고 고치지 않음. 미커밋 변경이 있는 파일은 별도 승인 없이 고치지 않음)"
+    - "`docs/agent-memory-audit.md`에 점검 보고서 추가 (`docs/`가 없으면 폴더도 만듭니다. 줄 수, 크기, 한도 대비, 유지·낡음·중복·이동 후보, 선별·덤프·드리밍·위키 후보, 정리 제안. 파일이 이미 있으면 승인한 이름으로)"
+    - "승인한 경우에만 레포의 `CLAUDE.md`(또는 `AGENTS.md`)에서 중복·낡은 줄을 줄이거나 항목을 정리 (`.claude/CLAUDE.md`와 `CLAUDE.local.md`는 점검만 하고 고치지 않음. 미커밋 변경이 있는 파일은 별도 승인 없이 고치지 않음. 드리밍·위키는 만들지 않음)"
   doesNotDo:
     - "홈 디렉터리 등 레포 밖에 있는 자동 메모리 파일(기본 `~/.claude/projects/`)은 고치지 않습니다. 정리안만 보고서에 적습니다."
     - "자동 메모리 파일과 `settings.json` 계열 설정(`~/.claude/settings.json`, `.claude/settings.json`, `.claude/settings.local.json`)은 바꾸지 않고, 커밋하거나 푸시하지 않습니다."
     - "메모리 항목의 원문과 비밀 값을 보고서에 옮겨 적지 않습니다."
   fitsWhen: "Claude Code를 쓰며 자동 메모리나 CLAUDE.md가 쌓여 가는 프로젝트"
   time: "15~30분"
-tryIt: "자동 메모리 폴더 경로는 <붙여넣기>야(/memory의 폴더 열기로 확인). 읽기 전용으로 MEMORY.md, CLAUDE.md, .claude/CLAUDE.md, CLAUDE.local.md, AGENTS.md, .claude/AGENTS.md 중 있는 파일의 줄 수(grep -c '')와 바이트(wc -c)를 알려줘. MEMORY.md는 200줄 또는 25KB(25,000·25,600바이트) 초과 여부, 나머지는 200줄 이상인지 표시해. AGENTS.md가 있는데 레포의 CLAUDE.md류가 @AGENTS.md를 가져오지 않으면 '로드 안 될 수 있음'으로 표시해. 파일이 하나도 없거나 grep·wc가 없으면 그렇게만 말하고 멈춰. 끝에 키트를 돌릴 만한지 한 줄로 판단해. 아무 파일도 바꾸지 마."
+tryIt: "자동 메모리 폴더는 <붙여넣기>(/memory로 확인). MEMORY.md·CLAUDE.md·AGENTS.md 등 있는 파일의 줄 수(grep -c '')·바이트(wc -c)만 알려줘. MEMORY.md는 200줄·25KB(25000·25600) 초과 여부, 나머지는 200줄 이상인지, MEMORY.md가 선별/덤프 중 어디에 가까운지 한 줄로. AGENTS.md만 있고 @AGENTS.md 없으면 '로드 안 될 수 있음'. 없으면 멈추고, 끝에 키트 可否/권장 한 줄. 아무 파일도 바꾸지 마."
 draft: false
 publishedAt: 2026-11-06
 keyIdeas:
