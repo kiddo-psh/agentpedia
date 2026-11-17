@@ -150,6 +150,18 @@ Agentpedia 기사를 쓰는 사람(사람이든 에이전트든)이 따르는 �
 - **형제 키트와 범위를 나눈다.** 검증 루프를 CLAUDE.md에 쌓는 일은 Boris 키트, 환경 마찰은 Theo, 하네스 판정은 Chase처럼 역할을 겹치지 않게 `doesNotDo`나 도입부에 밝힌다.
 - **감사 보고서만으로 끝내지 말 것.** 기사가 실제 변경을 요구하면 action 키트로 쓰고, 감사가 맞으면 보고서 항목이 그 기사 claim을 검증해야 한다.
 
+### 키트 장르 (혼합)
+
+장르는 일괄 변환하지 않는다. **기사 claim이 레포를 바꾸는 일**이면 action(또는 점검 후 최소 변경인 hybrid), **판정·목록·병목 보고가 claim**이면 audit을 유지한다.
+
+| 형태 | 언제 | 예 |
+|---|---|---|
+| action | CLI 노출, 문서·설정에 검증 루프 심기처럼 변경 자체가 claim | Steinberger, Karpathy, Boris |
+| hybrid | 점검이 본이고, 승인 시 좁은 한 줄·린트 하나·allow 축소만 | Lauren Tan, auto-mode, Theo, do-context |
+| audit | 감사·판정 보고서가 claim (템플릿만 추가해도 됨) | Chase 하네스 판정, isolation/trust/surface 점검, 병목·증거 보고서 |
+
+강제 전환 금지: 형제 키트와 같은 `docs/*-audit.md` 찍기로 수렴시키거나, Boris만의 "검증 명령을 CLAUDE.md에 덧붙이기"를 다른 키트에 넣지 않는다. 장르를 바꿀 때는 `apply`·`prompt.md`·`checklist.md`·`tryIt`을 한 세트로 맞추고 `content:` 커밋으로 남긴다.
+
 frontmatter `apply`에 아래를 반드시 씁니다. 기사 페이지와 MCP `apply_article` 프롬프트에 그대로 표시됩니다.
 
 | 필드 | 내용 | 예 |
