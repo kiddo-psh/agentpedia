@@ -130,7 +130,7 @@ const REVIEWERS = [
     key: 'kit',
     model: 'sonnet',
     rubric: 'D (kit clarity and safety)',
-    lens: 'You are a cautious senior engineer about to run this kit on your own repo. Check that frontmatter apply.goal/changes/doesNotDo match kit/prompt.md and kit/checklist.md exactly, that frontmatter tryIt is read-only (changes no files) and helps decide whether to run the kit, that the prompt stops when unfit, asks for approval before changes, verifies by running commands, and actually implements this article\'s idea. Check every config key, file location and command in kit/prompt.md against the vendor\'s official documentation.',
+    lens: 'You are a cautious senior engineer about to run this kit on your own repo. Score against docs/review-rubric.md D and docs/writing-guide.md section 8 fidelity rules. Check that apply.goal/changes/doesNotDo match kit/prompt.md and kit/checklist.md exactly; both kit files are required; tryIt is read-only and helps decide whether to run the kit; the prompt states this article\'s claim, stops when unfit, asks for approval before changes, verifies by running commands, and does not drift into a generic audit or a Claude Code settings/version encyclopedia. Sibling kits must not own the same job (e.g. only Boris owns "append verify commands to CLAUDE.md"). Check every config key, file location and command against the vendor\'s official docs; prefer "confirm against current docs" over pasting long key matrices.',
   },
 ]
 
@@ -192,7 +192,7 @@ const results = await pipeline(
 ${it.mode === 'revise' ? `Rewrite the existing draft in content/articles/${it.slug}/` : `Create content/articles/${it.slug}/`} following docs/writing-guide.md exactly:
 index.mdx (frontmatter incl. brief, apply, tryIt, people ids, sources with dateNote where dateVerified is false, draft: true), kit/prompt.md, kit/checklist.md.
 Follow the three layers in docs/writing-guide.md section 2: brief is facts only; the body is the story; wrap each glossary term at its first use in <Term id="..."> using ids from content/glossary.yaml.
-Look at content/articles/agent-tools-trust-boundary/ for the file format and section structure. The body has no apply section: the read-only diagnosis prompt goes in frontmatter tryIt (writing guide section 8). Do not end with an "as of <date>" disclaimer; the page header shows the source age.
+Look at content/articles/steinberger-shipping-at-inference-speed/ (action kit) and content/articles/lauren-tan-anti-slop-trust-pyramid/ (article-native audit) for kit fidelity: prompt states this article's claim, classification uses the article's concepts, no settings/version encyclopedia, sibling kits do not share the same job (writing guide section 8). File format: body has no apply section; tryIt is frontmatter only. Do not end with an "as of <date>" disclaimer; the page header shows the source age.
 Use only these verified facts and quotes; anything not here must not appear:
 ${JSON.stringify(r, null, 2)}
 Open with this angle: ${r.storyAngle}

@@ -12,7 +12,7 @@
 
 1. 사용자가 `/a/karpathy-software-3` 기사를 읽는다.
 2. 기사 끝 "적용 키트" 맨 위의 진단 프롬프트(frontmatter `tryIt`, 읽기 전용)를 복사한다. 이때 `apply_event(channel: web_copy)`가 기록된다.
-3. 기사 끝의 "적용 키트"에서 `CLAUDE.md` 스니펫과 스킬 파일을 받는다. 이때 `kit_download`가 기록된다.
+3. 기사 끝의 "적용 키트"에서 zip(`prompt.md`·`checklist.md`)을 받는다. 이때 `kit_download`가 기록된다.
 
 ### 흐름 B: 에이전트에서 적용 (핵심 차별점)
 
@@ -42,7 +42,7 @@ claude mcp add --transport http agentpedia https://agentpedia-flax.vercel.app/mc
 |---|---|
 | 기사 목록 | 카테고리 필터 (인물 / 트렌드 / 창업 사례 / 보안) |
 | 인터랙티브 기사 | MDX와 소수의 전용 컴포넌트 (아래 4절) |
-| 적용 키트 | 기사마다 프롬프트, 스킬 파일, 설정 스니펫, 체크리스트 |
+| 적용 키트 | 기사마다 `prompt.md` + `checklist.md` (MCP·zip 공통) |
 | MCP 서버 | 원격 HTTP, 읽기 전용, 인증 없음 |
 | 댓글 | GitHub 로그인, 답글 1단계 |
 | 적용 이벤트 로깅 | 핵심 지표 측정용 |
@@ -118,11 +118,11 @@ content/articles/
   karpathy-software-3/
     index.mdx          # 본문 + frontmatter
     kit/
-      prompt.md        # 메인 적용 프롬프트 (MCP 프롬프트의 본체)
-      CLAUDE.md        # 붙여 넣을 설정 스니펫 (선택)
-      skills/…/SKILL.md  (선택)
-      checklist.md     # 적용 후 스스로 확인할 항목
+      prompt.md        # 메인 적용 프롬프트 (MCP apply_article의 본체, 필수)
+      checklist.md     # goal 달성 여부 점검 (필수)
 ```
+
+키트는 **이 기사의 claim을 실행하는 지시**다. MCP `apply_article`은 본문 없이 키트를 넘기므로, 작성·리뷰 기준은 `docs/writing-guide.md` §8과 `docs/review-rubric.md` §D를 따른다. 선택 스니펫·스킬 파일을 더 둘 수는 있으나, 현재 기사들은 `prompt.md`+`checklist.md`만 둔다.
 
 ### Frontmatter 스키마
 
@@ -245,7 +245,7 @@ events {
 | 종류 | 이름 | 입력 | 반환 |
 |---|---|---|---|
 | tool | `search_articles` | `query?`, `category?`, `limit=10` | slug, 제목, 요약, 카테고리, 키트 유무 목록 |
-| tool | `get_article` | `slug` | 핵심 아이디어, 출처 링크, 본문 요약(마크다운), 키트 파일 목록 |
+| tool | `get_article` | `slug` | 핵심 아이디어, 출처 링크, 본문(MDX 원문), 키트 파일 목록 |
 | tool | `get_apply_kit` | `slug` | 키트 파일 전체 (`path`, `content`) |
 | prompt | `apply_article` | `slug` | 레포에 적용하는 작업 지시 (아래) |
 
