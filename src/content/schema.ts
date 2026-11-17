@@ -134,3 +134,6 @@ export type MdxComponentName = (typeof MDX_COMPONENTS)[number];
 
 /** Every kit must ship this file; it is the body of the MCP `apply_article` prompt. */
 export const REQUIRED_KIT_FILE = "prompt.md";
+
+/** Every kit must ship a checklist that verifies `apply.goal`, not just procedure. */
+export const REQUIRED_CHECKLIST_FILE = "checklist.md";

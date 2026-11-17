@@ -8,6 +8,7 @@ import type { MdxJsxAttribute } from "mdast-util-mdx-jsx";
 import {
   ArticleMeta,
   MDX_COMPONENTS,
+  REQUIRED_CHECKLIST_FILE,
   REQUIRED_KIT_FILE,
   TIMED_SOURCE_KINDS,
   type Article,
@@ -74,6 +75,9 @@ export function parseArticle({ dirName, raw, kit, people, glossary }: ArticleInp
 
   if (!kit.some((f) => f.path === REQUIRED_KIT_FILE)) {
     issues.push(`kit/${REQUIRED_KIT_FILE} is missing`);
+  }
+  if (!kit.some((f) => f.path === REQUIRED_CHECKLIST_FILE)) {
+    issues.push(`kit/${REQUIRED_CHECKLIST_FILE} is missing`);
   }
 
   let tree: Root | undefined;

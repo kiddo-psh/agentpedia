@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { parseArticle, timestampToSeconds } from "./validate";
 
-const kit = [{ path: "prompt.md", content: "apply it" }];
+const kit = [
+  { path: "prompt.md", content: "apply it" },
+  { path: "checklist.md", content: "- [ ] done" },
+];
 
 function mdx(body: string, overrides: Record<string, string> = {}) {
   const fm = {
@@ -147,7 +150,10 @@ describe("parseArticle", () => {
   });
 
   it("checks the kit and the definitions of terms the body uses for transliterated names", () => {
-    const badKit = [{ path: "prompt.md", content: "에이다의 원칙을 적용한다." }];
+    const badKit = [
+      { path: "prompt.md", content: "에이다의 원칙을 적용한다." },
+      { path: "checklist.md", content: "- [ ] done" },
+    ];
     const r1 = parse(mdx("body"), "sample", badKit);
     expect(!r1.ok && r1.issues.join("\n")).toMatch(/kit\/prompt\.md: write "Ada" instead of "에이다"/);
 
@@ -172,12 +178,18 @@ describe("parseArticle", () => {
     expect(!r.ok && r.issues.join("\n")).toMatch(/kit\/prompt\.md is missing/);
   });
 
+  it("rejects missing kit checklist", () => {
+    const r = parse(mdx("body"), "sample", [{ path: "prompt.md", content: "apply it" }]);
+    expect(!r.ok && r.issues.join("\n")).toMatch(/kit\/checklist\.md is missing/);
+  });
+
   it("reports frontmatter errors and continues collecting others", () => {
     const r = parse(mdx("body", { category: "gossip" }), "sample", []);
     expect(r.ok).toBe(false);
     const text = !r.ok ? r.issues.join("\n") : "";
     expect(text).toMatch(/frontmatter\.category/);
     expect(text).toMatch(/kit\/prompt\.md is missing/);
+    expect(text).toMatch(/kit\/checklist\.md is missing/);
   });
 
   it("reports invalid MDX instead of throwing", () => {
