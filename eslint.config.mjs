@@ -18,6 +18,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Claude/Cursor worktree checkouts (nested .next and node_modules).
+    ".claude/worktrees/**",
   ]),
 ]);
 

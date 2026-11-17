@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run",
+    "test": "vitest run --exclude .claude/worktrees/**",
     "validate:content": "tsx scripts/validate-content.ts",
     "ideas:collect": "tsx scripts/collect-ideas.ts",
     "render:article": "tsx scripts/render-article.ts",
