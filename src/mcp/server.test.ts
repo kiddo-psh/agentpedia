@@ -59,6 +59,7 @@ describe(`${SERVER_NAME} MCP server`, () => {
     expect(t).toContain("## 핵심 아이디어");
     expect(t).toContain("https://x.com/bcherny/status/2007179832300581177");
     expect(t).toContain("먼저 진단 (파일 수정 없음): ");
+    expect(t).not.toMatch(/<Term\b|<Pyramid\b|<Quote\b|<KeyIdea\b/);
   });
 
   it("unknown slug is a tool error that suggests close matches", async () => {
@@ -86,7 +87,7 @@ describe(`${SERVER_NAME} MCP server`, () => {
     ]);
   });
 
-  it("apply_article embeds the kit and the stop-if-unfit instruction", async () => {
+  it("apply_article embeds tryIt, cleaned body, kit, and a short progress block", async () => {
     const { messages } = await client.getPrompt({ name: "apply_article", arguments: { slug: SLUG } });
     const t = (messages[0].content as { text: string }).text;
     expect(messages[0].role).toBe("user");
@@ -95,6 +96,10 @@ describe(`${SERVER_NAME} MCP server`, () => {
     expect(t).toContain("하지 않는 것:");
     expect(t).toContain("### prompt.md");
     expect(t).toContain(`${ORIGIN}/a/${SLUG}`);
+    expect(t).toContain("## 먼저 진단 (파일 수정 없음)");
+    expect(t).toContain("키트의 맞는지-판단");
+    expect(t).not.toMatch(/1\.\s*현재 레포 구조와 설정을 먼저 읽고[\s\S]*4\.\s/);
+    expect(t).not.toMatch(/<Term\b|<Pyramid\b|<Quote\b|<KeyIdea\b/);
   });
 
   it.each(APPLY_SLOTS)("applyPromptText contract for %s", (slug) => {
@@ -106,10 +111,15 @@ describe(`${SERVER_NAME} MCP server`, () => {
     expect(t).toContain(`${ORIGIN}/a/${slug}`);
     expect(t).toContain("핵심 아이디어:");
     for (const idea of a!.keyIdeas) expect(t).toContain(idea);
+    expect(t).toContain(a!.tryIt);
     expect(t).toContain("## 이 키트가 하는 일");
     expect(t).toContain(a!.apply.goal);
+    expect(t).toContain("## 본문 요약");
     expect(t).toContain("### prompt.md");
+    expect(t.indexOf(a!.tryIt)).toBeLessThan(t.indexOf("### prompt.md"));
     expect(t.indexOf("### prompt.md")).toBeLessThan(t.indexOf("## 진행 방식"));
     expect(t).toContain("## 출처");
+    expect(t).not.toMatch(/<Term\b|<Pyramid\b|<Quote\b|<KeyIdea\b/);
+    expect(t).not.toMatch(/1\.\s*현재 레포 구조와 설정을 먼저 읽고[\s\S]*4\.\s/);
   });
 });

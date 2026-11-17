@@ -4,6 +4,7 @@ import { orderedKit } from "@/content/kit";
 import { CATEGORY_LABEL } from "@/content/labels";
 import { getArticle, listArticles } from "@/content/loader";
 import { Category, REQUIRED_KIT_FILE, type Article, type ArticleMeta, type KitFile } from "@/content/schema";
+import { bodyExcerptForAgent, bodyMarkdownForAgent } from "./bodyForAgent";
 import { SERVER_NAME } from "./name";
 
 export { SERVER_NAME };
@@ -94,12 +95,12 @@ export function articleText(a: Article, origin: string): string {
     "## 핵심 아이디어",
     ...a.keyIdeas.map((k, i) => `${i + 1}. ${k}`),
     "",
-    "## 본문 (MDX)",
+    "## 본문",
     "",
-    a.bodyMarkdown,
+    bodyMarkdownForAgent(a),
     "",
     ...(a.terms.length > 0
-      ? ["## 용어 (본문의 <Term id>)", ...a.terms.map((t) => `- ${t.term}${t.en ? ` (${t.en})` : ""}: ${t.definition}`), ""]
+      ? ["## 용어", ...a.terms.map((t) => `- ${t.term}${t.en ? ` (${t.en})` : ""}: ${t.definition}`), ""]
       : []),
     "## 출처",
     sourcesText(a),
@@ -124,9 +125,17 @@ export function applyPromptText(a: Article, origin: string): string {
     "핵심 아이디어:",
     ...a.keyIdeas.map((k) => `- ${k}`),
     "",
+    "## 먼저 진단 (파일 수정 없음)",
+    "",
+    a.tryIt,
+    "",
     "## 이 키트가 하는 일 (이 범위를 벗어나지 마세요)",
     "",
     applySummaryText(a),
+    "",
+    "## 본문 요약",
+    "",
+    bodyExcerptForAgent(a),
     "",
     "## 적용 키트",
     "",
@@ -134,11 +143,7 @@ export function applyPromptText(a: Article, origin: string): string {
     "",
     "## 진행 방식",
     "",
-    "1. 현재 레포 구조와 설정을 먼저 읽고, 이 방법이 이 프로젝트에 맞는지 판단하세요.",
-    "   맞지 않으면 이유를 설명하고 멈추세요.",
-    "2. 바꿀 파일과 이유를 담은 적용 계획을 제시하고 사용자 승인을 받으세요.",
-    "3. 승인된 범위만 구현하세요.",
-    `4. ${a.kit.some((f) => f.path === "checklist.md") ? "checklist.md" : REQUIRED_KIT_FILE}의 기준으로 결과를 점검하고 보고하세요.`,
+    "키트의 맞는지-판단 · 승인 · 실행-확인 단계를 따릅니다. 맞지 않으면 멈추고, 변경 전 승인을 받으며, 추측 대신 실행으로 확인하세요. 자세한 규칙은 kit/prompt.md와 checklist.md에 있습니다.",
     "",
     "## 출처",
     sourcesText(a),
@@ -191,7 +196,7 @@ export function createAgentpediaServer(
     "get_article",
     {
       title: "기사 읽기",
-      description: "기사의 핵심 아이디어, 본문, 출처, 키트 파일 목록을 반환합니다.",
+      description: "기사의 핵심 아이디어, 정제된 본문(에이전트용 마크다운), 출처, 키트 파일 목록을 반환합니다.",
       inputSchema: z.object({ slug: Slug }),
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
