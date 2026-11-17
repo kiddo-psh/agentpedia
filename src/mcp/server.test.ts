@@ -1,11 +1,19 @@
 import { Client } from "@modelcontextprotocol/client";
 import { InMemoryTransport } from "@modelcontextprotocol/server";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { createAgentpediaServer, SERVER_NAME } from "./server";
+import { applyPromptText, createAgentpediaServer, SERVER_NAME } from "./server";
+import { getArticle } from "@/content/loader";
 
 // Runs against the real content/articles (drafts are visible outside production).
 const ORIGIN = "https://agentpedia.test";
 const SLUG = "boris-cherny-claude-code-workflow";
+
+/** One representative slug per kit genre slot (action / audit / hybrid). */
+const APPLY_SLOTS = [
+  "steinberger-shipping-at-inference-speed",
+  "openai-isolation-failure",
+  "lauren-tan-anti-slop-trust-pyramid",
+] as const;
 
 let client: Client;
 let recorded: [string, string][];
@@ -82,10 +90,26 @@ describe(`${SERVER_NAME} MCP server`, () => {
     const { messages } = await client.getPrompt({ name: "apply_article", arguments: { slug: SLUG } });
     const t = (messages[0].content as { text: string }).text;
     expect(messages[0].role).toBe("user");
-    expect(t).toContain("맞지 않으면 이유를 설명하고 멈추세요");
+    expect(t).toContain("맞지 않으면");
     expect(t).toContain("## 이 키트가 하는 일");
     expect(t).toContain("하지 않는 것:");
     expect(t).toContain("### prompt.md");
     expect(t).toContain(`${ORIGIN}/a/${SLUG}`);
+  });
+
+  it.each(APPLY_SLOTS)("applyPromptText contract for %s", (slug) => {
+    const a = getArticle(slug);
+    expect(a).toBeTruthy();
+    const t = applyPromptText(a!, ORIGIN);
+    expect(t.length).toBeGreaterThan(500);
+    expect(t).toContain(`## 기사: ${a!.title}`);
+    expect(t).toContain(`${ORIGIN}/a/${slug}`);
+    expect(t).toContain("핵심 아이디어:");
+    for (const idea of a!.keyIdeas) expect(t).toContain(idea);
+    expect(t).toContain("## 이 키트가 하는 일");
+    expect(t).toContain(a!.apply.goal);
+    expect(t).toContain("### prompt.md");
+    expect(t.indexOf("### prompt.md")).toBeLessThan(t.indexOf("## 진행 방식"));
+    expect(t).toContain("## 출처");
   });
 });

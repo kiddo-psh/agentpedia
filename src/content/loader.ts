@@ -4,6 +4,7 @@ import { parse as parseYaml } from "yaml";
 import type { z } from "zod";
 import { GlossaryRegistry, PeopleRegistry, type Article, type ArticleMeta, type Category, type KitFile } from "./schema";
 import { relatedGraph, type RelatedGraph } from "./related";
+import { checkKitFidelity } from "./kitFidelity";
 import { parseArticle } from "./validate";
 
 /** The single content entry point shared by web pages and the MCP server. */
@@ -83,8 +84,11 @@ export function loadAllArticles(): Article[] {
       people,
       glossary,
     });
-    if (result.ok) articles.push(result.article);
-    else problems.push({ dir: entry.name, issues: result.issues });
+    if (result.ok) {
+      const fidelity = checkKitFidelity(result.article);
+      if (fidelity.length > 0) problems.push({ dir: entry.name, issues: fidelity });
+      else articles.push(result.article);
+    } else problems.push({ dir: entry.name, issues: result.issues });
   }
 
   if (problems.length > 0) throw new ContentError(problems);
