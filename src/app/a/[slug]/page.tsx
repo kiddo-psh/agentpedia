@@ -13,6 +13,7 @@ import { PersonCard } from "@/components/PersonCard";
 import { ReactionRail } from "@/components/reactions/ReactionRail";
 import { RelatedArticles } from "@/components/RelatedArticles";
 import { SourceAge } from "@/components/SourceAge";
+import { CitationSelect } from "@/components/comments/CitationSelect";
 import { Comments } from "@/components/comments/Comments";
 import { LikesSlot } from "@/components/likes/LikeButton";
 import { ArticleBody } from "@/components/mdx/ArticleBody";
@@ -76,6 +77,7 @@ export default async function ArticlePage({ params }: PageProps<"/a/[slug]">) {
         text={article.summary}
         likes={<LikesSlot slug={slug} />}
       />
+      <CitationSelect />
     </>
   );
 }

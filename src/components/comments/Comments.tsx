@@ -114,7 +114,14 @@ function Comment({ c, me }: { c: CommentView; me?: string }) {
         {c.body === null ? (
           <p className="mt-1 text-sm italic text-muted">삭제된 댓글입니다.</p>
         ) : (
-          <p className="mt-1 whitespace-pre-wrap break-words leading-relaxed">{c.body}</p>
+          <>
+            {c.citationQuote && (
+              <blockquote className="mt-2 border-l-2 border-foreground/25 pl-3 text-sm text-muted whitespace-pre-wrap break-words">
+                {c.citationQuote}
+              </blockquote>
+            )}
+            <p className="mt-1 whitespace-pre-wrap break-words leading-relaxed">{c.body}</p>
+          </>
         )}
       </div>
     </article>

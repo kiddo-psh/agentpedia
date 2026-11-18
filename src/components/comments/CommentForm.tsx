@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { postComment, type FormState } from "@/comments/actions";
 import { MAX_COMMENT_LENGTH } from "@/comments/limits";
+import { CITE_EVENT, type CiteDetail } from "./cite";
 
 export function CommentForm({
   slug,
@@ -16,18 +17,74 @@ export function CommentForm({
   onDone?: () => void;
 }) {
   const [state, action, pending] = useActionState<FormState, FormData>(postComment, {});
-  const form = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    if (!state.savedAt) return;
-    form.current?.reset();
-    onDone?.();
+    if (state.savedAt) onDone?.();
   }, [state.savedAt, onDone]);
+
+  // Remount fields after a successful save so the citation chip and textarea clear without setState-in-effect.
+  return (
+    <CommentFormFields
+      key={state.savedAt ?? 0}
+      slug={slug}
+      parentId={parentId}
+      placeholder={placeholder}
+      state={state}
+      action={action}
+      pending={pending}
+    />
+  );
+}
+
+function CommentFormFields({
+  slug,
+  parentId,
+  placeholder,
+  state,
+  action,
+  pending,
+}: {
+  slug: string;
+  parentId?: string;
+  placeholder: string;
+  state: FormState;
+  action: (payload: FormData) => void;
+  pending: boolean;
+}) {
+  const form = useRef<HTMLFormElement>(null);
+  const [citationQuote, setCitationQuote] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (parentId) return;
+    function onCite(e: Event) {
+      const detail = (e as CustomEvent<CiteDetail>).detail;
+      if (detail?.quote) setCitationQuote(detail.quote);
+    }
+    window.addEventListener(CITE_EVENT, onCite);
+    return () => window.removeEventListener(CITE_EVENT, onCite);
+  }, [parentId]);
 
   return (
     <form ref={form} action={action} className="grid gap-2">
       <input type="hidden" name="slug" value={slug} />
       {parentId && <input type="hidden" name="parentId" value={parentId} />}
+      {!parentId && citationQuote && (
+        <>
+          <input type="hidden" name="citationQuote" value={citationQuote} />
+          <div className="flex items-start gap-2 rounded-xl border border-line bg-soft/80 px-3 py-2 text-sm">
+            <blockquote className="min-w-0 flex-1 border-l-2 border-foreground/25 pl-3 text-muted whitespace-pre-wrap break-words">
+              {citationQuote}
+            </blockquote>
+            <button
+              type="button"
+              onClick={() => setCitationQuote(null)}
+              className="shrink-0 text-xs text-muted hover:text-foreground"
+            >
+              인용 취소
+            </button>
+          </div>
+        </>
+      )}
       <textarea
         name="body"
         required
