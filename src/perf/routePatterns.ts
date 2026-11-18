@@ -19,3 +19,38 @@ export function paramsChromeBehindSuspenseIssues(source: string): string[] {
   }
   return issues;
 }
+
+/** Under partialPrefetching, category Links need prefetch={true} or params content waits until click. */
+export function categoryNavMissingPrefetchIssues(source: string): string[] {
+  const issues: string[] = [];
+  // SiteIndex must not import next/link directly — CategoryNavLink owns prefetch={true}.
+  if (/from\s+["']next\/link["']/.test(source) && /categoryHref|aria-label="분류"/.test(source)) {
+    issues.push(
+      "Use CategoryNavLink (prefetch={true}) for category/index Links. Default Link prefetch is shell-only when partialPrefetching is on.",
+    );
+    return issues;
+  }
+  const linkTag =
+    /<Link\b([^>]*?)\bhref=\{(?:categoryHref\([^)]*\)|`\/c\/\$\{[^}]+\}`)\}([^>]*)\/?>/g;
+  let m: RegExpExecArray | null;
+  while ((m = linkTag.exec(source))) {
+    const attrs = `${m[1]} ${m[2]}`;
+    if (!/\bprefetch=\{true\}/.test(attrs)) {
+      issues.push(
+        "Use CategoryNavLink (prefetch={true}) for category/index Links. Default Link prefetch is shell-only when partialPrefetching is on.",
+      );
+      break;
+    }
+  }
+  const stringHref = /<Link\b([^>]*?)\bhref="\/c\/[^"]+"([^>]*)\/?>/g;
+  while ((m = stringHref.exec(source))) {
+    const attrs = `${m[1]} ${m[2]}`;
+    if (!/\bprefetch=\{true\}/.test(attrs)) {
+      issues.push(
+        "Use CategoryNavLink (prefetch={true}) for category/index Links. Default Link prefetch is shell-only when partialPrefetching is on.",
+      );
+      break;
+    }
+  }
+  return issues;
+}

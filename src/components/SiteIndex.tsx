@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
+import { CategoryNavLink } from "@/components/CategoryNavLink";
 import { CATEGORY_LABEL } from "@/content/labels";
 import type { ArticleMeta, Category } from "@/content/schema";
 
@@ -33,21 +33,24 @@ export function WithIndex({
         <ul>
           {categoryCounts(articles).map(([c, n]) => (
             <li key={c}>
-              <Link
+              <CategoryNavLink
                 href={categoryHref(c)}
                 aria-current={c === active ? "page" : undefined}
                 className="-mx-2.5 flex justify-between rounded-lg px-2.5 py-1.5 text-muted hover:text-foreground aria-[current=page]:bg-soft aria-[current=page]:font-medium aria-[current=page]:text-foreground"
               >
                 {categoryLabel(c)}
                 <span className="text-xs opacity-70">{n}</span>
-              </Link>
+              </CategoryNavLink>
             </li>
           ))}
         </ul>
         <p className="mt-8 mb-2 text-xs font-medium text-muted">시작하기</p>
-        <Link href="/connect" className="-mx-2.5 block rounded-lg px-2.5 py-1.5 text-muted hover:text-foreground">
+        <CategoryNavLink
+          href="/connect"
+          className="-mx-2.5 block rounded-lg px-2.5 py-1.5 text-muted hover:text-foreground"
+        >
           에이전트 연결
-        </Link>
+        </CategoryNavLink>
       </aside>
       <div className="min-w-0">{children}</div>
     </div>
@@ -58,14 +61,14 @@ export function CategoryChips({ articles, active }: { articles: ArticleMeta[]; a
   return (
     <nav className="flex flex-wrap gap-1.5 lg:hidden" aria-label="분류">
       {categoryCounts(articles).map(([c]) => (
-        <Link
+        <CategoryNavLink
           key={c}
           href={categoryHref(c)}
           aria-current={c === active ? "page" : undefined}
           className="inline-flex h-8 items-center rounded-full bg-soft px-3.5 text-[13.5px] text-muted hover:text-foreground aria-[current=page]:bg-foreground aria-[current=page]:text-background"
         >
           {categoryLabel(c)}
-        </Link>
+        </CategoryNavLink>
       ))}
     </nav>
   );
