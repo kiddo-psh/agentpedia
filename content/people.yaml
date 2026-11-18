@@ -111,3 +111,13 @@
   name: Calvin Yee
   nameKo: 캘빈이
   role: Cursor에서 장시간 에이전트 토큰 효율 글을 공동 집필한 사람
+
+- id: addy-osmani
+  name: Addy Osmani
+  nameKo: 애디 오스마니
+  role: Anthropic Claude Code 팀, 에이전트 검증 글 저자
+
+- id: yoav-goldberg
+  name: Yoav Goldberg
+  nameKo: 요아브 골드버그
+  role: NLP 연구자, X 계정 yoavgo
