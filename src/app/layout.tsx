@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { DeferredContentFont } from "@/components/DeferredContentFont";
 import { DeferredMonoFont } from "@/components/DeferredMonoFont";
 import { LogoLink } from "@/components/LogoLink";
@@ -24,7 +25,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <DeferredMonoFont />
         <header className="sticky top-0 z-20 bg-background/90 backdrop-blur">
           <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center gap-8 px-4 sm:px-8">
-            <LogoLink className="text-[17px] font-semibold tracking-tight">Agentpedia</LogoLink>
+            {/* usePathname suspends on fallback dynamic params (e.g. /community/[id]). */}
+            <Suspense
+              fallback={
+                <span className="text-[17px] font-semibold tracking-tight">Agentpedia</span>
+              }
+            >
+              <LogoLink className="text-[17px] font-semibold tracking-tight">Agentpedia</LogoLink>
+            </Suspense>
             <nav className="flex gap-6 text-sm text-muted">
               <Link href="/" className="max-sm:hidden hover:text-foreground">
                 기사

@@ -18,6 +18,10 @@ const timeFormat = new Intl.DateTimeFormat("ko-KR", {
   timeZone: "Asia/Seoul",
 });
 
+// UUID posts are not known at build time (unlike /a/[slug] generateStaticParams), so the
+// root layout's usePathname and this page's DB/session reads cannot form a static shell.
+export const instant = false;
+
 export async function generateMetadata({
   params,
 }: PageProps<"/community/[id]">): Promise<Metadata> {
