@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  articleMissingContentVisibilityIssues,
   categoryMissingUseCacheIssues,
   categoryNavMissingPrefetchIssues,
   likeSessionDbWaterfallIssues,
@@ -136,5 +137,18 @@ async function CategoryView({ category }: { category: string }) {
   it("passes live category page with use cache", () => {
     const src = fs.readFileSync(path.join(root, "src/app/c/[category]/page.tsx"), "utf8");
     expect(categoryMissingUseCacheIssues(src)).toEqual([]);
+  });
+});
+
+describe("articleMissingContentVisibilityIssues", () => {
+  it("fails when CSS lacks content-visibility", () => {
+    expect(articleMissingContentVisibilityIssues(".prose-article { font-size: 1rem; }")).toEqual([
+      expect.stringContaining("content-visibility"),
+    ]);
+  });
+
+  it("passes live globals.css", () => {
+    const css = fs.readFileSync(path.join(root, "src/app/globals.css"), "utf8");
+    expect(articleMissingContentVisibilityIssues(css)).toEqual([]);
   });
 });

@@ -45,6 +45,16 @@ body {
     font-size: 1.125rem;
     line-height: 1.85;
   }
+  /*
+   * Skip below-fold layout until scroll (prod experiment: LCP ~3.2s → ~1.9s Slow 4G).
+   * contain-intrinsic-size keeps approximate scroll height / #comments anchors stable.
+   * docs/perf/2026-11-14-production.md
+   */
+  .prose-article > *,
+  article > section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+  }
   /* Scene break: a short centered rule marks a change of scene inside a section. */
   .prose-article :where(hr):not(:where(.not-prose *)) {
     width: 4rem;

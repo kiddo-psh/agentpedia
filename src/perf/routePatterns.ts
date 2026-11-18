@@ -97,3 +97,13 @@ export function categoryMissingUseCacheIssues(source: string): string[] {
   }
   return [];
 }
+
+/** Below-fold article layout must opt into content-visibility (prod experiment). */
+export function articleMissingContentVisibilityIssues(css: string): string[] {
+  if (!/content-visibility\s*:\s*auto/.test(css)) {
+    return [
+      "Ship content-visibility: auto for below-fold article sections (docs/perf/2026-11-14-production.md).",
+    ];
+  }
+  return [];
+}
