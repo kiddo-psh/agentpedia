@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   bigserial,
+  boolean,
   index,
   pgTable,
   primaryKey,
@@ -29,6 +30,49 @@ export const comments = pgTable(
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
   },
   (t) => [index("comments_article_created_idx").on(t.articleSlug, t.createdAt)],
+);
+
+/**
+ * Community posts: one shape for showcase and apply stories.
+ * Optional articleSlug (and linkKit when that article ships a kit); external links are free-form https URLs.
+ */
+export const communityPosts = pgTable(
+  "community_posts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    body: text("body").notNull(),
+    links: text("links").array().notNull().default([]),
+    articleSlug: text("article_slug"),
+    linkKit: boolean("link_kit").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  },
+  (t) => [index("community_posts_created_idx").on(t.createdAt)],
+);
+
+/** Comments on community posts; same one-level parentId reply pattern as article comments. */
+export const communityComments = pgTable(
+  "community_comments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    postId: uuid("post_id")
+      .notNull()
+      .references(() => communityPosts.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    parentId: uuid("parent_id").references((): AnyPgColumn => communityComments.id, {
+      onDelete: "cascade",
+    }),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  },
+  (t) => [index("community_comments_post_created_idx").on(t.postId, t.createdAt)],
 );
 
 /** One row per (user, article); the primary key makes a second like a no-op. */
