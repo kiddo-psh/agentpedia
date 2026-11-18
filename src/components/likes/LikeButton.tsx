@@ -1,10 +1,38 @@
+import { cacheLife } from "next/cache";
 import { headers } from "next/headers";
 import { connection } from "next/server";
+import { Suspense } from "react";
 import { railButton } from "@/components/reactions/railButton";
 import { getDb } from "@/db/client";
 import { getSession } from "@/lib/auth";
 import { getLikeState, type LikeState } from "@/likes/service";
 import { LikeToggle } from "./LikeToggle";
+
+/** Public count for the shell; short lifetime so the rail shows a real number without session. */
+async function getPublicLikeCount(slug: string): Promise<number> {
+  "use cache";
+  cacheLife("minutes");
+  try {
+    const db = await getDb();
+    return (await getLikeState(db, slug)).count;
+  } catch (err) {
+    console.error(`[likes] public count failed for ${slug}`, err);
+    return 0;
+  }
+}
+
+/**
+ * Cached public count paints with the shell; session heart/toggle stays in Suspense so Seoul→iad1
+ * RTT does not gate the visible number.
+ */
+export async function LikesSlot({ slug }: { slug: string }) {
+  const count = await getPublicLikeCount(slug);
+  return (
+    <Suspense fallback={<LikeButtonSkeleton count={count} />}>
+      <LikeButton slug={slug} />
+    </Suspense>
+  );
+}
 
 /** Request-time data (session, live count): render inside a Suspense boundary. */
 export async function LikeButton({ slug }: { slug: string }) {
@@ -26,11 +54,11 @@ export async function LikeButton({ slug }: { slug: string }) {
 }
 
 /** Heart + count placeholder so the rail does not read as a missing control while session/DB stream. */
-export function LikeButtonSkeleton() {
+export function LikeButtonSkeleton({ count }: { count?: number } = {}) {
   return (
     <span className={railButton} aria-hidden>
       <HeartIcon />
-      <span className="text-muted">·</span>
+      <span className="text-muted tabular-nums">{count !== undefined ? count : "·"}</span>
     </span>
   );
 }

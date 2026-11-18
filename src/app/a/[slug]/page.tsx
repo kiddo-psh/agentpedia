@@ -14,7 +14,7 @@ import { ReactionRail } from "@/components/reactions/ReactionRail";
 import { RelatedArticles } from "@/components/RelatedArticles";
 import { SourceAge } from "@/components/SourceAge";
 import { Comments } from "@/components/comments/Comments";
-import { LikeButton, LikeButtonSkeleton } from "@/components/likes/LikeButton";
+import { LikesSlot } from "@/components/likes/LikeButton";
 import { ArticleBody } from "@/components/mdx/ArticleBody";
 import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatDate, newestPublished, sourcePeriod } from "@/content/labels";
 import { getArticle, getRelatedGraph, listArticles } from "@/content/loader";
@@ -74,12 +74,7 @@ export default async function ArticlePage({ params }: PageProps<"/a/[slug]">) {
         slug={slug}
         title={article.title}
         text={article.summary}
-        likes={
-          // The like count is request-time; a fixed-size placeholder keeps the rail from shifting.
-          <Suspense fallback={<LikeButtonSkeleton />}>
-            <LikeButton slug={slug} />
-          </Suspense>
-        }
+        likes={<LikesSlot slug={slug} />}
       />
     </>
   );
