@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { geistMono } from "./fonts";
 import Link from "next/link";
+import { LogoLink } from "@/components/LogoLink";
 import { UserMenu } from "@/components/UserMenu";
 // Split into unicode-range subsets: a page downloads only the glyphs it uses.
 import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
@@ -19,9 +20,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <header className="sticky top-0 z-20 bg-background/90 backdrop-blur">
           <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center gap-8 px-4 sm:px-8">
-            <Link href="/" className="text-[17px] font-semibold tracking-tight">
-              Agentpedia
-            </Link>
+            <LogoLink className="text-[17px] font-semibold tracking-tight">Agentpedia</LogoLink>
             <nav className="flex gap-6 text-sm text-muted">
               <Link href="/" className="max-sm:hidden hover:text-foreground">
                 기사
