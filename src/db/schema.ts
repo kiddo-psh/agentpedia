@@ -25,6 +25,8 @@ export const comments = pgTable(
       .references(() => user.id, { onDelete: "cascade" }),
     parentId: uuid("parent_id").references((): AnyPgColumn => comments.id, { onDelete: "cascade" }),
     body: text("body").notNull(),
+    /** Selected article prose for citation comments; roots only. */
+    citationQuote: text("citation_quote"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     // Soft delete keeps reply threads readable.
     deletedAt: timestamp("deleted_at", { withTimezone: true }),

@@ -1,9 +1,9 @@
 import { and, asc, eq, isNull } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { comments, user } from "@/db/schema";
-import { MAX_COMMENT_LENGTH } from "./limits";
+import { MAX_CITATION_LENGTH, MAX_COMMENT_LENGTH } from "./limits";
 
-export { MAX_COMMENT_LENGTH };
+export { MAX_CITATION_LENGTH, MAX_COMMENT_LENGTH };
 
 export type CommentView = {
   id: string;
@@ -12,11 +12,30 @@ export type CommentView = {
   authorImage: string | null;
   /** null when deleted; the row stays so its replies keep their context. */
   body: string | null;
+  /** Selected article prose; roots only. Cleared when the comment is deleted. */
+  citationQuote: string | null;
   createdAt: Date;
 };
 export type Thread = CommentView & { replies: CommentView[] };
 
 export type Result = { ok: true; id: string } | { ok: false; error: string };
+
+function normalizeMultiline(raw: string): string {
+  // Browsers submit textarea newlines as CRLF.
+  return raw.replace(/\r\n?/g, "\n").trim();
+}
+
+function normalizeCitation(
+  raw: string | null | undefined,
+): { ok: true; quote: string | null } | { ok: false; error: string } {
+  if (raw == null || raw === "") return { ok: true, quote: null };
+  const quote = normalizeMultiline(raw);
+  if (!quote) return { ok: true, quote: null };
+  if (quote.length > MAX_CITATION_LENGTH) {
+    return { ok: false, error: `인용은 ${MAX_CITATION_LENGTH}자까지 쓸 수 있습니다.` };
+  }
+  return { ok: true, quote };
+}
 
 /** Roots oldest-first, each with replies oldest-first. Deleted roots without replies are dropped. */
 export async function listThreads(db: Db, articleSlug: string): Promise<Thread[]> {
@@ -25,6 +44,7 @@ export async function listThreads(db: Db, articleSlug: string): Promise<Thread[]
       id: comments.id,
       parentId: comments.parentId,
       body: comments.body,
+      citationQuote: comments.citationQuote,
       deletedAt: comments.deletedAt,
       createdAt: comments.createdAt,
       authorId: user.id,
@@ -42,6 +62,7 @@ export async function listThreads(db: Db, articleSlug: string): Promise<Thread[]
     authorName: r.authorName,
     authorImage: r.authorImage,
     body: r.deletedAt ? null : r.body,
+    citationQuote: r.deletedAt ? null : r.citationQuote,
     createdAt: r.createdAt,
   });
 
@@ -55,13 +76,24 @@ export async function listThreads(db: Db, articleSlug: string): Promise<Thread[]
 
 export async function createComment(
   db: Db,
-  input: { articleSlug: string; userId: string; body: string; parentId?: string | null },
+  input: {
+    articleSlug: string;
+    userId: string;
+    body: string;
+    parentId?: string | null;
+    citationQuote?: string | null;
+  },
 ): Promise<Result> {
-  // Browsers submit textarea newlines as CRLF.
-  const body = input.body.replace(/\r\n?/g, "\n").trim();
+  const body = normalizeMultiline(input.body);
   if (!body) return { ok: false, error: "내용을 입력하세요." };
   if (body.length > MAX_COMMENT_LENGTH) {
     return { ok: false, error: `댓글은 ${MAX_COMMENT_LENGTH}자까지 쓸 수 있습니다.` };
+  }
+
+  const cited = normalizeCitation(input.citationQuote);
+  if (!cited.ok) return cited;
+  if (cited.quote && input.parentId) {
+    return { ok: false, error: "답글에는 인용을 붙일 수 없습니다." };
   }
 
   if (input.parentId) {
@@ -74,7 +106,13 @@ export async function createComment(
 
   const [row] = await db
     .insert(comments)
-    .values({ articleSlug: input.articleSlug, userId: input.userId, body, parentId: input.parentId ?? null })
+    .values({
+      articleSlug: input.articleSlug,
+      userId: input.userId,
+      body,
+      parentId: input.parentId ?? null,
+      citationQuote: cited.quote ?? null,
+    })
     .returning({ id: comments.id });
   return { ok: true, id: row.id };
 }

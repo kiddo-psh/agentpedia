@@ -1,7 +1,13 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Db } from "@/db/client";
 import { createTestDb, insertUser } from "@/db/testing";
-import { createComment, deleteComment, listThreads, MAX_COMMENT_LENGTH } from "./service";
+import {
+  createComment,
+  deleteComment,
+  listThreads,
+  MAX_CITATION_LENGTH,
+  MAX_COMMENT_LENGTH,
+} from "./service";
 
 let db: Db;
 const A = "article-a";
@@ -73,5 +79,38 @@ describe("comments", () => {
     expect(await createComment(db, { articleSlug: A, userId: "bob", body: "x", parentId: root })).toMatchObject({
       ok: false,
     });
+  });
+
+  it("stores a citation quote on roots only", async () => {
+    const root = await createComment(db, {
+      articleSlug: A,
+      userId: "alice",
+      body: "동의",
+      citationQuote: "  본문 인용 구절  ",
+    });
+    if (!root.ok) throw new Error(root.error);
+    expect((await listThreads(db, A))[0]).toMatchObject({
+      body: "동의",
+      citationQuote: "본문 인용 구절",
+    });
+
+    expect(
+      await createComment(db, {
+        articleSlug: A,
+        userId: "bob",
+        body: "답",
+        parentId: root.id,
+        citationQuote: "안 됨",
+      }),
+    ).toEqual({ ok: false, error: "답글에는 인용을 붙일 수 없습니다." });
+
+    expect(
+      await createComment(db, {
+        articleSlug: A,
+        userId: "alice",
+        body: "길다",
+        citationQuote: "x".repeat(MAX_CITATION_LENGTH + 1),
+      }),
+    ).toMatchObject({ ok: false });
   });
 });

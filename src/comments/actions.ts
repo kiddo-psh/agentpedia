@@ -21,6 +21,7 @@ export async function postComment(_prev: FormState, form: FormData): Promise<For
     userId: session.user.id,
     body: String(form.get("body") ?? ""),
     parentId: (form.get("parentId") as string | null) || null,
+    citationQuote: String(form.get("citationQuote") ?? "") || null,
   });
   if (!result.ok) return { error: result.error };
 
