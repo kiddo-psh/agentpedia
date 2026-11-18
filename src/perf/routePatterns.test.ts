@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   articleBodyBeforeSuspenseIssues,
   articleMissingContentVisibilityIssues,
+  articleNavMissingPrefetchIssues,
   categoryMissingUseCacheIssues,
   categoryNavMissingPrefetchIssues,
   likeSessionDbWaterfallIssues,
@@ -47,6 +48,35 @@ export default function CategoryPage({ params }: PageProps<"/c/[category]">) {
   it("passes the live category page (params awaited before chrome)", () => {
     const src = fs.readFileSync(path.join(root, "src/app/c/[category]/page.tsx"), "utf8");
     expect(paramsChromeBehindSuspenseIssues(src)).toEqual([]);
+  });
+});
+
+describe("articleNavMissingPrefetchIssues", () => {
+  it("fails when ArticleList imports next/link for /a/ hrefs", () => {
+    const past = `
+import Link from "next/link";
+export function ArticleList() {
+  return articles.map((a) => <Link href={\`/a/\${a.slug}\`}>x</Link>);
+}
+`;
+    expect(articleNavMissingPrefetchIssues(past)).toEqual([
+      expect.stringContaining("ArticleNavLink"),
+    ]);
+  });
+
+  it("passes ArticleList (ArticleNavLink owns prefetch)", () => {
+    const src = fs.readFileSync(path.join(root, "src/app/ArticleList.tsx"), "utf8");
+    expect(articleNavMissingPrefetchIssues(src)).toEqual([]);
+  });
+
+  it("passes home Featured (ArticleNavLink)", () => {
+    const src = fs.readFileSync(path.join(root, "src/app/page.tsx"), "utf8");
+    expect(articleNavMissingPrefetchIssues(src)).toEqual([]);
+  });
+
+  it("ArticleNavLink hardcodes prefetch={true}", () => {
+    const src = fs.readFileSync(path.join(root, "src/components/ArticleNavLink.tsx"), "utf8");
+    expect(src).toMatch(/prefetch=\{true\}/);
   });
 });
 

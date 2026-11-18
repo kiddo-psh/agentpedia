@@ -30,6 +30,7 @@ Each rule pairs with what fails when an agent breaks it. Prefer architecture/typ
 | Await `params` outside Suspense before primary chrome (WithIndex / article body); only searchParams/request-time holes belong behind the boundary | `paramsChromeBehindSuspenseIssues` in `src/perf/routePatterns.ts` (vitest); copy `src/app/a/[slug]/page.tsx` / `src/app/c/[category]/page.tsx` |
 | Article MDX/prose streams behind Suspense (cached above-fold shell only); do not inline `ArticleBody` in the `"use cache"` shell | `articleBodyBeforeSuspenseIssues` on `src/app/a/[slug]/page.tsx` |
 | Category/index nav Links must full-prefetch under `partialPrefetching` | `CategoryNavLink` (`prefetch={true}`); `categoryNavMissingPrefetchIssues` fails if `SiteIndex` imports `next/link` or omits prefetch on category hrefs |
+| Home/category article Links must full-prefetch under `partialPrefetching` | `ArticleNavLink` (`prefetch={true}`); `articleNavMissingPrefetchIssues` on `ArticleList` / home Featured |
 | Request-time likes: overlap `getSession` with `getDb` via `Promise.all`; Suspense fallback shows heart + count placeholder, not a blank circle | `likeSessionDbWaterfallIssues` / `likeSkeletonBlankIssues`; copy `Comments.tsx` + `LikeButton.tsx` |
 | Public like count paints with the article shell (`LikesSlot` + cached count); session/mine stays behind Suspense | `LikeButton.tsx` (`LikesSlot` / `getPublicLikeCount`) |
 | Prerenderable category shell/list uses `"use cache"` like `ArticleView` | `categoryMissingUseCacheIssues` on `src/app/c/[category]/page.tsx` |

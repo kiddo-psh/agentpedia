@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { ArticleNavLink } from "@/components/ArticleNavLink";
 import { ArticlePagination, ArticleSortControls } from "@/components/ArticleListControls";
 import { CategoryChips, WithIndex } from "@/components/SiteIndex";
 import { paginateArticles, parseListQuery, sortArticles, type ArticleSort } from "@/content/articleList";
@@ -154,7 +155,7 @@ function Featured({
           const likes = likeCounts.get(a.slug) ?? 0;
           return (
             <li key={a.slug}>
-              <Link href={`/a/${a.slug}`} className="group block">
+              <ArticleNavLink href={`/a/${a.slug}`} className="group block">
                 <div
                   className={`flex aspect-[16/7] items-end justify-between rounded-2xl bg-linear-135 p-4 text-[13px] font-medium text-foreground/70 sm:aspect-[16/10] ${COVER[a.category]}`}
                 >
@@ -168,7 +169,7 @@ function Featured({
                   {a.title}
                 </h3>
                 <p className="mt-1.5 line-clamp-2 text-[14.5px] leading-relaxed text-muted">{a.summary}</p>
-              </Link>
+              </ArticleNavLink>
             </li>
           );
         })}

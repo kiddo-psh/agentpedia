@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ArticleNavLink } from "@/components/ArticleNavLink";
 import { SourceAge } from "@/components/SourceAge";
 import { CATEGORY_LABEL, DIFFICULTY_LABEL, formatMonth, newestPublished } from "@/content/labels";
 import type { ArticleMeta } from "@/content/schema";
@@ -12,7 +12,7 @@ export function ArticleList({ articles, titleAs: Title = "h2" }: { articles: Art
     <ul className="border-b border-line">
       {articles.map((a) => (
         <li key={a.slug} className="border-t border-line">
-          <Link href={`/a/${a.slug}`} className="group grid gap-x-8 gap-y-2 py-7 sm:grid-cols-[minmax(0,1fr)_auto]">
+          <ArticleNavLink href={`/a/${a.slug}`} className="group grid gap-x-8 gap-y-2 py-7 sm:grid-cols-[minmax(0,1fr)_auto]">
             <div className="min-w-0">
               <p className="flex items-center gap-2 text-[13px] font-medium text-muted">
                 {CATEGORY_LABEL[a.category]}
@@ -36,7 +36,7 @@ export function ArticleList({ articles, titleAs: Title = "h2" }: { articles: Art
                 <SourceAge newestIso={newestPublished(a.sources).toISOString()} staleOnly />
               </dd>
             </dl>
-          </Link>
+          </ArticleNavLink>
         </li>
       ))}
     </ul>

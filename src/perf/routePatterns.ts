@@ -20,6 +20,34 @@ export function paramsChromeBehindSuspenseIssues(source: string): string[] {
   return issues;
 }
 
+/** Under partialPrefetching, home/category article Links need prefetch={true} or slug content waits until click. */
+export function articleNavMissingPrefetchIssues(source: string): string[] {
+  const issues: string[] = [];
+  // List surfaces should use ArticleNavLink, not bare next/link to /a/...
+  if (
+    /from\s+["']next\/link["']/.test(source) &&
+    /<Link\b[^>]*\bhref=\{`\/a\/\$\{[^}]+\}`\}/.test(source) &&
+    /ArticleList|function Featured|articles\.map/.test(source)
+  ) {
+    issues.push(
+      "Use ArticleNavLink (prefetch={true}) for home/category article Links. Default Link prefetch is shell-only when partialPrefetching is on.",
+    );
+    return issues;
+  }
+  const linkTag = /<Link\b([^>]*?)\bhref=\{`\/a\/\$\{[^}]+\}`\}([^>]*)\/?>/g;
+  let m: RegExpExecArray | null;
+  while ((m = linkTag.exec(source))) {
+    const attrs = `${m[1]} ${m[2]}`;
+    if (!/\bprefetch=\{true\}/.test(attrs)) {
+      issues.push(
+        "Use ArticleNavLink (prefetch={true}) for home/category article Links. Default Link prefetch is shell-only when partialPrefetching is on.",
+      );
+      break;
+    }
+  }
+  return issues;
+}
+
 /** Under partialPrefetching, category Links need prefetch={true} or params content waits until click. */
 export function categoryNavMissingPrefetchIssues(source: string): string[] {
   const issues: string[] = [];
