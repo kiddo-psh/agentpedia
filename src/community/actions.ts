@@ -58,7 +58,10 @@ export async function removeCommunityPost(form: FormData): Promise<void> {
   const session = await getSession(await headers());
   if (!session) return;
   const result = await deletePost(await getDb(), { id: String(form.get("id") ?? ""), userId: session.user.id });
-  if (result.ok) updateTag("community-post-list");
+  if (result.ok) {
+    updateTag("community-post-list");
+    updateTag(`community-post-${result.id}`);
+  }
   redirect("/community");
 }
 

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
+import { cacheLife, cacheTag } from "next/cache";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
-import { cache, Suspense } from "react";
+import { Suspense } from "react";
 import { getPost, type PostView } from "@/community/service";
 import { ArticleNavLink } from "@/components/ArticleNavLink";
 import { DeletePostButton } from "@/components/community/DeletePostButton";
@@ -17,14 +18,19 @@ const timeFormat = new Intl.DateTimeFormat("ko-KR", {
   timeZone: "Asia/Seoul",
 });
 
-const loadPost = cache(async (id: string) => getPost(await getDb(), id));
+async function loadPost(id: string) {
+  "use cache";
+  cacheLife("minutes");
+  const post = await getPost(await getDb(), id);
+  if (post) cacheTag(`community-post-${post.id}`);
+  return post;
+}
 type PostParams = PageProps<"/community/[id]">["params"];
 
 export async function generateMetadata({
   params,
 }: PageProps<"/community/[id]">): Promise<Metadata> {
   const { id } = await params;
-  await connection();
   try {
     const post = await loadPost(id);
     if (!post) return { title: "커뮤니티" };
@@ -64,6 +70,7 @@ async function PostCommentsSection({ params }: { params: PostParams }) {
 }
 
 async function OwnerControls({ post }: { post: PostView }) {
+  await connection();
   const session = await getRenderSession().catch(() => null);
   return session?.user.id === post.authorId ? (
     <span className="ml-auto">
@@ -74,7 +81,6 @@ async function OwnerControls({ post }: { post: PostView }) {
 
 async function PostDetail({ params }: { params: PostParams }) {
   const { id } = await params;
-  await connection();
   let post: PostView | null;
   try {
     post = await loadPost(id);

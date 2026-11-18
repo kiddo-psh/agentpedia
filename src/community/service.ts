@@ -126,7 +126,7 @@ export async function deletePost(db: Db, input: { id: string; userId: string }):
       and(eq(communityPosts.id, input.id), eq(communityPosts.userId, input.userId), isNull(communityPosts.deletedAt)),
     )
     .returning({ id: communityPosts.id });
-  return deleted.length > 0 ? { ok: true, id: input.id } : { ok: false, error: "삭제할 수 없는 글입니다." };
+  return deleted.length > 0 ? { ok: true, id: deleted[0].id } : { ok: false, error: "삭제할 수 없는 글입니다." };
 }
 
 export async function getPost(db: Db, id: string): Promise<PostView | null> {

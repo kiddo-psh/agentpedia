@@ -107,7 +107,7 @@ async function PostList() {
     <ul className="divide-y divide-line border-t border-line">
       {posts.map((p) => (
         <li key={p.id}>
-          <Link href={`/community/${p.id}`} className="block py-5 hover:bg-soft/60">
+          <Link href={`/community/${p.id}`} prefetch={true} className="block py-5 hover:bg-soft/60">
             <h2 className="text-lg font-medium tracking-tight">{p.title}</h2>
             <p className="mt-1 line-clamp-2 text-sm text-muted">{p.preview}</p>
             <div className="mt-2 flex flex-wrap items-center gap-x-2 text-xs text-muted">
