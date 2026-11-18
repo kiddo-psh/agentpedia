@@ -1,0 +1,123 @@
+import { headers } from "next/headers";
+import Link from "next/link";
+import { connection } from "next/server";
+import { listPostThreads, type CommentView, type Thread } from "@/community/service";
+import { getDb } from "@/db/client";
+import { getSession } from "@/lib/auth";
+import { PostCommentForm } from "./PostCommentForm";
+import { PostDeleteCommentButton, PostReplyBox } from "./PostReplyBox";
+
+const timeFormat = new Intl.DateTimeFormat("ko-KR", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "Asia/Seoul",
+});
+
+/** Request-time data (session, live comments): render inside a Suspense boundary. */
+export async function PostComments({ postId }: { postId: string }) {
+  await connection();
+  const requestHeaders = await headers();
+  let session: Awaited<ReturnType<typeof getSession>>;
+  let threads: Thread[];
+  try {
+    [session, threads] = await Promise.all([
+      getSession(requestHeaders),
+      getDb().then((db) => listPostThreads(db, postId)),
+    ]);
+  } catch (err) {
+    console.error(`[community] failed to load comments for ${postId}`, err);
+    return (
+      <>
+        <h2 id="comments-title" className="text-[22px] font-semibold tracking-tight">
+          댓글
+        </h2>
+        <p className="mt-4 rounded-xl bg-soft px-5 py-4 text-sm text-muted">
+          지금은 댓글을 불러올 수 없습니다.
+        </p>
+      </>
+    );
+  }
+  const me = session?.user.id;
+  const count = threads.reduce((n, t) => n + (t.body !== null ? 1 : 0) + t.replies.length, 0);
+
+  return (
+    <>
+      <h2 id="comments-title" className="text-[22px] font-semibold tracking-tight">
+        댓글 <span className="text-muted">{count}</span>
+      </h2>
+
+      <div className="mt-4">
+        {session ? (
+          <PostCommentForm postId={postId} />
+        ) : (
+          <p className="rounded-xl bg-soft px-5 py-4 text-sm text-muted">
+            <Link
+              href={`/login?next=${encodeURIComponent(`/community/${postId}#comments`)}`}
+              className="font-medium text-foreground underline underline-offset-4"
+            >
+              로그인
+            </Link>
+            하고 댓글을 남겨 보세요.
+          </p>
+        )}
+      </div>
+
+      {threads.length === 0 ? (
+        <p className="mt-8 text-sm text-muted">아직 댓글이 없습니다. 첫 의견을 남겨 주세요.</p>
+      ) : (
+        <ul className="mt-8 grid gap-6">
+          {threads.map((t) => (
+            <li key={t.id}>
+              <Comment c={t} me={me} />
+              <div className="mt-2 pl-11">
+                {session && t.body !== null && <PostReplyBox postId={postId} parentId={t.id} />}
+                {t.replies.length > 0 && (
+                  <ul className="mt-3 grid gap-4 border-l border-line pl-4">
+                    {t.replies.map((r) => (
+                      <li key={r.id}>
+                        <Comment c={r} me={me} />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
+  );
+}
+
+function Comment({ c, me }: { c: CommentView; me?: string }) {
+  return (
+    <article className="flex gap-3">
+      {c.authorImage ? (
+        // eslint-disable-next-line @next/next/no-img-element -- avatar URLs come from arbitrary OAuth hosts
+        <img src={c.authorImage} alt="" className="size-8 shrink-0 rounded-full" />
+      ) : (
+        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-soft text-sm font-semibold">
+          {c.authorName.slice(0, 1)}
+        </span>
+      )}
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-x-2 text-sm">
+          <span className="font-semibold">{c.authorName}</span>
+          <time className="text-xs text-muted" dateTime={c.createdAt.toISOString()}>
+            {timeFormat.format(c.createdAt)}
+          </time>
+          {c.body !== null && c.authorId === me && (
+            <span className="ml-auto">
+              <PostDeleteCommentButton id={c.id} />
+            </span>
+          )}
+        </div>
+        {c.body === null ? (
+          <p className="mt-1 text-sm italic text-muted">삭제된 댓글입니다.</p>
+        ) : (
+          <p className="mt-1 whitespace-pre-wrap break-words leading-relaxed">{c.body}</p>
+        )}
+      </div>
+    </article>
+  );
+}
