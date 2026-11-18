@@ -20,6 +20,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Claude/Cursor worktree checkouts (nested .next and node_modules).
     ".claude/worktrees/**",
+    // Local PGlite / agent checkouts under .data (gitignored; nested .next).
+    ".data/**",
   ]),
 ]);
 
