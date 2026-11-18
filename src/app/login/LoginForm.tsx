@@ -2,11 +2,15 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { authClient } from "@/lib/auth-client";
 
 /** Only same-site paths, so ?next= cannot redirect off the site. */
 function safeNext(next: string | null): string {
   return next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+}
+
+async function loadAuthClient() {
+  const { authClient } = await import("@/lib/auth-client");
+  return authClient;
 }
 
 export function LoginForm({ github, devPassword }: { github: boolean; devPassword: boolean }) {
@@ -24,12 +28,16 @@ export function LoginForm({ github, devPassword }: { github: boolean; devPasswor
     const email = String(form.get("email"));
     const password = String(form.get("password"));
 
-    const signIn = await authClient.signIn.email({ email, password });
-    const result = signIn.error ? await authClient.signUp.email({ name, email, password }) : signIn;
-    setBusy(false);
-    if (result.error) return setError(result.error.message ?? "로그인에 실패했습니다.");
-    router.push(next);
-    router.refresh();
+    try {
+      const authClient = await loadAuthClient();
+      const signIn = await authClient.signIn.email({ email, password });
+      const result = signIn.error ? await authClient.signUp.email({ name, email, password }) : signIn;
+      if (result.error) return setError(result.error.message ?? "로그인에 실패했습니다.");
+      router.push(next);
+      router.refresh();
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -37,8 +45,11 @@ export function LoginForm({ github, devPassword }: { github: boolean; devPasswor
       {github && (
         <button
           type="button"
-          onClick={() => authClient.signIn.social({ provider: "github", callbackURL: next })}
           className="h-11 rounded-full bg-foreground px-5 font-medium text-background hover:opacity-85"
+          onClick={async () => {
+            const authClient = await loadAuthClient();
+            await authClient.signIn.social({ provider: "github", callbackURL: next });
+          }}
         >
           GitHub로 로그인
         </button>
