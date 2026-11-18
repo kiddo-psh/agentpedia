@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { cacheLife, cacheTag } from "next/cache";
+import { cacheLife, cacheTag, prefetch } from "next/cache";
+import { unstable_rethrow } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { listPostPreviews } from "@/community/service";
@@ -82,11 +83,12 @@ async function loadPostPreviews() {
 }
 
 async function PostList() {
-  await connection();
+  await prefetch();
   let posts: Awaited<ReturnType<typeof loadPostPreviews>>;
   try {
     posts = await loadPostPreviews();
   } catch (err) {
+    unstable_rethrow(err);
     console.error("[community] failed to list posts", err);
     return (
       <p className="rounded-xl bg-soft px-5 py-4 text-sm text-muted">
