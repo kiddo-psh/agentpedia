@@ -92,6 +92,7 @@ export function loadAllArticles(): Article[] {
   }
 
   if (problems.length > 0) throw new ContentError(problems);
+  // Default browse order is 작성/최신순: frontmatter `publishedAt` (canonical write/publish date).
   return articles.sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
 }
 
