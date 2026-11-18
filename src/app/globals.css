@@ -61,6 +61,18 @@ body {
   .prose-article > .editorial-quote {
     margin-block: 2.5rem;
   }
+  /* VS Code Dark+ palette for server-rendered fenced code. */
+  .article-code :is(.hljs-keyword, .hljs-literal, .hljs-tag, .hljs-name) { color: #569cd6; }
+  .article-code :is(.hljs-string, .hljs-meta .hljs-string) { color: #ce9178; }
+  .article-code :is(.hljs-comment, .hljs-quote) { color: #6a9955; }
+  .article-code :is(.hljs-number, .hljs-symbol) { color: #b5cea8; }
+  .article-code :is(.hljs-title, .hljs-section) { color: #dcdcaa; }
+  .article-code :is(.hljs-type, .hljs-built_in, .hljs-title.class_) { color: #4ec9b0; }
+  .article-code :is(.hljs-attr, .hljs-attribute, .hljs-property, .hljs-variable, .hljs-params) { color: #9cdcfe; }
+  .article-code :is(.hljs-meta, .hljs-selector-class) { color: #c586c0; }
+  .article-code .hljs-regexp { color: #d16969; }
+  .article-code .hljs-subst { color: #d4d4d4; }
+  .article-code ::selection { background: #264f78; color: #fff; }
   .editorial-quote > p:first-of-type {
     margin-top: 0;
   }

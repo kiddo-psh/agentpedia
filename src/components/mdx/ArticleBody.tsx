@@ -2,6 +2,7 @@ import { evaluate } from "@mdx-js/mdx";
 import type { ComponentProps } from "react";
 import { isValidElement } from "react";
 import * as runtime from "react/jsx-runtime";
+import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 import type { Article, MdxComponentName } from "@/content/schema";
 import { Compare } from "./Compare";
@@ -27,6 +28,7 @@ export async function ArticleBody({ article }: { article: Article }) {
     ...runtime,
     // Korean ranges like "15~17개" use a single tilde; GFM would read a pair of them as strikethrough.
     remarkPlugins: [[remarkGfm, { singleTilde: false }]],
+    rehypePlugins: [rehypeHighlight],
   });
   return (
     <div className="prose-article">
@@ -41,13 +43,14 @@ function CodeBlock({ children, ...props }: ComponentProps<"pre">) {
     : undefined;
 
   return (
-    <figure className="not-prose my-8 min-w-0 border border-[#414143] bg-[#202021] text-[#f5f5f4]">
-      {language && (
-        <figcaption className="border-b border-[#414143] px-4 py-2 font-mono text-xs tracking-wider text-[#b8b8b8] uppercase">
-          {language}
-        </figcaption>
-      )}
-      <pre {...props} className="overflow-x-auto px-4 py-3 font-mono text-sm leading-relaxed">{children}</pre>
+    <figure className="article-code not-prose my-8 min-w-0 overflow-hidden rounded-md border border-[#454545] bg-[#1e1e1e] text-[#d4d4d4]">
+      <figcaption className="flex border-b border-[#353535] bg-[#252526]">
+        <span className="inline-flex items-center gap-2 border-t-2 border-r border-t-[#007acc] border-r-[#353535] bg-[#1e1e1e] px-4 py-1.5 font-mono text-xs">
+          <span aria-hidden="true" className="select-none text-[#75beff]">&lt;/&gt;</span>
+          {language ?? "Plain text"}
+        </span>
+      </figcaption>
+      <pre {...props} className="overflow-x-auto px-4 py-4 font-mono text-sm leading-6 [tab-size:4]">{children}</pre>
     </figure>
   );
 }
