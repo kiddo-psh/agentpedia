@@ -48,6 +48,27 @@ body {
     font-size: 1.125rem;
     line-height: 1.85;
   }
+  .editorial-quote {
+    font-family: "AppleMyungjo", "Batang", "Noto Serif CJK KR", Georgia, serif;
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.55;
+    letter-spacing: -0.025em;
+    text-align: center;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+  .prose-article > .editorial-quote {
+    margin-block: 2.5rem;
+  }
+  .editorial-quote > p:first-of-type {
+    margin-top: 0;
+  }
+  @media (max-width: 440px) {
+    .editorial-quote {
+      font-size: 1rem;
+    }
+  }
   /*
    * Skip below-fold layout until scroll (prod experiment: LCP ~3.2s → ~1.9s Slow 4G).
    * contain-intrinsic-size keeps approximate scroll height / #comments anchors stable.
