@@ -1,16 +1,17 @@
 import Link from "next/link";
 import { connection } from "next/server";
-import { Suspense } from "react";
+import { cache, Suspense } from "react";
 import { ArticleNavLink } from "@/components/ArticleNavLink";
 import { ArticlePagination, ArticleSortControls } from "@/components/ArticleListControls";
 import { CategoryChips, WithIndex } from "@/components/SiteIndex";
-import { paginateArticles, parseListQuery, sortArticles, type ArticleSort } from "@/content/articleList";
+import { paginateArticles, parseListQuery, sortArticles } from "@/content/articleList";
 import { CATEGORY_LABEL, DIFFICULTY_LABEL } from "@/content/labels";
 import { listArticles } from "@/content/loader";
 import type { ArticleMeta, Category } from "@/content/schema";
 import { getDb } from "@/db/client";
 import { listArticleLikeCounts } from "@/likes/service";
 import { ArticleList } from "./ArticleList";
+import "./home.css";
 
 /** A quiet wash per category stands in for cover art until articles have images of their own. */
 const COVER: Record<Category, string> = {
@@ -25,9 +26,9 @@ export default function Home({ searchParams }: PageProps<"/">) {
 
   return (
     <WithIndex articles={articles} active="all">
-      <section className="pt-2">
+      <section className="home-hero pt-2">
         <p className="text-[13px] font-medium text-muted">AI 에이전트 백과사전</p>
-        <h1 className="mt-3 max-w-[14em] text-4xl leading-[1.12] font-medium tracking-[-0.035em] sm:text-6xl">
+        <h1 className="mt-3 max-w-[14em] text-4xl leading-[1.12] font-medium tracking-[-0.035em] text-balance sm:text-6xl">
           읽고, 내 프로젝트에 바로 적용하세요
         </h1>
         <p className="mt-5 max-w-[34em] text-lg leading-relaxed text-muted">
@@ -50,130 +51,115 @@ export default function Home({ searchParams }: PageProps<"/">) {
         </div>
       </section>
 
-      <Suspense
-        fallback={
-          <>
-            <FeaturedSkeleton />
-            <ArticlesSkeleton articles={articles} />
-          </>
-        }
-      >
-        <HomeLists articles={articles} searchParams={searchParams} />
-      </Suspense>
+      {articles.length > 0 && (
+        <section aria-labelledby="featured-title">
+          <div className="mt-20 mb-5">
+            <h2 id="featured-title" className="text-2xl font-semibold tracking-tight">
+              좋아요 많은 기사
+            </h2>
+            <p className="mt-1 text-[13px] text-muted">독자가 가장 많이 좋아요한 글입니다</p>
+          </div>
+          <Suspense fallback={<FeaturedSkeleton count={Math.min(articles.length, 3)} />}>
+            <Featured articles={articles} />
+          </Suspense>
+        </section>
+      )}
+
+      <section id="articles" className="home-articles mt-20 scroll-mt-24" aria-labelledby="articles-title">
+        <h2 id="articles-title" className="text-2xl font-semibold tracking-tight">
+          모든 기사
+        </h2>
+        <Suspense fallback={<p className="py-10 text-sm text-muted">불러오는 중…</p>}>
+          <HomeArticleList articles={articles} searchParams={searchParams} />
+        </Suspense>
+      </section>
     </WithIndex>
   );
 }
 
-async function HomeLists({
+// Both rankings in a likes-sorted request use the same live totals.
+const getHomeLikeCounts = cache(async () => {
+  await connection();
+  return listArticleLikeCounts(await getDb());
+});
+
+async function HomeArticleList({
   articles,
   searchParams,
 }: {
   articles: ArticleMeta[];
   searchParams: PageProps<"/">["searchParams"];
 }) {
-  await connection();
   const { sort, page } = parseListQuery(await searchParams);
-  const likeCounts = await getDb().then(listArticleLikeCounts);
-  const featured = sortArticles(articles, "likes", likeCounts).slice(0, 3);
-  const sorted = sortArticles(articles, sort, likeCounts);
+  const sorted = sort === "likes" ? sortArticles(articles, sort, await getHomeLikeCounts()) : articles;
   const slice = paginateArticles(sorted, page);
 
   return (
     <>
-      {featured.length > 0 && <Featured articles={featured} likeCounts={likeCounts} />}
-      <section id="articles" className="scroll-mt-24" aria-labelledby="articles-title">
-        <div className="mt-20 mb-5 flex flex-wrap items-end justify-between gap-4">
-          <div className="min-w-0">
-            <h2 id="articles-title" className="text-2xl font-semibold tracking-tight">
-              모든 기사
-            </h2>
-            <p className="mt-1 text-[13px] text-muted">
-              {slice.total}편 · {sortLabel(sort)}
-              {slice.pageCount > 1 ? ` · ${slice.page}/${slice.pageCount}페이지` : null}
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <ArticleSortControls basePath="/" sort={sort} />
-            <CategoryChips articles={articles} active="all" />
-          </div>
+      <div className="mt-1 mb-5 flex flex-wrap items-end justify-between gap-4">
+        <p className="text-[13px] text-muted">
+          {slice.total}편 · {sort === "likes" ? "좋아요순" : "최신순"}
+          {slice.pageCount > 1 ? ` · ${slice.page}/${slice.pageCount}페이지` : null}
+        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <ArticleSortControls basePath="/" sort={sort} />
+          <CategoryChips articles={articles} active="all" />
         </div>
-        <ArticleList articles={slice.items} titleAs="h3" />
-        <ArticlePagination basePath="/" sort={sort} page={slice.page} pageCount={slice.pageCount} />
-      </section>
+      </div>
+      <ArticleList articles={slice.items} titleAs="h3" />
+      <ArticlePagination basePath="/" sort={sort} page={slice.page} pageCount={slice.pageCount} />
     </>
   );
 }
 
-function sortLabel(sort: ArticleSort) {
-  return sort === "likes" ? "좋아요순" : "최신순";
-}
+const coverClass = "flex aspect-[16/7] items-end justify-between rounded-2xl sm:aspect-[16/10]";
 
-function FeaturedSkeleton() {
+function FeaturedSkeleton({ count }: { count: number }) {
   return (
-    <section aria-hidden className="mt-20">
-      <div className="mb-5 h-8 w-48 rounded bg-soft" />
-      <div className="grid gap-5 sm:grid-cols-3">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="h-56 rounded-2xl bg-soft" />
-        ))}
-      </div>
-    </section>
+    <ul aria-hidden="true" className="grid gap-5 sm:grid-cols-3">
+      {Array.from({ length: count }, (_, i) => (
+        <li key={i}>
+          <div className={`${coverClass} home-placeholder bg-soft`} />
+          <div className="mt-4 h-5 w-24 rounded bg-soft" />
+          <div className="mt-1.5 h-[2lh] text-[19px] leading-snug">
+            <div className="h-4 w-5/6 rounded bg-soft" />
+          </div>
+          <div className="mt-1.5 h-[2lh] text-[14.5px] leading-relaxed">
+            <div className="h-3 w-3/4 rounded bg-soft" />
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }
 
-function ArticlesSkeleton({ articles }: { articles: ArticleMeta[] }) {
+async function Featured({ articles }: { articles: ArticleMeta[] }) {
+  const likeCounts = await getHomeLikeCounts();
+  const featured = sortArticles(articles, "likes", likeCounts).slice(0, 3);
   return (
-    <section id="articles" className="scroll-mt-24" aria-labelledby="articles-title">
-      <div className="mt-20 mb-5 flex flex-wrap items-baseline justify-between gap-4">
-        <h2 id="articles-title" className="text-2xl font-semibold tracking-tight">
-          모든 기사
-        </h2>
-        <CategoryChips articles={articles} active="all" />
-      </div>
-      <p className="py-10 text-sm text-muted">불러오는 중…</p>
-    </section>
-  );
-}
-
-function Featured({
-  articles,
-  likeCounts,
-}: {
-  articles: ArticleMeta[];
-  likeCounts: ReadonlyMap<string, number>;
-}) {
-  return (
-    <section aria-labelledby="featured-title">
-      <div className="mt-20 mb-5">
-        <h2 id="featured-title" className="text-2xl font-semibold tracking-tight">
-          좋아요 많은 기사
-        </h2>
-        <p className="mt-1 text-[13px] text-muted">독자가 가장 많이 좋아요한 글입니다</p>
-      </div>
-      <ul className="grid gap-5 sm:grid-cols-3">
-        {articles.map((a) => {
-          const likes = likeCounts.get(a.slug) ?? 0;
-          return (
-            <li key={a.slug}>
-              <ArticleNavLink href={`/a/${a.slug}`} className="group block">
-                <div
-                  className={`flex aspect-[16/7] items-end justify-between rounded-2xl bg-linear-135 p-4 text-[13px] font-medium text-foreground/70 sm:aspect-[16/10] ${COVER[a.category]}`}
-                >
-                  <span>{CATEGORY_LABEL[a.category]}</span>
-                  <span className="tabular-nums">좋아요 {likes}</span>
-                </div>
-                <p className="mt-4 text-[13px] font-medium text-muted">
-                  {DIFFICULTY_LABEL[a.difficulty]} · 적용 {a.apply.time}
-                </p>
-                <h3 className="mt-1.5 text-[19px] leading-snug font-semibold tracking-tight group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
-                  {a.title}
-                </h3>
-                <p className="mt-1.5 line-clamp-2 text-[14.5px] leading-relaxed text-muted">{a.summary}</p>
-              </ArticleNavLink>
-            </li>
-          );
-        })}
-      </ul>
-    </section>
+    <ul className="home-featured grid gap-5 sm:grid-cols-3">
+      {featured.map((a) => {
+        const likes = likeCounts.get(a.slug) ?? 0;
+        return (
+          <li key={a.slug}>
+            <ArticleNavLink href={`/a/${a.slug}`} className="group block">
+              <div
+                className={`${coverClass} bg-linear-135 p-4 text-[13px] font-medium text-foreground/70 ${COVER[a.category]}`}
+              >
+                <span>{CATEGORY_LABEL[a.category]}</span>
+                <span className="tabular-nums">좋아요 {likes}</span>
+              </div>
+              <p className="mt-4 text-[13px] font-medium text-muted">
+                {DIFFICULTY_LABEL[a.difficulty]} · 적용 {a.apply.time}
+              </p>
+              <h3 className="mt-1.5 min-h-[2lh] text-[19px] leading-snug font-semibold tracking-tight group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
+                {a.title}
+              </h3>
+              <p className="mt-1.5 line-clamp-2 min-h-[2lh] text-[14.5px] leading-relaxed text-muted">{a.summary}</p>
+            </ArticleNavLink>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
