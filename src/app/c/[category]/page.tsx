@@ -20,49 +20,62 @@ export async function generateMetadata({ params }: PageProps<"/c/[category]">): 
   return isCategory(category) ? { title: `${CATEGORY_LABEL[category]} 기사` } : {};
 }
 
-// params / searchParams are URL data: keep them behind Suspense so client navigation can show the shell instantly.
-export default function CategoryPage({ params, searchParams }: PageProps<"/c/[category]">) {
-  return (
-    <Suspense fallback={<p className="pt-2 text-sm text-muted">불러오는 중…</p>}>
-      <CategoryView params={params} searchParams={searchParams} />
-    </Suspense>
-  );
-}
-
-async function CategoryView({
+/**
+ * Params are awaited outside Suspense on purpose (same as /a/[slug]): every category is
+ * prerendered, so the sidebar + heading can paint and update `aria-current` without waiting on
+ * searchParams. Only the paginated list sits behind the boundary.
+ * docs/perf/2026-11-14-first-paint.md; docs/sidebar-tab-switch-perf.md
+ */
+export default async function CategoryPage({
   params,
   searchParams,
-}: {
-  params: PageProps<"/c/[category]">["params"];
-  searchParams: PageProps<"/c/[category]">["searchParams"];
-}) {
+}: PageProps<"/c/[category]">) {
   const { category } = await params;
   if (!isCategory(category)) notFound();
 
-  const { page } = parseListQuery(await searchParams);
   const articles = listArticles();
-  // Category lists always use 작성순 (`publishedAt`); sort controls live on 전체 only.
+  const total = articles.filter((a) => a.category === category).length;
+
+  return (
+    <WithIndex articles={articles} active={category}>
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-4 pt-2">
+        <div>
+          <p className="text-[13px] font-medium text-muted">기사 {total}편 · 최신순</p>
+          <h1 className="mt-2 text-4xl font-medium tracking-[-0.03em]">{CATEGORY_LABEL[category]}</h1>
+        </div>
+        <CategoryChips articles={articles} active={category} />
+      </div>
+      <Suspense fallback={<p className="py-10 text-sm text-muted">불러오는 중…</p>}>
+        <CategoryArticles category={category} searchParams={searchParams} />
+      </Suspense>
+    </WithIndex>
+  );
+}
+
+async function CategoryArticles({
+  category,
+  searchParams,
+}: {
+  category: Category;
+  searchParams: PageProps<"/c/[category]">["searchParams"];
+}) {
+  const { page } = parseListQuery(await searchParams);
   const shown = sortArticles(
-    articles.filter((a) => a.category === category),
+    listArticles().filter((a) => a.category === category),
     "newest",
   );
   const slice = paginateArticles(shown, page);
   const basePath = `/c/${category}`;
 
   return (
-    <WithIndex articles={articles} active={category}>
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-4 pt-2">
-        <div>
-          <p className="text-[13px] font-medium text-muted">
-            기사 {slice.total}편 · 최신순
-            {slice.pageCount > 1 ? ` · ${slice.page}/${slice.pageCount}페이지` : null}
-          </p>
-          <h1 className="mt-2 text-4xl font-medium tracking-[-0.03em]">{CATEGORY_LABEL[category]}</h1>
-        </div>
-        <CategoryChips articles={articles} active={category} />
-      </div>
+    <>
+      {slice.pageCount > 1 ? (
+        <p className="mb-4 text-[13px] text-muted">
+          {slice.page}/{slice.pageCount}페이지
+        </p>
+      ) : null}
       <ArticleList articles={slice.items} />
       <ArticlePagination basePath={basePath} page={slice.page} pageCount={slice.pageCount} />
-    </WithIndex>
+    </>
   );
 }
