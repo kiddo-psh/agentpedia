@@ -3,8 +3,8 @@ import Link from "next/link";
 import { DeferredMonoFont } from "@/components/DeferredMonoFont";
 import { LogoLink } from "@/components/LogoLink";
 import { UserMenu } from "@/components/UserMenu";
-// Split into unicode-range subsets: a page downloads only the glyphs it uses.
-import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
+// Content-scanned Pretendard subsets (critical first-paint + body delta). Regenerate: npm run fonts:subset
+import "./pretendard-subset.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
