@@ -3,6 +3,8 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   categoryNavMissingPrefetchIssues,
+  likeSessionDbWaterfallIssues,
+  likeSkeletonBlankIssues,
   paramsChromeBehindSuspenseIssues,
 } from "./routePatterns";
 
@@ -75,5 +77,44 @@ export function WithIndex() {
   it("CategoryNavLink hardcodes prefetch={true}", () => {
     const src = fs.readFileSync(path.join(root, "src/components/CategoryNavLink.tsx"), "utf8");
     expect(src).toMatch(/prefetch=\{true\}/);
+  });
+});
+
+describe("likeSessionDbWaterfallIssues", () => {
+  it("fails on sequential getSession then getDb", () => {
+    const past = `
+export async function LikeButton({ slug }: { slug: string }) {
+  await connection();
+  const requestHeaders = await headers();
+  session = await getSession(requestHeaders);
+  state = await getDb().then((db) => getLikeState(db, slug, session?.user.id));
+}
+`;
+    expect(likeSessionDbWaterfallIssues(past)).toEqual([
+      expect.stringContaining("Promise.all"),
+    ]);
+  });
+
+  it("passes live LikeButton overlap", () => {
+    const src = fs.readFileSync(path.join(root, "src/components/likes/LikeButton.tsx"), "utf8");
+    expect(likeSessionDbWaterfallIssues(src)).toEqual([]);
+  });
+});
+
+describe("likeSkeletonBlankIssues", () => {
+  it("fails on blank soft-circle skeleton", () => {
+    const past = `
+export function LikeButtonSkeleton() {
+  return <span className="block size-14 rounded-full bg-soft" aria-hidden />;
+}
+`;
+    expect(likeSkeletonBlankIssues(past)).toEqual([
+      expect.stringContaining("heart"),
+    ]);
+  });
+
+  it("passes live LikeButtonSkeleton with heart", () => {
+    const src = fs.readFileSync(path.join(root, "src/components/likes/LikeButton.tsx"), "utf8");
+    expect(likeSkeletonBlankIssues(src)).toEqual([]);
   });
 });

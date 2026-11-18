@@ -54,3 +54,35 @@ export function categoryNavMissingPrefetchIssues(source: string): string[] {
   }
   return issues;
 }
+
+/** LikeButton used to await getSession then getDb; Comments already overlaps them. */
+export function likeSessionDbWaterfallIssues(source: string): string[] {
+  if (!/\bgetSession\b/.test(source) || !/\bgetDb\b/.test(source)) return [];
+  const parallel =
+    /Promise\.all\(\s*\[[\s\S]*?\bgetSession\b[\s\S]*?\bgetDb\b[\s\S]*?\]\s*\)/.test(source) ||
+    /Promise\.all\(\s*\[[\s\S]*?\bgetDb\b[\s\S]*?\bgetSession\b[\s\S]*?\]\s*\)/.test(source);
+  if (parallel) return [];
+  if (/await getSession\b[\s\S]*?getDb\(/.test(source)) {
+    return [
+      "Overlap getSession with getDb via Promise.all in LikeButton (same pattern as Comments.tsx).",
+    ];
+  }
+  return [];
+}
+
+/** Blank soft circle with no heart/count reads as missing, not loading. */
+export function likeSkeletonBlankIssues(source: string): string[] {
+  const skeleton = source.match(
+    /export function LikeButtonSkeleton\(\)[\s\S]*?(?=export |$)/,
+  )?.[0];
+  if (!skeleton) return [];
+  const blankOnly =
+    /rounded-full bg-soft/.test(skeleton) &&
+    !/Heart|heart|aria-label|좋아요/.test(skeleton);
+  if (blankOnly) {
+    return [
+      "LikeButtonSkeleton must show a heart (and count placeholder), not a blank circle. See docs/article-load-like-perf.md.",
+    ];
+  }
+  return [];
+}
