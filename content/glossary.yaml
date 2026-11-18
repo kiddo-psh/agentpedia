@@ -362,6 +362,16 @@
   en: property-based testing
   definition: 예시 입력 몇 개 대신, 항상 참이어야 하는 성질을 정하고 무작위 입력을 대량으로 만들어 위반을 찾는 테스트 방식입니다.
 
+- id: e2e-test
+  term: E2E 테스트
+  en: end-to-end test
+  definition: 실제 사용자 흐름 전체를 돌려 기능이 끝까지 동작하는지 확인하는 테스트입니다. 단위 테스트만 통과해도 깨질 수 있는 경로를 잡습니다.
+
+- id: differential-test
+  term: 차분 테스트
+  en: differential test
+  definition: 같은 입력으로 옛 시스템과 새 시스템을 돌려 결과가 달라지는지 보는 테스트입니다. 동작이 같아야 하는 대규모 마이그레이션에 씁니다.
+
 - id: statsig
   term: Statsig
   en: Statsig
