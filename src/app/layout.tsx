@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { geistMono } from "./fonts";
 import Link from "next/link";
+import { DeferredMonoFont } from "@/components/DeferredMonoFont";
 import { LogoLink } from "@/components/LogoLink";
 import { UserMenu } from "@/components/UserMenu";
 // Split into unicode-range subsets: a page downloads only the glyphs it uses.
@@ -16,8 +16,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ko" className={`${geistMono.variable} h-full antialiased`}>
+    <html lang="ko" className="h-full antialiased">
       <body className="flex min-h-full flex-col">
+        <DeferredMonoFont />
         <header className="sticky top-0 z-20 bg-background/90 backdrop-blur">
           <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center gap-8 px-4 sm:px-8">
             <LogoLink className="text-[17px] font-semibold tracking-tight">Agentpedia</LogoLink>
