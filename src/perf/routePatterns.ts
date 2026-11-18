@@ -107,3 +107,37 @@ export function articleMissingContentVisibilityIssues(css: string): string[] {
   }
   return [];
 }
+
+/**
+ * Article MDX must not land in the first HTML: await body only inside a Suspense hole around prose.
+ * Shell keeps title/brief; body streams (connection + cached prose).
+ */
+export function articleBodyBeforeSuspenseIssues(source: string): string[] {
+  const issues: string[] = [];
+  // Direct ArticleBody in the cached shell (no prose slot / Suspense wrapper).
+  if (/<ArticleBody\b/.test(source) && !/prose=\{/.test(source) && !/<Suspense[\s\S]*<ArticleBody\b/.test(source)) {
+    issues.push(
+      "Stream ArticleBody behind Suspense (prose slot); do not await MDX before the first prose boundary. Copy src/app/a/[slug]/page.tsx.",
+    );
+  }
+  // evaluate() / ArticleBody invoked in the default export before any Suspense.
+  const defaultExport = source.match(/export default async function \w+\([\s\S]*$/)?.[0] ?? "";
+  const firstSuspense = defaultExport.search(/<Suspense\b/);
+  const bodyInDefault =
+    defaultExport.search(/\bArticleBody\b|\bevaluate\s*\(/);
+  if (firstSuspense >= 0 && bodyInDefault >= 0 && bodyInDefault < firstSuspense) {
+    issues.push(
+      "Stream ArticleBody behind Suspense (prose slot); do not await MDX before the first prose boundary. Copy src/app/a/[slug]/page.tsx.",
+    );
+  }
+  // Cached shell must expose a prose pass-through (or Suspense around body) so MDX is not inlined.
+  if (/async function ArticleView\b/.test(source) && /"use cache"/.test(source)) {
+    const view = source.match(/async function ArticleView\b[\s\S]*?(?=async function |$)/)?.[0] ?? "";
+    if (/<ArticleBody\b/.test(view)) {
+      issues.push(
+        "Stream ArticleBody behind Suspense (prose slot); do not await MDX before the first prose boundary. Copy src/app/a/[slug]/page.tsx.",
+      );
+    }
+  }
+  return [...new Set(issues)];
+}

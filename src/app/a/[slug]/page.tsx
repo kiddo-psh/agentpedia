@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
+import { cacheLife } from "next/cache";
 import { Suspense, type ReactNode } from "react";
 import { ApplyRail } from "@/components/ApplyRail";
 import { ArticleBrief } from "@/components/ArticleBrief";
@@ -53,25 +55,32 @@ export default async function ArticlePage({ params }: PageProps<"/a/[slug]">) {
   if (!article) notFound();
   return (
     <>
-    <ArticleView
-      slug={slug}
-      comments={
-        <Suspense fallback={<p className="text-sm text-muted">토론을 불러오는 중…</p>}>
-          <Comments slug={slug} />
-        </Suspense>
-      }
-    />
-    <ReactionRail
-      slug={slug}
-      title={article.title}
-      text={article.summary}
-      likes={
-        // The like count is request-time; a fixed-size placeholder keeps the rail from shifting.
-        <Suspense fallback={<LikeButtonSkeleton />}>
-          <LikeButton slug={slug} />
-        </Suspense>
-      }
-    />
+      <ArticleView
+        slug={slug}
+        prose={
+          // Body MDX stays out of the first HTML: connection() defers it, remote cache keeps
+          // evaluate off the per-request CPU path after the first fill.
+          <Suspense fallback={<ArticleBodyFallback />}>
+            <ArticleProseSlot slug={slug} />
+          </Suspense>
+        }
+        comments={
+          <Suspense fallback={<p className="text-sm text-muted">토론을 불러오는 중…</p>}>
+            <Comments slug={slug} />
+          </Suspense>
+        }
+      />
+      <ReactionRail
+        slug={slug}
+        title={article.title}
+        text={article.summary}
+        likes={
+          // The like count is request-time; a fixed-size placeholder keeps the rail from shifting.
+          <Suspense fallback={<LikeButtonSkeleton />}>
+            <LikeButton slug={slug} />
+          </Suspense>
+        }
+      />
     </>
   );
 }
@@ -102,11 +111,20 @@ function People({ persons }: { persons: Article["persons"] }) {
 }
 
 /**
- * Cached so the article, MDX compile included, lands in the prerendered page instead of
- * rendering per request. The request-time `comments` part arrives as a pass-through slot.
+ * Cached above-fold chrome only: title, meta, people, 30초 요약. Prose/kit/sources arrive through
+ * the `prose` pass-through so the first HTML stays small enough for Slow 4G h1 LCP.
  */
-async function ArticleView({ slug, comments }: { slug: string; comments: ReactNode }) {
+async function ArticleView({
+  slug,
+  prose,
+  comments,
+}: {
+  slug: string;
+  prose: ReactNode;
+  comments: ReactNode;
+}) {
   "use cache";
+  cacheLife("days");
   const article = getArticle(slug)!;
   const related = getRelatedGraph(article);
   const sections: [string, string][] = [
@@ -119,49 +137,69 @@ async function ArticleView({ slug, comments }: { slug: string; comments: ReactNo
 
   return (
     <ArticleTracking slug={article.slug}>
-    <div className="mx-auto max-w-[720px] xl:grid xl:max-w-none xl:grid-cols-[minmax(0,720px)_260px] xl:justify-center xl:gap-20">
-    <article className="min-w-0">
-      <header className="mb-10">
-        <nav className="mb-5 text-sm text-muted" aria-label="위치">
-          <Link href="/" className="hover:text-foreground">
-            기사
-          </Link>
-          <span className="mx-1.5" aria-hidden>
-            ›
-          </span>
-          <Link href={`/c/${article.category}`} className="hover:text-foreground">
-            {CATEGORY_LABEL[article.category]}
-          </Link>
-        </nav>
-        <h1 className="text-3xl leading-[1.22] font-medium tracking-[-0.035em] sm:text-[44px]">{article.title}</h1>
-        <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted">
-          <span className="font-medium text-foreground">{DIFFICULTY_LABEL[article.difficulty]}</span>
-          <span>·</span>
-          <span title="출처가 나온 시점입니다">{sourcePeriod(article.sources)}</span>
-          <SourceAge newestIso={newestPublished(article.sources).toISOString()} />
-          {article.draft && (
-            <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
-              초안 · 검수 전
-            </span>
-          )}
-        </div>
-        {/* `summary` feeds the list and metadata; here the 30-second brief below says the same thing. */}
-        {article.persons.length > 0 && <People persons={article.persons} />}
-      </header>
+      <div className="mx-auto max-w-[720px] xl:grid xl:max-w-none xl:grid-cols-[minmax(0,720px)_260px] xl:justify-center xl:gap-20">
+        <article className="min-w-0">
+          <header className="mb-10">
+            <nav className="mb-5 text-sm text-muted" aria-label="위치">
+              <Link href="/" className="hover:text-foreground">
+                기사
+              </Link>
+              <span className="mx-1.5" aria-hidden>
+                ›
+              </span>
+              <Link href={`/c/${article.category}`} className="hover:text-foreground">
+                {CATEGORY_LABEL[article.category]}
+              </Link>
+            </nav>
+            <h1 className="text-3xl leading-[1.22] font-medium tracking-[-0.035em] sm:text-[44px]">{article.title}</h1>
+            <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted">
+              <span className="font-medium text-foreground">{DIFFICULTY_LABEL[article.difficulty]}</span>
+              <span>·</span>
+              <span title="출처가 나온 시점입니다">{sourcePeriod(article.sources)}</span>
+              <SourceAge newestIso={newestPublished(article.sources).toISOString()} />
+              {article.draft && (
+                <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
+                  초안 · 검수 전
+                </span>
+              )}
+            </div>
+            {/* `summary` feeds the list and metadata; here the 30-second brief below says the same thing. */}
+            {article.persons.length > 0 && <People persons={article.persons} />}
+          </header>
 
-      <ArticleBrief article={article} />
+          <ArticleBrief article={article} />
 
+          {prose}
+
+          <section id="comments" className="mt-24 scroll-mt-24" aria-labelledby="comments-title">
+            {comments}
+          </section>
+        </article>
+        <ApplyRail article={article} sections={sections} />
+      </div>
+    </ArticleTracking>
+  );
+}
+
+/** Request-time gate so MDX/prose is a streaming hole, not part of the prerendered shell. */
+async function ArticleProseSlot({ slug }: { slug: string }) {
+  await connection();
+  return <CachedArticleProse slug={slug} />;
+}
+
+/** Runtime-cached body + below-fold sections (kit/related/sources). */
+async function CachedArticleProse({ slug }: { slug: string }) {
+  "use cache: remote";
+  cacheLife("days");
+  const article = getArticle(slug)!;
+  const related = getRelatedGraph(article);
+
+  return (
+    <>
       <ArticleBody article={article} />
       <GlossaryList terms={article.terms} />
-
       <KitSection article={article} />
-
       <RelatedArticles graph={related} />
-
-      <section id="comments" className="mt-24 scroll-mt-24" aria-labelledby="comments-title">
-        {comments}
-      </section>
-
       <section className="mt-24 scroll-mt-24" id="sources" aria-labelledby="sources-title">
         <h2 id="sources-title" className="mb-4 text-[22px] font-semibold tracking-tight">
           출처
@@ -182,9 +220,21 @@ async function ArticleView({ slug, comments }: { slug: string; comments: ReactNo
           ))}
         </ul>
       </section>
-    </article>
-    <ApplyRail article={article} sections={sections} />
+    </>
+  );
+}
+
+/** Sized placeholder so the rail/layout stay put while prose streams. */
+function ArticleBodyFallback() {
+  return (
+    <div className="article-body-fallback space-y-4" aria-hidden>
+      <div className="h-5 w-11/12 rounded bg-soft" />
+      <div className="h-5 w-full rounded bg-soft" />
+      <div className="h-5 w-10/12 rounded bg-soft" />
+      <div className="h-5 w-full rounded bg-soft" />
+      <div className="h-5 w-8/12 rounded bg-soft" />
+      <div className="h-5 w-11/12 rounded bg-soft" />
+      <div className="h-5 w-9/12 rounded bg-soft" />
     </div>
-    </ArticleTracking>
   );
 }

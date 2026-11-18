@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  articleBodyBeforeSuspenseIssues,
   articleMissingContentVisibilityIssues,
   categoryMissingUseCacheIssues,
   categoryNavMissingPrefetchIssues,
@@ -150,5 +151,31 @@ describe("articleMissingContentVisibilityIssues", () => {
   it("passes live globals.css", () => {
     const css = fs.readFileSync(path.join(root, "src/app/globals.css"), "utf8");
     expect(articleMissingContentVisibilityIssues(css)).toEqual([]);
+  });
+});
+
+describe("articleBodyBeforeSuspenseIssues", () => {
+  it("fails when ArticleView inlines ArticleBody under use cache", () => {
+    const past = `
+async function ArticleView({ slug, comments }: { slug: string; comments: ReactNode }) {
+  "use cache";
+  const article = getArticle(slug)!;
+  return (
+    <article>
+      <ArticleBrief article={article} />
+      <ArticleBody article={article} />
+      {comments}
+    </article>
+  );
+}
+`;
+    expect(articleBodyBeforeSuspenseIssues(past)).toEqual([
+      expect.stringContaining("Stream ArticleBody behind Suspense"),
+    ]);
+  });
+
+  it("passes live article page (prose slot + Suspense)", () => {
+    const src = fs.readFileSync(path.join(root, "src/app/a/[slug]/page.tsx"), "utf8");
+    expect(articleBodyBeforeSuspenseIssues(src)).toEqual([]);
   });
 });

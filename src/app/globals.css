@@ -55,6 +55,10 @@ body {
     content-visibility: auto;
     contain-intrinsic-size: auto 600px;
   }
+  /* Above-fold shell streams prose later; keep approximate height so layout does not jump. */
+  .article-body-fallback {
+    min-height: 24rem;
+  }
   /* Scene break: a short centered rule marks a change of scene inside a section. */
   .prose-article :where(hr):not(:where(.not-prose *)) {
     width: 4rem;
