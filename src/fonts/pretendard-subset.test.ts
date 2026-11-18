@@ -12,18 +12,33 @@ describe("pretendard content-scanned subset", () => {
     expect(meta.critical.hangul).toBeGreaterThan(100);
   });
 
-  it("ships both woff2 files and generated CSS wired for unicode-range", () => {
-    const css = fs.readFileSync(path.join(root, "app/pretendard-subset.css"), "utf8");
-    expect(css).toContain("pretendard-critical.woff2");
-    expect(css).toContain("pretendard-content.woff2");
-    expect(css).toContain("unicode-range:");
-    expect(css).toContain('font-family: "Pretendard Variable"');
+  it("ships both woff2 files and split CSS (critical layout / content deferred)", () => {
+    const criticalCss = fs.readFileSync(path.join(root, "app/pretendard-subset.css"), "utf8");
+    const contentCss = fs.readFileSync(path.join(root, "app/pretendard-content.css"), "utf8");
+    expect(criticalCss).toContain("pretendard-critical.woff2");
+    expect(criticalCss).not.toContain("pretendard-content.woff2");
+    expect(contentCss).toContain("pretendard-content.woff2");
+    expect(contentCss).not.toContain("pretendard-critical.woff2");
+    expect(criticalCss).toContain("unicode-range:");
+    expect(contentCss).toContain("unicode-range:");
+    expect(criticalCss).toContain('font-family: "Pretendard Variable"');
 
     for (const file of [meta.critical.file, meta.content.file]) {
       const abs = path.join(process.cwd(), file);
       expect(fs.existsSync(abs), abs).toBe(true);
       expect(fs.statSync(abs).size).toBeGreaterThan(1_000);
     }
+  });
+
+  it("keeps content face off the layout first-paint import", () => {
+    const layout = fs.readFileSync(path.join(root, "app/layout.tsx"), "utf8");
+    expect(layout).toContain('import "./pretendard-subset.css"');
+    expect(layout).not.toMatch(/import\s+["'].*pretendard-content\.css["']/);
+    expect(layout).toContain("DeferredContentFont");
+
+    const deferred = fs.readFileSync(path.join(root, "components/DeferredContentFont.tsx"), "utf8");
+    expect(deferred).toContain('import("@/app/pretendard-content.css")');
+    expect(deferred).toContain(".prose-article");
   });
 
   it("covers the Lauren Tan article title in the critical face unicode-range", () => {

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { DeferredContentFont } from "@/components/DeferredContentFont";
 import { DeferredMonoFont } from "@/components/DeferredMonoFont";
 import { LogoLink } from "@/components/LogoLink";
 import { UserMenu } from "@/components/UserMenu";
-// Content-scanned Pretendard subsets (critical first-paint + body delta). Regenerate: npm run fonts:subset
+// Critical Pretendard only on first paint; content face via DeferredContentFont.
+// Regenerate both CSS files: npm run fonts:subset
 import "./pretendard-subset.css";
 import "./globals.css";
 
@@ -18,6 +20,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className="h-full antialiased">
       <body className="flex min-h-full flex-col">
+        <DeferredContentFont />
         <DeferredMonoFont />
         <header className="sticky top-0 z-20 bg-background/90 backdrop-blur">
           <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center gap-8 px-4 sm:px-8">
