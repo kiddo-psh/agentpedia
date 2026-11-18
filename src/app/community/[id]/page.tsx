@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
-import { Suspense } from "react";
+import { cache, Suspense } from "react";
 import { getPost, type PostView } from "@/community/service";
 import { ArticleNavLink } from "@/components/ArticleNavLink";
 import { DeletePostButton } from "@/components/community/DeletePostButton";
 import { PostComments } from "@/components/community/PostComments";
 import { getArticle } from "@/content/loader";
 import { getDb } from "@/db/client";
-import { getSession } from "@/lib/auth";
+import { getRenderSession } from "@/lib/auth";
 
 const timeFormat = new Intl.DateTimeFormat("ko-KR", {
   dateStyle: "medium",
@@ -18,16 +17,16 @@ const timeFormat = new Intl.DateTimeFormat("ko-KR", {
   timeZone: "Asia/Seoul",
 });
 
-// UUID posts are not known at build time (unlike /a/[slug] generateStaticParams), so the
-// root layout's usePathname and this page's DB/session reads cannot form a static shell.
-export const instant = false;
+const loadPost = cache(async (id: string) => getPost(await getDb(), id));
+type PostParams = PageProps<"/community/[id]">["params"];
 
 export async function generateMetadata({
   params,
 }: PageProps<"/community/[id]">): Promise<Metadata> {
   const { id } = await params;
+  await connection();
   try {
-    const post = await getDb().then((db) => getPost(db, id));
+    const post = await loadPost(id);
     if (!post) return { title: "커뮤니티" };
     return { title: `${post.title} · 커뮤니티`, description: post.body.slice(0, 160) };
   } catch {
@@ -35,8 +34,7 @@ export async function generateMetadata({
   }
 }
 
-export default async function CommunityPostPage({ params }: PageProps<"/community/[id]">) {
-  const { id } = await params;
+export default function CommunityPostPage({ params }: PageProps<"/community/[id]">) {
   return (
     <div className="mx-auto max-w-3xl">
       <nav className="mb-5 pt-2 text-sm text-muted" aria-label="위치">
@@ -49,26 +47,37 @@ export default async function CommunityPostPage({ params }: PageProps<"/communit
         <span className="text-foreground">글</span>
       </nav>
       <Suspense fallback={<p className="text-sm text-muted">불러오는 중…</p>}>
-        <PostDetail id={id} />
+        <PostDetail params={params} />
       </Suspense>
       <section id="comments" className="mt-14 scroll-mt-24">
         <Suspense fallback={<p className="text-sm text-muted">댓글을 불러오는 중…</p>}>
-          <PostComments postId={id} />
+          <PostCommentsSection params={params} />
         </Suspense>
       </section>
     </div>
   );
 }
 
-async function PostDetail({ id }: { id: string }) {
+async function PostCommentsSection({ params }: { params: PostParams }) {
+  const { id } = await params;
+  return <PostComments postId={id} />;
+}
+
+async function OwnerControls({ post }: { post: PostView }) {
+  const session = await getRenderSession().catch(() => null);
+  return session?.user.id === post.authorId ? (
+    <span className="ml-auto">
+      <DeletePostButton id={post.id} />
+    </span>
+  ) : null;
+}
+
+async function PostDetail({ params }: { params: PostParams }) {
+  const { id } = await params;
   await connection();
   let post: PostView | null;
-  let session: Awaited<ReturnType<typeof getSession>> = null;
   try {
-    [post, session] = await Promise.all([
-      getDb().then((db) => getPost(db, id)),
-      getSession(await headers()).catch(() => null),
-    ]);
+    post = await loadPost(id);
   } catch (err) {
     console.error(`[community] failed to load post ${id}`, err);
     return (
@@ -80,7 +89,6 @@ async function PostDetail({ id }: { id: string }) {
   if (!post) notFound();
 
   const article = post.articleSlug ? getArticle(post.articleSlug) : null;
-  const me = session?.user.id;
 
   return (
     <article>
@@ -91,11 +99,9 @@ async function PostDetail({ id }: { id: string }) {
         <div className="mt-3 flex flex-wrap items-center gap-x-2 text-sm text-muted">
           <span className="font-medium text-foreground">{post.authorName}</span>
           <time dateTime={post.createdAt.toISOString()}>{timeFormat.format(post.createdAt)}</time>
-          {me === post.authorId && (
-            <span className="ml-auto">
-              <DeletePostButton id={post.id} />
-            </span>
-          )}
+          <Suspense fallback={null}>
+            <OwnerControls post={post} />
+          </Suspense>
         </div>
       </header>
 

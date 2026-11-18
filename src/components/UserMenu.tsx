@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { getSession } from "@/lib/auth";
+import { getRenderSession } from "@/lib/auth";
 import { LoginLink } from "./LoginLink";
 import { SignOutButton } from "./SignOutButton";
 
@@ -17,9 +16,9 @@ export function UserMenu() {
 
 async function UserMenuSession() {
   await connection();
-  let session: Awaited<ReturnType<typeof getSession>> = null;
+  let session: Awaited<ReturnType<typeof getRenderSession>> = null;
   try {
-    session = await getSession(await headers());
+    session = await getRenderSession();
   } catch (err) {
     // Auth must not take the page down; fall through to the login link.
     console.error("[auth] UserMenu session failed", err);

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { headers } from "next/headers";
+import { cacheLife, cacheTag } from "next/cache";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { listPosts, type PostView } from "@/community/service";
-import { getArticle } from "@/content/loader";
+import { listPostPreviews } from "@/community/service";
+import { listArticleOptions } from "@/content/loader";
 import { getDb } from "@/db/client";
-import { getSession } from "@/lib/auth";
+import { getRenderSession } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "커뮤니티",
@@ -41,9 +41,9 @@ export default function CommunityPage() {
 
 async function NewPostLink() {
   await connection();
-  let session: Awaited<ReturnType<typeof getSession>> = null;
+  let session: Awaited<ReturnType<typeof getRenderSession>> = null;
   try {
-    session = await getSession(await headers());
+    session = await getRenderSession();
   } catch (err) {
     console.error("[community] session failed on list", err);
   }
@@ -67,11 +67,25 @@ async function NewPostLink() {
   );
 }
 
+async function loadPostPreviews() {
+  "use cache";
+  cacheLife("seconds");
+  cacheTag("community-post-list");
+  const posts = await listPostPreviews(await getDb());
+  const titles = posts.some((post) => post.articleSlug)
+    ? new Map(listArticleOptions().map((article) => [article.slug, article.title]))
+    : null;
+  return posts.map((post) => ({
+    ...post,
+    articleTitle: post.articleSlug && (titles?.get(post.articleSlug) ?? post.articleSlug),
+  }));
+}
+
 async function PostList() {
   await connection();
-  let posts: PostView[];
+  let posts: Awaited<ReturnType<typeof loadPostPreviews>>;
   try {
-    posts = await getDb().then((db) => listPosts(db));
+    posts = await loadPostPreviews();
   } catch (err) {
     console.error("[community] failed to list posts", err);
     return (
@@ -95,14 +109,14 @@ async function PostList() {
         <li key={p.id}>
           <Link href={`/community/${p.id}`} className="block py-5 hover:bg-soft/60">
             <h2 className="text-lg font-medium tracking-tight">{p.title}</h2>
-            <p className="mt-1 line-clamp-2 text-sm text-muted">{p.body}</p>
+            <p className="mt-1 line-clamp-2 text-sm text-muted">{p.preview}</p>
             <div className="mt-2 flex flex-wrap items-center gap-x-2 text-xs text-muted">
               <span className="font-medium text-foreground">{p.authorName}</span>
               <time dateTime={p.createdAt.toISOString()}>{timeFormat.format(p.createdAt)}</time>
-              {p.articleSlug && (
+              {p.articleTitle && (
                 <>
                   <span aria-hidden>·</span>
-                  <span>{getArticle(p.articleSlug)?.title ?? p.articleSlug}</span>
+                  <span>{p.articleTitle}</span>
                   {p.linkKit && <span>· 키트</span>}
                 </>
               )}

@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { headers } from "next/headers";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { PostForm, type ArticleOption } from "@/components/community/PostForm";
-import { getArticle, listArticles } from "@/content/loader";
-import { getSession } from "@/lib/auth";
+import { PostForm } from "@/components/community/PostForm";
+import { listArticleOptions } from "@/content/loader";
+import { getRenderSession } from "@/lib/auth";
 
 export const metadata: Metadata = { title: "글쓰기 · 커뮤니티" };
 
@@ -29,18 +28,11 @@ export default function NewCommunityPostPage() {
   );
 }
 
-function articleOptions(): ArticleOption[] {
-  return listArticles().map((a) => {
-    const full = getArticle(a.slug);
-    return { slug: a.slug, title: a.title, hasKit: (full?.kit.length ?? 0) > 0 };
-  });
-}
-
 async function NewPostGate() {
   await connection();
-  let session: Awaited<ReturnType<typeof getSession>> = null;
+  let session: Awaited<ReturnType<typeof getRenderSession>> = null;
   try {
-    session = await getSession(await headers());
+    session = await getRenderSession();
   } catch (err) {
     console.error("[community] session failed on new", err);
   }
@@ -59,5 +51,5 @@ async function NewPostGate() {
     );
   }
 
-  return <PostForm articles={articleOptions()} />;
+  return <PostForm articles={listArticleOptions()} />;
 }

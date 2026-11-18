@@ -106,6 +106,13 @@ function all(): Article[] {
 const includeDraftsByDefault = () =>
   process.env.NODE_ENV !== "production" || process.env.SHOW_DRAFTS === "1";
 
+export function listArticleOptions() {
+  const includeDrafts = includeDraftsByDefault();
+  return all()
+    .filter((article) => includeDrafts || !article.draft)
+    .map(({ slug, title, kit }) => ({ slug, title, hasKit: kit.length > 0 }));
+}
+
 export function listArticles(filter: {
   category?: Category;
   query?: string;

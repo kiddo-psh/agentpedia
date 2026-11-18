@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, isNull } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { communityComments, communityPosts, user } from "@/db/schema";
 import {
@@ -163,37 +163,22 @@ export async function getPost(db: Db, id: string): Promise<PostView | null> {
 }
 
 /** Newest first; soft-deleted posts are omitted. */
-export async function listPosts(db: Db, limit = 50): Promise<PostView[]> {
-  const rows = await db
+export async function listPostPreviews(db: Db, limit = 50) {
+  return db
     .select({
       id: communityPosts.id,
       title: communityPosts.title,
-      body: communityPosts.body,
-      links: communityPosts.links,
+      preview: sql<string>`left(${communityPosts.body}, 240)`,
       articleSlug: communityPosts.articleSlug,
       linkKit: communityPosts.linkKit,
       createdAt: communityPosts.createdAt,
-      authorId: user.id,
       authorName: user.name,
-      authorImage: user.image,
     })
     .from(communityPosts)
     .innerJoin(user, eq(communityPosts.userId, user.id))
     .where(isNull(communityPosts.deletedAt))
     .orderBy(desc(communityPosts.createdAt))
     .limit(limit);
-  return rows.map((r) => ({
-    id: r.id,
-    title: r.title,
-    body: r.body,
-    links: r.links ?? [],
-    articleSlug: r.articleSlug,
-    linkKit: r.linkKit,
-    createdAt: r.createdAt,
-    authorId: r.authorId,
-    authorName: r.authorName,
-    authorImage: r.authorImage,
-  }));
 }
 
 /** Roots oldest-first, each with replies oldest-first. Deleted roots without replies are dropped. */

@@ -1,6 +1,8 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import { headers } from "next/headers";
+import { cache } from "react";
 import { getDb, type Db } from "@/db/client";
 import * as schema from "@/db/schema";
 import { devPasswordLogin, githubCredentials } from "./auth-config";
@@ -36,3 +38,5 @@ export function getAuth(): Promise<Auth> {
 export async function getSession(headers: Headers): Promise<Session | null> {
   return (await getAuth()).api.getSession({ headers });
 }
+
+export const getRenderSession = cache(async () => getSession(await headers()));

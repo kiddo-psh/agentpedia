@@ -8,7 +8,7 @@ import {
   deletePostComment,
   getPost,
   listPostThreads,
-  listPosts,
+  listPostPreviews,
   MAX_COMMUNITY_COMMENT_LENGTH,
   MAX_POST_BODY_LENGTH,
   MAX_POST_TITLE_LENGTH,
@@ -36,17 +36,19 @@ async function post(userId: string, overrides: Partial<Parameters<typeof createP
 describe("community posts", () => {
   it("creates and lists newest first with author", async () => {
     const older = await post("alice", { title: "먼저", body: "a" });
-    const newer = await post("bob", { title: "나중", body: "b", links: ["https://example.com/x"] });
+    const body = "📝한".repeat(200);
+    const newer = await post("bob", { title: "나중", body, links: ["https://example.com/x"] });
 
-    const list = await listPosts(db);
+    const list = await listPostPreviews(db);
     expect(list.map((p) => p.id)).toEqual([newer, older]);
     expect(list[0]).toMatchObject({
       title: "나중",
       authorName: "밥",
-      links: ["https://example.com/x"],
+      preview: "📝한".repeat(120),
       articleSlug: null,
       linkKit: false,
     });
+    expect(await getPost(db, newer)).toMatchObject({ body, links: ["https://example.com/x"] });
   });
 
   it("stores optional article and kit link when the article has a kit", async () => {
@@ -97,7 +99,7 @@ describe("community posts", () => {
     expect(await deletePost(db, { id, userId: "bob" })).toMatchObject({ ok: false });
     expect(await deletePost(db, { id, userId: "alice" })).toMatchObject({ ok: true });
     expect(await getPost(db, id)).toBeNull();
-    expect(await listPosts(db)).toEqual([]);
+    expect(await listPostPreviews(db)).toEqual([]);
   });
 });
 

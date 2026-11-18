@@ -1,9 +1,8 @@
-import { headers } from "next/headers";
 import Link from "next/link";
 import { connection } from "next/server";
 import { listPostThreads, type CommentView, type Thread } from "@/community/service";
 import { getDb } from "@/db/client";
-import { getSession } from "@/lib/auth";
+import { getRenderSession } from "@/lib/auth";
 import { PostCommentForm } from "./PostCommentForm";
 import { PostDeleteCommentButton, PostReplyBox } from "./PostReplyBox";
 
@@ -16,12 +15,11 @@ const timeFormat = new Intl.DateTimeFormat("ko-KR", {
 /** Request-time data (session, live comments): render inside a Suspense boundary. */
 export async function PostComments({ postId }: { postId: string }) {
   await connection();
-  const requestHeaders = await headers();
-  let session: Awaited<ReturnType<typeof getSession>>;
+  let session: Awaited<ReturnType<typeof getRenderSession>>;
   let threads: Thread[];
   try {
     [session, threads] = await Promise.all([
-      getSession(requestHeaders),
+      getRenderSession(),
       getDb().then((db) => listPostThreads(db, postId)),
     ]);
   } catch (err) {
@@ -94,7 +92,7 @@ function Comment({ c, me }: { c: CommentView; me?: string }) {
     <article className="flex gap-3">
       {c.authorImage ? (
         // eslint-disable-next-line @next/next/no-img-element -- avatar URLs come from arbitrary OAuth hosts
-        <img src={c.authorImage} alt="" className="size-8 shrink-0 rounded-full" />
+        <img src={c.authorImage} alt="" loading="lazy" className="size-8 shrink-0 rounded-full" />
       ) : (
         <span className="grid size-8 shrink-0 place-items-center rounded-full bg-soft text-sm font-semibold">
           {c.authorName.slice(0, 1)}

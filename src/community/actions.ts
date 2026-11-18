@@ -1,6 +1,6 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { refresh, updateTag } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getArticle } from "@/content/loader";
@@ -50,14 +50,15 @@ export async function createCommunityPost(
   });
   if (!result.ok) return { error: result.error };
 
+  updateTag("community-post-list");
   redirect(`/community/${result.id}`);
 }
 
 export async function removeCommunityPost(form: FormData): Promise<void> {
   const session = await getSession(await headers());
   if (!session) return;
-  await deletePost(await getDb(), { id: String(form.get("id") ?? ""), userId: session.user.id });
-  refresh();
+  const result = await deletePost(await getDb(), { id: String(form.get("id") ?? ""), userId: session.user.id });
+  if (result.ok) updateTag("community-post-list");
   redirect("/community");
 }
 
