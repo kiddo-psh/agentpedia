@@ -86,3 +86,14 @@ export function likeSkeletonBlankIssues(source: string): string[] {
   }
   return [];
 }
+
+/** Category list/shell must use Cache Components like ArticleView. */
+export function categoryMissingUseCacheIssues(source: string): string[] {
+  if (!/CategoryShell|CategoryList|CategoryView|CategoryPage/.test(source)) return [];
+  if (!/"use cache"/.test(source)) {
+    return [
+      'Add "use cache" on the category shell/list (same as ArticleView in src/app/a/[slug]/page.tsx).',
+    ];
+  }
+  return [];
+}

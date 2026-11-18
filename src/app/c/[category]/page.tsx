@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, type ReactNode } from "react";
 import { ArticlePagination } from "@/components/ArticleListControls";
 import { CategoryChips, WithIndex } from "@/components/SiteIndex";
 import { paginateArticles, parseListQuery, sortArticles } from "@/content/articleList";
@@ -33,6 +33,24 @@ export default async function CategoryPage({
   const { category } = await params;
   if (!isCategory(category)) notFound();
 
+  return (
+    <CategoryShell
+      category={category}
+      list={
+        <Suspense fallback={<p className="py-10 text-sm text-muted">불러오는 중…</p>}>
+          <CategoryArticles category={category} searchParams={searchParams} />
+        </Suspense>
+      }
+    />
+  );
+}
+
+/**
+ * Cached like ArticleView so category chrome + article index land in the prerendered segment
+ * instead of re-filtering on every soft navigation.
+ */
+async function CategoryShell({ category, list }: { category: Category; list: ReactNode }) {
+  "use cache";
   const articles = listArticles();
   const total = articles.filter((a) => a.category === category).length;
 
@@ -45,9 +63,7 @@ export default async function CategoryPage({
         </div>
         <CategoryChips articles={articles} active={category} />
       </div>
-      <Suspense fallback={<p className="py-10 text-sm text-muted">불러오는 중…</p>}>
-        <CategoryArticles category={category} searchParams={searchParams} />
-      </Suspense>
+      {list}
     </WithIndex>
   );
 }
@@ -60,6 +76,11 @@ async function CategoryArticles({
   searchParams: PageProps<"/c/[category]">["searchParams"];
 }) {
   const { page } = parseListQuery(await searchParams);
+  return <CategoryList category={category} page={page} />;
+}
+
+async function CategoryList({ category, page }: { category: Category; page: number }) {
+  "use cache";
   const shown = sortArticles(
     listArticles().filter((a) => a.category === category),
     "newest",

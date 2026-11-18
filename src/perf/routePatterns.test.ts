@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  categoryMissingUseCacheIssues,
   categoryNavMissingPrefetchIssues,
   likeSessionDbWaterfallIssues,
   likeSkeletonBlankIssues,
@@ -116,5 +117,24 @@ export function LikeButtonSkeleton() {
   it("passes live LikeButtonSkeleton with heart", () => {
     const src = fs.readFileSync(path.join(root, "src/components/likes/LikeButton.tsx"), "utf8");
     expect(likeSkeletonBlankIssues(src)).toEqual([]);
+  });
+});
+
+describe("categoryMissingUseCacheIssues", () => {
+  it("fails when category page has no use cache", () => {
+    const past = `
+async function CategoryView({ category }: { category: string }) {
+  const articles = listArticles();
+  return <WithIndex articles={articles} active={category} />;
+}
+`;
+    expect(categoryMissingUseCacheIssues(past)).toEqual([
+      expect.stringContaining("use cache"),
+    ]);
+  });
+
+  it("passes live category page with use cache", () => {
+    const src = fs.readFileSync(path.join(root, "src/app/c/[category]/page.tsx"), "utf8");
+    expect(categoryMissingUseCacheIssues(src)).toEqual([]);
   });
 });
