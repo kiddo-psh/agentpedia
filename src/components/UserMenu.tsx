@@ -1,44 +1,39 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
+import { headers } from "next/headers";
+import { connection } from "next/server";
+import { Suspense } from "react";
+import { getSession } from "@/lib/auth";
+import { LoginLink } from "./LoginLink";
+import { SignOutButton } from "./SignOutButton";
 
-/** Client-side so the header stays in the static shell. */
+/** Header chrome: SSR session behind Suspense so the layout shell stays prerenderable. */
 export function UserMenu() {
-  const { data, isPending } = authClient.useSession();
-  const pathname = usePathname();
-  const router = useRouter();
+  return (
+    <Suspense fallback={<span className="inline-block h-9 w-16" aria-hidden />}>
+      <UserMenuSession />
+    </Suspense>
+  );
+}
 
-  if (isPending) return <span className="inline-block h-9 w-16" aria-hidden />;
-
-  if (!data) {
-    return (
-      <Link
-        href={`/login?next=${encodeURIComponent(pathname)}`}
-        className="inline-flex h-9 items-center rounded-full bg-foreground px-4 font-medium text-background hover:opacity-85"
-      >
-        로그인
-      </Link>
-    );
+async function UserMenuSession() {
+  await connection();
+  let session: Awaited<ReturnType<typeof getSession>> = null;
+  try {
+    session = await getSession(await headers());
+  } catch (err) {
+    // Auth must not take the page down; fall through to the login link.
+    console.error("[auth] UserMenu session failed", err);
   }
+
+  if (!session) return <LoginLink />;
 
   return (
     <span className="flex items-center gap-4 text-muted">
       <Link href="/likes" className="hover:text-foreground">
         좋아요한 글
       </Link>
-      <span className="text-foreground max-sm:hidden">{data.user.name}</span>
-      <button
-        type="button"
-        className="hover:text-foreground"
-        onClick={async () => {
-          await authClient.signOut();
-          router.refresh();
-        }}
-      >
-        로그아웃
-      </button>
+      <span className="text-foreground max-sm:hidden">{session.user.name}</span>
+      <SignOutButton />
     </span>
   );
 }
