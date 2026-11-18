@@ -38,3 +38,12 @@ export async function listLikedSlugs(db: Db, userId: string): Promise<string[]> 
     .orderBy(desc(likes.createdAt));
   return rows.map((r) => r.slug);
 }
+
+/** Like totals keyed by article slug. Articles with no likes are absent (treat as 0). */
+export async function listArticleLikeCounts(db: Db): Promise<Map<string, number>> {
+  const rows = await db
+    .select({ slug: likes.articleSlug, n: count() })
+    .from(likes)
+    .groupBy(likes.articleSlug);
+  return new Map(rows.map((r) => [r.slug, r.n]));
+}

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import type { Db } from "@/db/client";
 import { likes, user } from "@/db/schema";
 import { createTestDb, insertUser } from "@/db/testing";
-import { getLikeState, listLikedSlugs, setLike } from "./service";
+import { getLikeState, listArticleLikeCounts, listLikedSlugs, setLike } from "./service";
 
 let db: Db;
 
@@ -46,5 +46,16 @@ describe("likes", () => {
     await setLike(db, { userId: "alice", articleSlug: "a", liked: true });
     await db.delete(user).where(eq(user.id, "alice"));
     expect(await getLikeState(db, "a")).toEqual({ count: 0, liked: false });
+  });
+
+  it("aggregates like counts per article for ranking", async () => {
+    await setLike(db, { userId: "alice", articleSlug: "a", liked: true });
+    await setLike(db, { userId: "bob", articleSlug: "a", liked: true });
+    await setLike(db, { userId: "alice", articleSlug: "b", liked: true });
+
+    const counts = await listArticleLikeCounts(db);
+    expect(counts.get("a")).toBe(2);
+    expect(counts.get("b")).toBe(1);
+    expect(counts.has("missing")).toBe(false);
   });
 });
