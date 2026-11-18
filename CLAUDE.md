@@ -20,3 +20,17 @@ chore: bump @types/node to 24 for vitest compatibility
 feat(content): add article schema and validator with quote checks
 content: add karpathy software 3.0 draft article
 ```
+
+# Agent rules (Correct)
+
+Each rule pairs with what fails when an agent breaks it. Prefer architecture/types/tests over prose; drop a row once the mistake cannot happen.
+
+| Rule | Enforced by |
+|---|---|
+| Await `params` outside Suspense before primary chrome (WithIndex / article body); only searchParams/request-time holes belong behind the boundary | `paramsChromeBehindSuspenseIssues` in `src/perf/routePatterns.ts` (vitest); copy `src/app/a/[slug]/page.tsx` / `src/app/c/[category]/page.tsx` |
+| Category/index nav Links must full-prefetch under `partialPrefetching` | `CategoryNavLink` (`prefetch={true}`); `categoryNavMissingPrefetchIssues` fails if `SiteIndex` imports `next/link` or omits prefetch on category hrefs |
+| Request-time likes: overlap `getSession` with `getDb` via `Promise.all`; Suspense fallback shows heart + count placeholder, not a blank circle | `likeSessionDbWaterfallIssues` / `likeSkeletonBlankIssues`; copy `Comments.tsx` + `LikeButton.tsx` |
+| Prerenderable category shell/list uses `"use cache"` like `ArticleView` | `categoryMissingUseCacheIssues` on `src/app/c/[category]/page.tsx` |
+| Below-fold article sections use `content-visibility: auto` (with intrinsic size for anchors) | `articleMissingContentVisibilityIssues` on `src/app/globals.css` |
+| Conventional Commits + lint/test green per commit | `commit-msg` / `pre-commit` hooks |
+| Kit prompts match article claims and safety gates | `checkKitFidelity` via content load / `src/content/kitFidelity.test.ts` |
