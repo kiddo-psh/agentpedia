@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { DeferredContentFont } from "@/components/DeferredContentFont";
 import { DeferredMonoFont } from "@/components/DeferredMonoFont";
 import { LogoLink } from "@/components/LogoLink";
 import { UserMenu } from "@/components/UserMenu";
+import logo from "@/assets/logo.png";
 // Critical Pretendard only on first paint; content face via DeferredContentFont.
 // Regenerate both CSS files: npm run fonts:subset
 import "./pretendard-subset.css";
@@ -17,6 +19,15 @@ export const metadata: Metadata = {
   description: "AI 에이전트 시대의 인사이트를 읽고, 내 프로젝트에 바로 적용해 보세요.",
 };
 
+const brandClass = "flex items-center gap-2 text-[17px] font-semibold tracking-tight";
+// Black disc vanishes on the dark background, so invert it there.
+const brand = (
+  <>
+    <Image src={logo} alt="" width={28} height={28} preload className="dark:invert" />
+    Agentpedia
+  </>
+);
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className="h-full antialiased">
@@ -28,10 +39,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             {/* usePathname suspends on fallback dynamic params (e.g. /community/[id]). */}
             <Suspense
               fallback={
-                <span className="text-[17px] font-semibold tracking-tight">Agentpedia</span>
+                <span className={brandClass}>
+                  {brand}
+                </span>
               }
             >
-              <LogoLink className="text-[17px] font-semibold tracking-tight">Agentpedia</LogoLink>
+              <LogoLink className={brandClass}>{brand}</LogoLink>
             </Suspense>
             <nav className="flex gap-6 text-sm text-muted">
               <Link href="/" className="max-sm:hidden hover:text-foreground">
