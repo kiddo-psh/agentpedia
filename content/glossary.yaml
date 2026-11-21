@@ -471,3 +471,23 @@
   term: 프롬프트 캐싱
   en: prompt caching
   definition: 요청의 앞부분이 이전 턴과 같으면 모델 제공자가 그 접두를 다시 계산하지 않고 재사용하는 기법입니다.
+
+- id: copilot-connector
+  term: Copilot 커넥터
+  en: Copilot connector
+  definition: GitHub가 검증·호스팅하는 원격 MCP 서버입니다. 한 번 연결하면 여러 Copilot 화면에서 같은 서비스 도구를 씁니다.
+
+- id: mcp-allowlist
+  term: MCP 허용 목록
+  en: MCP allowlist
+  definition: 엔터프라이즈 managed-settings에서 허용할 MCP 서버·커넥터 URL·명령을 정해 둔 목록입니다. 목록 밖은 막힙니다.
+
+- id: cloud-sandbox
+  term: 클라우드 샌드박스
+  en: cloud sandbox
+  definition: GitHub가 호스팅하는 격리된 Linux 환경입니다. Copilot 클라우드 세션이 로컬 머신 대신 여기서 명령을 실행합니다.
+
+- id: sso
+  term: SSO
+  en: single sign-on
+  definition: 조직 계정으로 한 번 인증하면 연결된 서비스에 같은 신원으로 들어가는 방식입니다.

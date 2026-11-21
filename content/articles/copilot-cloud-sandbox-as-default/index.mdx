@@ -1,0 +1,96 @@
+---
+slug: copilot-cloud-sandbox-as-default
+title: "GitHub가 Copilot 세션 기본 실행 장소를 클라우드 샌드박스로 옮긴 이유"
+summary: "2026년 10월 28일 GitHub는 연결된 Copilot 클라우드 경험을 정식 출시했습니다. 기본으로 세션이 GitHub가 호스팅하는 격리된 클라우드 샌드박스에서 돌고, 여러 화면에서 이어갈 수 있습니다."
+category: trends
+people: []
+tags: ["github", "copilot", "cloud-sandbox", "agents", "enterprise", "sso"]
+difficulty: practical
+brief:
+  what: "2026년 10월 28일 GitHub는 연결된 Copilot 클라우드 경험을 정식 출시했습니다. 기본으로 세션이 격리된 클라우드 샌드박스에서 돌고, github.com·Mobile·앱·CLI·VS Code 등에서 이어갑니다."
+  why: "에이전트 실행이 개발자 노트북의 연장이라는 전제가 약해집니다. 어디서 돌릴지, SSO·허용 목록·도구 승인·레포 제외를 어떻게 둘지가 팀 정책이 됩니다."
+  action: "키트로 로컬 전용 작업과 클라우드로 넘길 작업을 나누고, 클라우드 쪽 정책 점검 표를 만듭니다."
+apply:
+  goal: "로컬에서만 돌릴 작업과 클라우드 샌드박스로 넘길 작업을 나누고, SSO·MCP 허용 목록·도구 승인·레포 제외 정책을 보고서로 남깁니다."
+  changes:
+    - "`docs/copilot-cloud-policy.md`에 정책 점검 보고서 추가 (작업 분류표, SSO·MCP·승인·레포 제외 현황과 권고)"
+    - "승인한 경우 레포 README 또는 `docs/`에 팀이 합의한 '로컬 전용 / 클라우드 기본' 한 줄 안내만 추가 (없으면 보고서에만 싣고 파일을 새로 만들지 않음)"
+  doesNotDo:
+    - "조직·엔터프라이즈 Copilot 정책 UI나 `managed-settings.json`을 직접 바꾸지 않습니다. 권고와 확인 절차만 적습니다."
+    - "클라우드 세션을 대신 시작하거나, Actions runner·self-hosted 환경을 등록·삭제하지 않습니다."
+    - "API 키·토큰 값을 읽거나 출력하지 않습니다. MCP 커넥터 인벤토리·침해 흔적 점검은 다른 키트 범위입니다."
+  fitsWhen: "GitHub Copilot 유료 플랜을 쓰거나 도입을 검토하는 팀, 또는 레포에 Copilot·에이전트 관련 설정·문서가 있는 프로젝트"
+  time: "20~40분"
+tryIt: "이 레포에서 Copilot·에이전트·샌드박스·MCP와 관련된 문서·설정 파일 이름만 찾아 줘. `.env`와 키 파일은 열지 마. 로컬에서만 돌려야 할 것 같은 작업(사설 네트워크, 로컬 DB, 특수 하드웨어 등)과 클라우드로 넘겨도 될 것 같은 작업을 각각 최대 5개씩 적어 줘. 분류할 단서가 거의 없으면 '지금은 불필요', 단서가 있으면 '키트를 돌릴 만하다'라고 한 줄로 적어 줘. 외부에 접속하지 말고, 아무 파일도 바꾸지 마."
+draft: true
+publishedAt: 2026-11-21
+keyIdeas:
+  - "2026년 10월 28일 GitHub는 연결된 Copilot 클라우드 경험과 클라우드 샌드박스를 유료 플랜에 정식 출시했습니다."
+  - "기본으로 세션은 GitHub가 호스팅하는 격리된 클라우드 샌드박스에서 돌고, 스냅샷으로 나중에 이어갈 수 있습니다."
+  - "클라우드 샌드박스 과금은 2026년 11월 23일부터 시작하며, 포함 Actions 컴퓨트 entitlement를 공유합니다."
+  - "접근은 Copilot in the cloud 정책이 잡고, 조직 SSO·MCP 허용 목록·도구 승인·레포 제외가 그대로 적용됩니다."
+  - "로컬 샌드박싱과 클라우드 샌드박스는 다른 기술입니다. 모든 작업을 클라우드로 옮기라는 뜻이 아닙니다."
+sources:
+  - id: gh-changelog-cloud
+    title: "Work from anywhere with a new, connected Copilot cloud experience"
+    url: https://github.blog/changelog/2026-10-28-work-from-anywhere-with-a-new-connected-copilot-cloud-experience/
+    author: GitHub Changelog
+    kind: blog
+    publishedAt: 2026-10-28
+    dateNote: "2026-11-19 편집판에서 과금 시작일을 11월 23일로 명시했습니다."
+  - id: gh-docs-cloud-sandboxes
+    title: "About cloud sandboxes for GitHub Copilot"
+    url: https://docs.github.com/en/copilot/concepts/security-governance-and-network-settings/about-cloud-sandboxes
+    author: GitHub
+    kind: blog
+    accessedAt: 2026-11-21
+    dateNote: "날짜 없는 공식 문서입니다. 2026-11-21에 열람했습니다."
+  - id: gh-docs-manage-cloud
+    title: "Managing GitHub Copilot in the cloud for your enterprise or organization"
+    url: https://docs.github.com/en/copilot/how-tos/administer-copilot/manage-for-enterprise/manage-agents/manage-copilot-in-the-cloud
+    author: GitHub
+    kind: blog
+    accessedAt: 2026-11-21
+    dateNote: "날짜 없는 공식 문서입니다. 2026-11-21에 열람했습니다."
+---
+
+2026년 10월 28일 GitHub Changelog는 연결된 Copilot 클라우드 경험을 유료 플랜에 정식 출시한다고 알렸습니다. 세션을 github.com, GitHub Mobile, Copilot CLI, Copilot 앱, VS Code, Slack·Microsoft Teams에서 시작하고, 다음 화면에서 이어갈 수 있습니다. 그리고 **기본으로** 그 세션은 개발자 노트북이 아니라 GitHub가 호스팅하는 <Term id="cloud-sandbox">클라우드 샌드박스</Term>에서 돕니다.
+
+## IDE 에이전트가 로컬 머신의 연장이라는 전제가 약해진다
+
+많은 개발자는 코딩 에이전트를 로컬 환경의 연장으로 씁니다. 파일과 테스트와 사설 네트워크가 노트북에 있고, 에이전트도 그 위에서 명령을 실행합니다. GitHub의 이번 발표는 그 기본값을 바꿉니다. Changelog는 모든 세션이 기본적으로 안전한 클라우드 샌드박스에서 돌며, 빠르게 시작되고 멈춘 곳에서 이어간다고 적었습니다.
+
+<Quote source="gh-changelog-cloud">
+By default, every session runs in a secure cloud sandbox that starts fast and resumes right where you left off.
+</Quote>
+
+2026년 11월 21일 공식 문서도 클라우드 샌드박스를 GitHub가 만드는 격리된 Linux 환경으로 설명합니다. 세션이 내 컴퓨터에서 돌지 않으므로, 샌드박스 안의 명령은 내 컴퓨터 파일을 읽거나 바꾸지 않습니다. 여러 세션을 병렬로 돌려도 로컬 자원을 쓰지 않습니다.
+
+## 클라우드 샌드박스와 로컬 샌드박싱은 다른 기술이다
+
+공식 문서는 둘을 섞지 말라고 분명히 적습니다. 클라우드 샌드박스는 **세션 전체를** GitHub 인프라로 옮깁니다. 로컬 샌드박싱은 세션을 내 머신에 둔 채, 에이전트가 닿을 수 있는 자원만 줄입니다. 설정·정책·명령도 서로 통하지 않습니다.
+
+<Compare
+  before="에이전트는 내 노트북의 파일·네트워크·도구를 그대로 씁니다. 실행 장소와 개발 환경이 같습니다."
+  after="에이전트는 GitHub가 호스팅한 격리 환경에서 레포를 클론해 명령을 실행합니다. 세션은 여러 화면에서 이어지고, 로컬 파일은 기본적으로 건드리지 않습니다."
+/>
+
+Copilot CLI는 기본적으로 로컬에서 돌고, `copilot --cloud`으로 클라우드 세션을 시작할 수 있습니다(2026년 11월 21일 문서 기준). Actions 기반 환경(`copilot-setup-steps.yml`, self-hosted runner, Windows 등)이 필요하면 Cloud가 아니라 Actions를 고릅니다. 환경은 세션 시작 때 정하고 도중에 바꿀 수 없습니다.
+
+<KeyIdea title="기본 실행 장소가 정책이 된다">
+GitHub는 클라우드 세션의 기본 실행 장소를 노트북이 아니라 이어갈 수 있는 격리 샌드박스로 두었습니다. 이제 팀은 어떤 작업을 로컬에 남기고 무엇을 클라우드로 넘길지, 그리고 클라우드 쪽에 어떤 통제를 켤지를 정해야 합니다.
+</KeyIdea>
+
+## 과금·권한·SSO가 같은 날의 이야기이다
+
+Changelog(2026년 11월 19일 갱신)에 따르면 클라우드 샌드박스 과금은 2026년 11월 23일부터 시작됩니다. 포함 Actions 컴퓨트 entitlement가 표준 호스티드 러너·클라우드 샌드박스·(Team·Enterprise Cloud의) 더 큰 호스티드 러너를 하나의 달러 기준 풀로 나눕니다. Free 사용자는 github.com·Mobile의 Copilot Chat을 쓰되, 이번 클라우드 경험은 유료 플랜 업그레이드가 필요합니다.
+
+접근은 Copilot 설정의 **Copilot in the cloud** 정책이 잡습니다. 예전에 클라우드 에이전트에서 레포를 제외해 두었다면 그 제외가 새 경험으로 넘어갑니다. 엔터프라이즈 managed settings의 에이전트 권한·MCP 허용 목록도 클라우드 경험에 적용됩니다. 채팅 세션은 기본적으로 한 조직 또는 개인 레포 범위이고, 조직 레포 세션 데이터에 접근하려면 <Term id="sso">SSO</Term> 인증이 필요합니다. 쓰기 권한이 없는 레포에서는 자동으로 읽기 전용입니다. 도구 호출은 승인이 필요한 경우 먼저 묻습니다.
+
+커넥터와 MCP도 클라우드 세션에서 쓸 수 있습니다. Customize에서 한 번 연결하면 클라우드 세션에도 이어집니다. 키 기반 커스텀 MCP도 설정할 수 있습니다. 다만 무엇을 허용할지는 조직 허용 목록과 방화벽 규칙이 함께 정합니다. 네트워크 허용 목록을 바꾼 뒤에는 **새 세션**을 시작해야 반영됩니다.
+
+## 모든 작업을 클라우드로 옮기라는 뜻은 아니다
+
+사설 VPC에만 있는 데이터베이스, 로컬 GPU, 아직 클라우드 방화벽에 없는 내부 호스트, Actions 전용 설정이 필요한 빌드는 로컬이나 Actions 쪽에 남는 편이 맞을 수 있습니다. Changelog도 Actions 기반 self-hosted runner나 `copilot-setup-steps.yml`을 쓰면 세션 환경으로 Actions를 써야 한다고 적습니다. self-hosted 환경을 등록해 클라이언트의 환경으로 쓰는 길도 있습니다.
+
+팀에 필요한 것은 기본값이 바뀌었다는 사실을 인정한 뒤, 로컬 전용과 클라우드 기본을 나누고, 클라우드 쪽에 SSO·MCP 허용 목록·도구 승인·레포 제외가 켜져 있는지 확인하는 일입니다. 정책 이름과 과금 단위는 바뀔 수 있으니, 적용 전에는 현재 공식 문서를 다시 보는 편이 안전합니다.
