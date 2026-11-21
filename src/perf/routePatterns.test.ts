@@ -49,6 +49,11 @@ export default function CategoryPage({ params }: PageProps<"/c/[category]">) {
     const src = fs.readFileSync(path.join(root, "src/app/c/[category]/page.tsx"), "utf8");
     expect(paramsChromeBehindSuspenseIssues(src)).toEqual([]);
   });
+
+  it("passes the agent page (params awaited before chrome)", () => {
+    const src = fs.readFileSync(path.join(root, "src/app/agents/[slug]/page.tsx"), "utf8");
+    expect(paramsChromeBehindSuspenseIssues(src)).toEqual([]);
+  });
 });
 
 describe("articleNavMissingPrefetchIssues", () => {

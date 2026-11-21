@@ -46,6 +46,12 @@ export function WithIndex({
         </ul>
         <p className="mt-8 mb-2 text-xs font-medium text-muted">시작하기</p>
         <CategoryNavLink
+          href="/agents"
+          className="-mx-2.5 block rounded-lg px-2.5 py-1.5 text-muted hover:text-foreground"
+        >
+          에이전트
+        </CategoryNavLink>
+        <CategoryNavLink
           href="/community"
           className="-mx-2.5 block rounded-lg px-2.5 py-1.5 text-muted hover:text-foreground"
         >
