@@ -1,0 +1,28 @@
+slug: gpt-6-2-astra
+name: GPT-6.2 Astra
+vendor: OpenAI
+openRouterId: openai/gpt-6.2-astra
+relatedAgents: [codex]
+inputUsdPerMTok:
+  value: 8
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+outputUsdPerMTok:
+  value: 40
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+benchmarks:
+  - bench: Terminal-Bench
+    version: "4.1"
+    model: GPT-6.2 Astra (max)
+    agentHarness: Codex
+    scoreKind: harness
+    score: 62.1
+    margin: 2.3
+    unit: "%"
+    cost: $1.4k
+    costUsd: 1400
+    tokensBillions: 1.1
+    note: "리더보드 RELEASE DATE 열은 2026-11-17입니다."
+    url: https://www.tbench.ai/leaderboard
+    asOf: 2026-11-21

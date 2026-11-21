@@ -1,0 +1,28 @@
+slug: gemini-4-carbon
+name: Gemini 4 Carbon
+vendor: Google
+openRouterId: google/gemini-4-carbon
+relatedAgents: []
+inputUsdPerMTok:
+  value: 2
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+outputUsdPerMTok:
+  value: 10
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+benchmarks:
+  - bench: Terminal-Bench
+    version: "4.1"
+    model: Gemini 4 Carbon (high)
+    agentHarness: Antigravity CLI
+    scoreKind: harness
+    score: 64.5
+    margin: 3.2
+    unit: "%"
+    cost: $1.4k
+    costUsd: 1400
+    tokensBillions: 3.8
+    note: "리더보드 RELEASE DATE 열은 2026-10-28입니다."
+    url: https://www.tbench.ai/leaderboard
+    asOf: 2026-11-21

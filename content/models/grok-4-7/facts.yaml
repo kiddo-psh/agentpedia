@@ -1,0 +1,28 @@
+slug: grok-4-7
+name: Grok 4.7
+vendor: xAI
+openRouterId: x-ai/grok-4.7
+relatedAgents: []
+inputUsdPerMTok:
+  value: 2
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+outputUsdPerMTok:
+  value: 6
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+benchmarks:
+  - bench: Terminal-Bench
+    version: "4.1"
+    model: Grok 4.7 (xhigh)
+    agentHarness: Grok Build
+    scoreKind: harness
+    score: 38.8
+    margin: 3.6
+    unit: "%"
+    cost: $3.7k
+    costUsd: 3700
+    tokensBillions: 5.5
+    note: "리더보드 RELEASE DATE 열은 2026-09-21입니다."
+    url: https://www.tbench.ai/leaderboard
+    asOf: 2026-11-21

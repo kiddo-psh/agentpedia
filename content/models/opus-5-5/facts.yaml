@@ -1,0 +1,28 @@
+slug: opus-5-5
+name: Claude Opus 5.5
+vendor: Anthropic
+openRouterId: anthropic/claude-opus-5.5
+relatedAgents: [claude-code]
+inputUsdPerMTok:
+  value: 4
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+outputUsdPerMTok:
+  value: 20
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+benchmarks:
+  - bench: Terminal-Bench
+    version: "4.1"
+    model: Opus 5.5 (max)
+    agentHarness: Claude Code
+    scoreKind: harness
+    score: 65.8
+    margin: 3.1
+    unit: "%"
+    cost: $4.7k
+    costUsd: 4700
+    tokensBillions: 8
+    note: "리더보드 RELEASE DATE 열은 2026-09-22입니다."
+    url: https://www.tbench.ai/leaderboard
+    asOf: 2026-11-21
