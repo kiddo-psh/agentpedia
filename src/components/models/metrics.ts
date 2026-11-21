@@ -12,7 +12,7 @@ export type MetricDef = {
   unit: string;
   /** One-line explanation under the tabs. */
   blurb: string;
-  /** Higher rank when value is larger (해결률) vs smaller (비용·시간). */
+  /** Sort high→low and fill bars by magnitude when true; low→high (fast/cheap-as-good) when false. */
   higherIsBetter: boolean;
 };
 
@@ -28,8 +28,8 @@ export const METRICS: readonly MetricDef[] = [
     id: "runCost",
     label: "런 비용",
     unit: "Terminal-Bench 4.1 · USD",
-    blurb: "리더보드가 찍은 전체 런 비용입니다. 확인하지 못한 칸은 비워 둡니다.",
-    higherIsBetter: false,
+    blurb: "리더보드가 찍은 전체 런 비용입니다. 값이 클수록 위·바가 깁니다. 확인하지 못한 칸은 비워 둡니다.",
+    higherIsBetter: true,
   },
   {
     id: "tokens",
@@ -42,15 +42,15 @@ export const METRICS: readonly MetricDef[] = [
     id: "inputPrice",
     label: "입력 $/1M",
     unit: "OpenRouter · USD / 1M tokens",
-    blurb: "백만 입력 토큰당 목록 가격입니다. 캐시·할인은 반영하지 않았습니다.",
-    higherIsBetter: false,
+    blurb: "백만 입력 토큰당 목록 가격입니다. 비싼 순입니다. 캐시·할인은 반영하지 않았습니다.",
+    higherIsBetter: true,
   },
   {
     id: "outputPrice",
     label: "출력 $/1M",
     unit: "OpenRouter · USD / 1M tokens",
-    blurb: "백만 출력 토큰당 목록 가격입니다. 캐시·할인은 반영하지 않았습니다.",
-    higherIsBetter: false,
+    blurb: "백만 출력 토큰당 목록 가격입니다. 비싼 순입니다. 캐시·할인은 반영하지 않았습니다.",
+    higherIsBetter: true,
   },
   {
     id: "taskTime",
@@ -116,7 +116,8 @@ function withBars(rows: LeaderboardRowData[], higherIsBetter: boolean): Leaderbo
   const span = Math.max(max - min, Number.EPSILON);
   return rows.map((row) => {
     if (row.value === null) return { ...row, bar: null };
-    // Score: longer bar for higher. Cost/time: longer bar for lower relative to peers.
+    // Magnitude metrics (score, prices): longer bar for higher.
+    // Inverted metrics (tokens, task time): longer bar for lower relative to peers.
     if (higherIsBetter) return { ...row, bar: Math.max(0.06, row.value / max) };
     if (max === min) return { ...row, bar: 1 };
     return { ...row, bar: Math.max(0.06, (max - row.value) / span) };
