@@ -3,8 +3,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cacheLife } from "next/cache";
+import { Suspense, type ReactNode } from "react";
 import * as runtime from "react/jsx-runtime";
 import remarkGfm from "remark-gfm";
+import { Comments } from "@/components/comments/Comments";
+import { AgentReviews } from "@/components/reviews/Reviews";
 import { SourceAge } from "@/components/SourceAge";
 import { FORM_LABEL, getAgent, listAgents } from "@/content/agents";
 import { formatDate } from "@/content/labels";
@@ -34,10 +37,32 @@ export default async function AgentPage({ params }: PageProps<"/agents/[slug]">)
   const { slug } = await params;
   const agent = getAgent(slug);
   if (!agent) notFound();
-  return <AgentView slug={slug} />;
+  return (
+    <AgentView
+      slug={slug}
+      reviews={
+        <Suspense fallback={<p className="mt-4 text-sm text-muted">리뷰를 불러오는 중…</p>}>
+          <AgentReviews slug={slug} />
+        </Suspense>
+      }
+      comments={
+        <Suspense fallback={<p className="text-sm text-muted">토론을 불러오는 중…</p>}>
+          <Comments slug={`agent:${slug}`} returnPath={`/agents/${slug}#comments`} />
+        </Suspense>
+      }
+    />
+  );
 }
 
-async function AgentView({ slug }: { slug: string }) {
+async function AgentView({
+  slug,
+  reviews,
+  comments,
+}: {
+  slug: string;
+  reviews: ReactNode;
+  comments: ReactNode;
+}) {
   "use cache";
   cacheLife("days");
   const agent = getAgent(slug)!;
@@ -112,6 +137,17 @@ async function AgentView({ slug }: { slug: string }) {
       <div className="prose-article mt-16">
         <Content />
       </div>
+
+      <section id="reviews" className="mt-16 scroll-mt-24" aria-labelledby="reviews-title">
+        <h2 id="reviews-title" className="text-[22px] font-semibold tracking-tight">
+          리뷰
+        </h2>
+        {reviews}
+      </section>
+
+      <section id="comments" className="mt-16 scroll-mt-24" aria-labelledby="comments-title">
+        {comments}
+      </section>
     </article>
   );
 }
