@@ -10,7 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # Product
 
-Agentpedia is a sourced reference for coding agents and models, plus articles. Read `docs/architecture.md` before treating the repo as an article-and-kit site. Numeric facts on agent and model pages need `value`, `sourceUrl`, and `asOf` (`SourcedValue` in `src/content/schema.ts`). Do not invent numbers. Article rules stay in `docs/writing-guide.md`.
+Agentpedia is a sourced reference for coding agents and models, plus articles. Read `docs/architecture.md` before treating the repo as an article-and-kit site. Numeric facts on agent and model pages need `value`, `sourceUrl`, and `asOf` (`SourcedValue` in `src/content/schema.ts`). Do not invent numbers. Article rules stay in `docs/writing-guide.md`. Korean sentences follow the 23 rules in that guide (section 11). `npm run validate:content` prints warnings for the grep-able rules and does not fail the build on them.
 
 # Commits
 
