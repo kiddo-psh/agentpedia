@@ -19,4 +19,13 @@ describe("buildLeaderboard", () => {
     expect(timed[0]!.value!).toBeLessThanOrEqual(timed[1]!.value!);
     expect(timed.some((row) => row.name === "Claude Opus 5" && row.href === "/models/opus-5")).toBe(true);
   });
+
+  it("ranks prices high-to-low with bars matching magnitude", () => {
+    const { boards } = buildLeaderboard(listModels(), loadTaskTiming());
+    for (const key of ["inputPrice", "outputPrice", "runCost"] as const) {
+      const priced = boards[key].rows.filter((row) => row.value !== null);
+      expect(priced[0]!.value!).toBeGreaterThanOrEqual(priced[1]!.value!);
+      expect(priced[0]!.bar!).toBeGreaterThanOrEqual(priced.at(-1)!.bar!);
+    }
+  });
 });
