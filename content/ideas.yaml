@@ -9,37 +9,6 @@
 
 # 2026-11-16 ChatGPT deep research, window 2026-09-15 ~ 2026-11-16
 
-- slug: codex-maintenance-evidence-before-deletion
-  topic: "OpenAI 엔지니어는 Codex에게 '코드를 지워라'가 아니라 사용 흔적을 모아 삭제의 증거부터 만들게 한다"
-  category: people
-  people:
-    - "Rodrigo Roim (OpenAI Core Experimentation 엔지니어, 글 저자)"
-  sources:
-    - https://developers.openai.com/blog/maintaining-software-with-the-gpt-6-family
-  publishedAt: 2026-10-14
-  sourceKind: blog
-  tension: "dead code 정리는 정적 분석 규칙을 정교하게 만드는 문제라는 통념과 달리, OpenAI는 에이전트가 PR·Slack·feature flag·production profiling까지 뒤져 삭제 근거를 만들도록 하고 사람이 작은 변경부터 검증했다."
-  kitIdea: "자기 레포에서 unused code·stale flag·flaky test 중 하나만 골라 에이전트가 '근거 수집→작은 draft PR→사람 검토' 순서로 수행하게 하고 모델·effort별 비용과 accepted finding 수를 비교한다."
-  primaryVerified: true
-  confidence: high
-  status: idea
-  note: "원문에 AGENTS.md 검증 예시가 나오지만 do-context-files-help와 겹치지 않게 maintenance workflow에 집중한다."
-
-- slug: anthropic-source-control-agent-scale
-  topic: "Anthropic에서는 코딩 속도가 빨라지자 Git 자체가 병목이 되어 5개월 만에 사내 VCS를 만들었다"
-  category: trends
-  people:
-    - "Anthropic Engineering (Scion 및 사내 소스컨트롤 시스템 구축 팀)"
-  sources:
-    - https://www.anthropic.com/research/redesigning-source-control
-  publishedAt: 2026-10-13
-  sourceKind: blog
-  tension: "코딩 에이전트 도입의 다음 병목도 모델 품질일 것이라는 예상과 달리, Anthropic에서는 코드 생산량이 급증하면서 source control·build·CI 같은 인간 규모용 인프라가 먼저 한계에 닿았다."
-  kitIdea: "에이전트 수를 더 늘리기 전에 레포별 PR 도착률, merge 대기시간, CI queue time, 대형 변경의 landing 실패율을 계측해 '코드 생성 이후' 병목을 대시보드로 만든다."
-  primaryVerified: true
-  confidence: high
-  status: idea
-
 - slug: cursor-agents-as-versioned-code
   topic: "Cursor는 반복 업무용 에이전트를 대화 프롬프트가 아니라 버전 관리되는 소프트웨어 프로젝트로 만들기 시작했다"
   category: startup
