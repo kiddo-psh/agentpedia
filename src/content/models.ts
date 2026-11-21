@@ -6,7 +6,6 @@ import remarkParse from "remark-parse";
 import remarkMdx from "remark-mdx";
 import { visit } from "unist-util-visit";
 import type { Root } from "mdast";
-import { z } from "zod";
 import { ContentError } from "./loader";
 import { ModelFacts, type Model, type ModelFacts as ModelFactsType } from "./schema";
 import { ageDays, STALE_AFTER_DAYS } from "./agents";
@@ -118,35 +117,4 @@ export function staleModelWarnings(models: Model[], now: Date): string[] {
   return models.flatMap((model) =>
     staleModelFactIssues(model, now).map((issue) => `${model.slug}: ${issue}`),
   );
-}
-
-/** Sourced Vals SWE-bench Verified rows for the duration / cost-per-task chart. */
-export const TaskTimingRow = z.object({
-  model: z.string().min(1),
-  vendor: z.string().min(1),
-  score: z.number(),
-  costUsd: z.number().nonnegative(),
-  durationSec: z.number().nonnegative(),
-  tokensPerTest: z.string().min(1),
-  url: z.url(),
-  asOf: z.coerce.date(),
-  note: z.string().min(1).optional(),
-});
-export type TaskTimingRow = z.infer<typeof TaskTimingRow>;
-
-const TaskTimingFile = z.object({ rows: z.array(TaskTimingRow) });
-
-export function loadTaskTiming(): TaskTimingRow[] {
-  const file = path.join(process.cwd(), "content", "models", "_task-timing.yaml");
-  if (!fs.existsSync(file)) return [];
-  const parsed = TaskTimingFile.safeParse(parseYaml(fs.readFileSync(file, "utf8")));
-  if (!parsed.success) {
-    throw new ContentError([
-      {
-        dir: "models/_task-timing.yaml",
-        issues: parsed.error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`),
-      },
-    ]);
-  }
-  return parsed.data.rows;
 }

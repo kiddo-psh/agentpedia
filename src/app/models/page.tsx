@@ -1,21 +1,15 @@
 import type { Metadata } from "next";
 import { cacheLife } from "next/cache";
 import { ModelsTable } from "@/components/models/ModelsTable";
-import { OtherBenchmarks } from "@/components/models/OtherBenchmarks";
 import { ScoreCostScatter } from "@/components/models/ScoreCostScatter";
 import { WhichModelCards } from "@/components/models/WhichModelCards";
-import {
-  buildModelsTable,
-  buildScatterPoints,
-  buildTimingRows,
-  pickWhichModels,
-} from "@/components/models/metrics";
-import { listModels, loadTaskTiming, rankModelsByTerminalBench } from "@/content/models";
+import { buildModelsTable, buildScatterPoints, pickWhichModels } from "@/components/models/metrics";
+import { listModels, rankModelsByTerminalBench } from "@/content/models";
 import "./models.css";
 
 export const metadata: Metadata = {
   title: "모델 비교",
-  description: "코딩 에이전트에 쓰는 모델의 벤치마크, 토큰 단가, 작업당 시간을 출처와 함께 비교합니다.",
+  description: "코딩 에이전트에 쓰는 모델의 Terminal-Bench 벤치마크와 토큰 단가를 출처와 함께 비교합니다.",
 };
 
 export default async function ModelsPage() {
@@ -26,14 +20,8 @@ async function ModelsIndex() {
   "use cache";
   cacheLife("days");
   const models = rankModelsByTerminalBench(listModels());
-  const timing = loadTaskTiming();
   const table = buildModelsTable(models);
   const scatter = buildScatterPoints(table.rows);
-  const timingRows = buildTimingRows(models, timing);
-  const timingAsOf =
-    timing.length > 0
-      ? new Date(Math.max(...timing.map((row) => row.asOf.getTime()))).toISOString()
-      : null;
   const picks = pickWhichModels(scatter);
 
   return (
@@ -68,12 +56,6 @@ async function ModelsIndex() {
           <ModelsTable payload={table} />
         </div>
       </section>
-
-      <OtherBenchmarks
-        rows={timingRows}
-        asOfIso={timingAsOf}
-        sourceUrl={timing[0]?.url ?? "https://www.vals.ai/benchmarks/swebench"}
-      />
     </div>
   );
 }

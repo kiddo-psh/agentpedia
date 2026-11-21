@@ -1,9 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { listModels, loadTaskTiming } from "@/content/models";
+import { listModels } from "@/content/models";
 import {
   buildModelsTable,
   buildScatterPoints,
-  buildTimingRows,
   competitionRanks,
   compareRows,
   paretoFrontier,
@@ -90,7 +89,7 @@ describe("buildModelsTable", () => {
   });
 });
 
-describe("scatter and timing", () => {
+describe("scatter", () => {
   it("builds scatter points and which-model picks from sourced rows only", () => {
     const table = buildModelsTable(listModels());
     const points = buildScatterPoints(table.rows);
@@ -98,11 +97,5 @@ describe("scatter and timing", () => {
     const picks = pickWhichModels(points);
     expect(picks.map((p) => p.kind)).toEqual(["performance", "value", "cheap"]);
     expect(picks[0]!.slug).toBe("copilot-fusion");
-  });
-
-  it("links Vals timing rows only on exact model name match", () => {
-    const timing = buildTimingRows(listModels(), loadTaskTiming());
-    expect(timing.some((row) => row.name === "Claude Opus 5" && row.href === "/models/opus-5")).toBe(true);
-    expect(timing.some((row) => row.name === "Grok 4.5" && row.href === null)).toBe(true);
   });
 });

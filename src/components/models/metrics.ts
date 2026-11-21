@@ -1,6 +1,5 @@
-import type { TaskTimingRow } from "@/content/models";
 import type { Model } from "@/content/schema";
-import { EMPTY, formatDuration, formatPercent, formatTokensBillions, formatUsd } from "./format";
+import { EMPTY, formatPercent, formatTokensBillions, formatUsd } from "./format";
 
 const TB = "Terminal-Bench";
 const TB_VERSION = "4.1";
@@ -56,18 +55,6 @@ export type ModelsTablePayload = {
   harnesses: string[];
   terminalBench: SourceMeta;
   openRouter: SourceMeta;
-};
-
-export type TimingViewRow = {
-  id: string;
-  name: string;
-  vendor: string;
-  href: string | null;
-  durationSec: number;
-  durationDisplay: string;
-  score: number;
-  costUsd: number;
-  costDisplay: string;
 };
 
 export type ScatterPoint = {
@@ -264,26 +251,6 @@ export function buildScatterPoints(rows: ReadonlyArray<ModelTableRow>): ScatterP
       margin: row.margin,
       effort: row.effort,
     }));
-}
-
-export function buildTimingRows(models: Model[], timing: TaskTimingRow[]): TimingViewRow[] {
-  const byName = new Map(models.map((m) => [m.name, m.slug]));
-  return [...timing]
-    .sort((a, b) => a.durationSec - b.durationSec)
-    .map((row) => {
-      const slug = byName.get(row.model);
-      return {
-        id: slug ?? `timing:${row.model}`,
-        name: row.model,
-        vendor: row.vendor,
-        href: slug ? `/models/${slug}` : null,
-        durationSec: row.durationSec,
-        durationDisplay: formatDuration(row.durationSec),
-        score: row.score,
-        costUsd: row.costUsd,
-        costDisplay: formatUsd(row.costUsd),
-      };
-    });
 }
 
 export function pickWhichModels(points: ReadonlyArray<ScatterPoint>): WhichPick[] {
