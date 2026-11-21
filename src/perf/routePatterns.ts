@@ -109,7 +109,7 @@ export function likeSkeletonBlankIssues(source: string): string[] {
     !/Heart|heart|aria-label|좋아요/.test(skeleton);
   if (blankOnly) {
     return [
-      "LikeButtonSkeleton must show a heart (and count placeholder), not a blank circle. See docs/article-load-like-perf.md.",
+      "LikeButtonSkeleton must show a heart (and count placeholder), not a blank circle.",
     ];
   }
   return [];

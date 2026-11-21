@@ -1,5 +1,7 @@
 # Production measurement (2026-11-14)
 
+> Point-in-time record. Not a current performance budget. See [README](README.md).
+
 `https://agentpedia-flax.vercel.app`, build `ac8159a`, measured from Seoul. The deploy was
 confirmed live: the Geist Mono preload is gone from the article HTML.
 

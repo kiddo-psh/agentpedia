@@ -1,5 +1,7 @@
 # Article rendering after the UI rewrite (2026-11-14)
 
+> Point-in-time record. Not a current performance budget. See [README](README.md).
+
 Local Windows, `next build` + in-process server, PGlite, logged out, `BETTER_AUTH_SECRET` set to a
 local test value.
 
