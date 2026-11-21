@@ -1,0 +1,19 @@
+slug: copilot-fusion
+name: Copilot Fusion
+vendor: GitHub
+relatedAgents: []
+benchmarks:
+  - bench: Terminal-Bench
+    version: "4.1"
+    model: Copilot Fusion (max)
+    agentHarness: GitHub Copilot
+    scoreKind: harness
+    score: 71.2
+    margin: 2.9
+    unit: "%"
+    cost: $2.0k
+    costUsd: 2000
+    tokensBillions: 3.3
+    note: "리더보드 RELEASE DATE 열은 2026-11-17입니다."
+    url: https://www.tbench.ai/leaderboard
+    asOf: 2026-11-21
