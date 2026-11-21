@@ -29,35 +29,41 @@ export function BarChart({
   }
 
   const max = Math.max(...data.map((row) => row.value), Number.EPSILON);
-  const height = data.length * 44 + 8;
 
   return (
     <div>
       <h3 className="text-lg font-medium">{title}</h3>
       <p className="mt-1 text-sm text-muted">{unit}</p>
-      <svg
-        role="img"
-        aria-label={title}
-        viewBox={`0 0 720 ${height}`}
-        className="mt-4 w-full max-w-[720px] overflow-visible text-foreground"
-      >
+      <ul className="models-barchart mt-4" aria-label={title}>
         {data.map((row, index) => {
-          const y = index * 44 + 4;
-          const width = Math.max(4, (row.value / max) * 420);
+          const ratio = Math.max(0.04, row.value / max);
+          const label = (
+            <span className="models-barchart-label truncate text-[13px]">{row.label}</span>
+          );
           return (
-            <g key={row.id}>
-              <text x={0} y={y + 18} fill="currentColor" fontSize={13}>
-                {row.label}
-              </text>
-              <rect x={180} y={y + 4} width={width} height={22} fill="currentColor" opacity={0.8} rx={2} />
-              <text x={180 + width + 10} y={y + 19} fill="currentColor" fontSize={13}>
+            <li
+              key={row.id}
+              className="models-barchart-row"
+              style={{ ["--bar" as string]: String(ratio), ["--i" as string]: String(index) }}
+            >
+              {row.href ? (
+                <a href={row.href} className="models-barchart-label-link hover:text-foreground">
+                  {label}
+                </a>
+              ) : (
+                label
+              )}
+              <span className="models-barchart-track" aria-hidden>
+                <span className="models-barchart-fill" />
+              </span>
+              <span className="models-barchart-value tabular-nums text-[13px]">
                 {format(row.value)}
                 {row.detail ? ` · ${row.detail}` : ""}
-              </text>
-            </g>
+              </span>
+            </li>
           );
         })}
-      </svg>
+      </ul>
     </div>
   );
 }
