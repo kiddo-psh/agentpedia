@@ -23,6 +23,6 @@ benchmarks:
     cost: $1.4k
     costUsd: 1400
     tokensBillions: 1.1
-    note: "리더보드 RELEASE DATE 열은 2026-11-17입니다."
+    note: "리더보드에 적힌 출시일: 2026-11-17입니다."
     url: https://www.tbench.ai/leaderboard
     asOf: 2026-11-21

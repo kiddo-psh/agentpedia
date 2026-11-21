@@ -1,4 +1,5 @@
 import { loadAllAgents, staleAgentWarnings } from "../src/content/agents";
+import { koreanStyleWarnings } from "../src/content/koreanStyle";
 import { loadAllModels, staleModelWarnings } from "../src/content/models";
 import { ContentError, loadAllArticles } from "../src/content/loader";
 
@@ -30,6 +31,21 @@ try {
   }
   for (const warning of staleModelWarnings(models, new Date())) {
     console.warn(`stale model fact: ${warning}`);
+  }
+  for (const article of articles) {
+    for (const warning of koreanStyleWarnings(article.bodyMarkdown)) {
+      console.warn(`style ${article.slug}: ${warning}`);
+    }
+  }
+  for (const agent of agents) {
+    for (const warning of koreanStyleWarnings(agent.bodyMarkdown)) {
+      console.warn(`style agent ${agent.slug}: ${warning}`);
+    }
+  }
+  for (const model of models) {
+    for (const warning of koreanStyleWarnings(model.bodyMarkdown)) {
+      console.warn(`style model ${model.slug}: ${warning}`);
+    }
   }
   console.log(
     `content ok: ${articles.length} articles (${drafts} draft), ${agents.length} agents, ${models.length} models`,

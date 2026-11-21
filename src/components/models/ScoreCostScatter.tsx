@@ -30,7 +30,7 @@ export function ScoreCostScatter({
   compact?: boolean;
 }) {
   if (points.length === 0) {
-    return <p className="text-sm text-muted">해결률과 런 비용을 모두 확인한 모델이 없습니다.</p>;
+    return <p className="text-sm text-muted">해결률과 비용이 모두 확인된 모델이 아직 없습니다.</p>;
   }
 
   const width = compact ? 360 : 720;
@@ -74,7 +74,7 @@ export function ScoreCostScatter({
         viewBox={`0 0 ${width} ${height}`}
         className="models-scatter-svg h-auto w-full"
         role="img"
-        aria-label="해결률 대 벤치마크 전체 런 비용 산점도"
+        aria-label="모델별 해결률과 전체 실행 비용 산점도"
       >
         <line
           x1={pad.left}
@@ -119,7 +119,7 @@ export function ScoreCostScatter({
         {!compact ? (
           <>
             <text x={pad.left + innerW / 2} y={height - 2} textAnchor="middle" className="models-scatter-axis">
-              벤치마크 전체 런 비용 (로그)
+              전체 실행 비용(달러, 로그 눈금)
             </text>
             <text
               x={14}
@@ -128,7 +128,7 @@ export function ScoreCostScatter({
               className="models-scatter-axis"
               transform={`rotate(-90 14 ${pad.top + innerH / 2})`}
             >
-              해결률
+              해결률(%)
             </text>
           </>
         ) : null}
@@ -192,19 +192,19 @@ export function ScoreCostScatter({
         ))}
         <li className="inline-flex items-center gap-1.5">
           <span className="inline-block h-px w-4 bg-foreground/40" aria-hidden />
-          Pareto 전선
+          <span title="Pareto 전선. 이 선 위의 모델보다 더 싸면서 더 많이 푸는 모델은 없습니다.">
+            가성비 경계선
+          </span>
         </li>
       </ul>
       {!compact ? (
         <p className="mt-2 text-[12px] text-muted">
-          점마다 세로 막대는 해결률 ±오차입니다. 가로축은 벤치마크{" "}
-          <strong className="font-medium text-foreground">전체 런 비용</strong>
-          (로그 스케일)입니다.
+          세로 막대는 해결률의 오차 범위입니다. 가로축은 전체 실행 비용이며 로그 눈금입니다.
         </p>
       ) : (
         <p className="mt-2 text-[12px] text-muted">
           <Link href="/models" prefetch={true} className="underline underline-offset-2">
-            전체 산점도
+            전체 모델과 비교하기
           </Link>
         </p>
       )}

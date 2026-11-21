@@ -8,7 +8,7 @@ import * as runtime from "react/jsx-runtime";
 import remarkGfm from "remark-gfm";
 import { Comments } from "@/components/comments/Comments";
 import { ScoreCostScatter } from "@/components/models/ScoreCostScatter";
-import { formatPercent, formatTokensBillions, formatUsd } from "@/components/models/format";
+import { EMPTY, formatPercent, formatTokensBillions, formatUsd, isRedundantModelBody } from "@/components/models/format";
 import {
   buildModelsTable,
   buildScatterPoints,
@@ -64,10 +64,15 @@ async function ModelView({ slug, comments }: { slug: string; comments: ReactNode
   "use cache";
   cacheLife("days");
   const model = getModel(slug)!;
-  const { default: Content } = await evaluate(model.bodyMarkdown, {
-    ...runtime,
-    remarkPlugins: [[remarkGfm, { singleTilde: false }]],
-  });
+  const showBody = !isRedundantModelBody(model.bodyMarkdown);
+  const Content = showBody
+    ? (
+        await evaluate(model.bodyMarkdown, {
+          ...runtime,
+          remarkPlugins: [[remarkGfm, { singleTilde: false }]],
+        })
+      ).default
+    : null;
   const table = buildModelsTable(listModels());
   const scatter = buildScatterPoints(table.rows);
   const tb = model.benchmarks.find((row) => row.bench === "Terminal-Bench" && row.version === "4.1");
@@ -108,11 +113,12 @@ async function ModelView({ slug, comments }: { slug: string; comments: ReactNode
       </header>
 
       <KeyStrip model={model} tb={tb} />
+      <p className="mt-2 text-[12px] text-muted">— 확인하지 못한 값. 입력 단가는 100만 토큰당 달러입니다.</p>
 
       {scatter.length > 0 ? (
         <section className="mt-10" aria-labelledby="mini-scatter-title">
           <h2 id="mini-scatter-title" className="text-[18px] font-semibold tracking-tight">
-            해결률 × 런 비용에서의 위치
+            해결률과 실행 비용으로 본 위치
           </h2>
           <div className="mt-4">
             <ScoreCostScatter points={scatter} highlightId={slug} compact />
@@ -125,8 +131,8 @@ async function ModelView({ slug, comments }: { slug: string; comments: ReactNode
           토큰 단가
         </h2>
         <div className="mt-4 grid gap-6 sm:grid-cols-2">
-          <PriceFact label="입력 / 1M" fact={model.inputUsdPerMTok} />
-          <PriceFact label="출력 / 1M" fact={model.outputUsdPerMTok} />
+          <PriceFact label="입력 단가" fact={model.inputUsdPerMTok} />
+          <PriceFact label="출력 단가" fact={model.outputUsdPerMTok} />
         </div>
       </section>
 
@@ -158,9 +164,11 @@ async function ModelView({ slug, comments }: { slug: string; comments: ReactNode
         </section>
       ) : null}
 
-      <div className="prose-article mt-16">
-        <Content />
-      </div>
+      {Content ? (
+        <div className="prose-article mt-16">
+          <Content />
+        </div>
+      ) : null}
 
       <section id="comments" className="mt-16 scroll-mt-24" aria-labelledby="comments-title">
         {comments}
@@ -173,27 +181,29 @@ function KeyStrip({ model, tb }: { model: Model; tb: ModelBenchmark | undefined 
   return (
     <dl className="models-key-strip border-y border-line py-5">
       <div>
-        <dt className="text-[12px] text-muted">해결률</dt>
+        <dt className="text-[12px] text-muted">Terminal-Bench 4.1 해결률</dt>
         <dd className="mt-1 text-lg font-medium tabular-nums">
-          {tb ? formatPercent(tb.score, tb.margin) : "없음"}
+          {tb ? formatPercent(tb.score, tb.margin) : EMPTY}
         </dd>
       </div>
       <div>
-        <dt className="text-[12px] text-muted">런 비용(전체)</dt>
+        <dt className="text-[12px] text-muted">전체 실행 비용</dt>
         <dd className="mt-1 text-lg font-medium tabular-nums">
-          {tb?.costUsd !== undefined ? formatUsd(tb.costUsd) : tb?.cost ?? "없음"}
+          {tb?.costUsd !== undefined ? formatUsd(tb.costUsd) : tb?.cost ?? EMPTY}
         </dd>
       </div>
       <div>
-        <dt className="text-[12px] text-muted">토큰</dt>
+        <dt className="text-[12px] text-muted">사용 토큰</dt>
         <dd className="mt-1 text-lg font-medium tabular-nums">
-          {tb?.tokensBillions !== undefined ? formatTokensBillions(tb.tokensBillions) : "없음"}
+          {tb?.tokensBillions !== undefined ? formatTokensBillions(tb.tokensBillions) : EMPTY}
         </dd>
       </div>
       <div>
-        <dt className="text-[12px] text-muted">입력 $/1M</dt>
+        <dt className="text-[12px] text-muted" title="100만 토큰당 달러">
+          입력 단가
+        </dt>
         <dd className="mt-1 text-lg font-medium tabular-nums">
-          {model.inputUsdPerMTok ? money.format(model.inputUsdPerMTok.value) : "없음"}
+          {model.inputUsdPerMTok ? money.format(model.inputUsdPerMTok.value) : EMPTY}
         </dd>
       </div>
     </dl>
@@ -217,7 +227,7 @@ function PriceFact({ label, fact }: { label: string; fact: SourcedNumber | undef
             </span>
           </>
         ) : (
-          <span className="text-muted">없음</span>
+          <span className="text-muted">{EMPTY}</span>
         )}
       </dd>
     </div>
@@ -225,7 +235,7 @@ function PriceFact({ label, fact }: { label: string; fact: SourcedNumber | undef
 }
 
 function BenchmarkCards({ rows }: { rows: ModelBenchmark[] }) {
-  if (rows.length === 0) return <p className="mt-2 text-sm text-muted">확인한 값이 없습니다.</p>;
+  if (rows.length === 0) return <p className="mt-2 text-sm text-muted">아직 확인한 벤치마크 점수가 없습니다.</p>;
   return (
     <ul className="models-bench-cards mt-4">
       {rows.map((row) => (
@@ -235,7 +245,7 @@ function BenchmarkCards({ rows }: { rows: ModelBenchmark[] }) {
               {row.bench}
               {row.version ? ` ${row.version}` : ""}
             </a>
-            <span className="text-muted"> · {row.scoreKind === "model" ? "모델 점수" : "하네스 점수"}</span>
+            <span className="text-muted"> · {row.scoreKind === "model" ? "고정 하네스 점수" : "제품 하네스 점수"}</span>
           </p>
           <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-[13px] sm:grid-cols-3">
             <div>
@@ -251,12 +261,12 @@ function BenchmarkCards({ rows }: { rows: ModelBenchmark[] }) {
               </dd>
             </div>
             <div>
-              <dt className="text-muted">런 비용(전체)</dt>
-              <dd>{row.cost ?? "없음"}</dd>
+              <dt className="text-muted">전체 실행 비용</dt>
+              <dd>{row.cost ?? EMPTY}</dd>
             </div>
             <div>
-              <dt className="text-muted">토큰</dt>
-              <dd>{row.tokensBillions !== undefined ? `${row.tokensBillions}B` : "없음"}</dd>
+              <dt className="text-muted">사용 토큰</dt>
+              <dd>{row.tokensBillions !== undefined ? `${row.tokensBillions}B` : EMPTY}</dd>
             </div>
             <div className="sm:col-span-2">
               <dt className="text-muted">시점</dt>

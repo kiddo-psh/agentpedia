@@ -27,7 +27,7 @@ Anthropic 블로그의 기사 페이지(예: `anthropic.com/research/redesigning
 
 ### 콘텐츠에서 드러난 점
 
-2026-11-13, 기사가 8개였을 때 `harrison-chase-agent-harness`와 `karpathy-software-3`은 관련 기사가 0개였습니다. 2026-11-21에 `getRelatedGraph`(초안 제외)로 다시 세면 공개 기사는 19개이고, 관련 기사가 없는 기사는 `karpathy-software-3`뿐입니다. `harrison-chase-agent-harness`의 관련 기사는 `cursor-long-agent-token-economics`, `anthropic-harness-design-long-running-apps`, `boris-cherny-claude-code-workflow`입니다. 알고리즘보다 태그 어휘가 결과를 더 크게 좌우합니다. 예를 들어 `agent-ready`와 `agent-ready-docs`, `claude-md`와 `context-files`는 같은 주제를 다른 이름으로 부릅니다. 다음 둘 중 하나가 먼저 필요합니다.
+2026-11-13, 기사가 8개였을 때 `harrison-chase-agent-harness`와 `karpathy-software-3`은 관련 기사가 0개였습니다. 2026-11-21에 `getRelatedGraph`(초안 제외)로 다시 세면 공개 기사는 19개이고, 관련 기사가 없는 기사는 `karpathy-software-3`뿐이었습니다. 그 뒤 `harrison-chase-agent-harness`, `anthropic-source-control-agent-scale`, `postiz-agent-ready-saas`는 삭제했습니다. 알고리즘보다 태그 어휘가 결과를 더 크게 좌우합니다. 예를 들어 `agent-ready`와 `agent-ready-docs`, `claude-md`와 `context-files`는 같은 주제를 다른 이름으로 부릅니다. 다음 둘 중 하나가 먼저 필요합니다.
 
 - 태그 목록을 `content/tags.yaml` 같은 레지스트리로 고정하고, `validate:content`가 목록에 없는 태그를 거부하게 합니다. 인물과 용어집이 이미 이 방식입니다.
 - 아래 2단계로 태그에 의존하지 않는 유사도를 더합니다.

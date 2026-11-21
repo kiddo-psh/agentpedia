@@ -253,10 +253,21 @@ export function buildScatterPoints(rows: ReadonlyArray<ModelTableRow>): ScatterP
     }));
 }
 
+/**
+ * Top half by resolve rate, including every model tied with the cutoff.
+ * Index `floor((n - 1) / 2)` is the last place that still counts as the top half.
+ */
+export function topHalfByResolve(points: ReadonlyArray<ScatterPoint>): ScatterPoint[] {
+  if (points.length === 0) return [];
+  const ranked = [...points].sort((a, b) => b.y - a.y || a.x - b.x);
+  const cutoff = ranked[Math.floor((ranked.length - 1) / 2)]!.y;
+  return ranked.filter((point) => point.y >= cutoff);
+}
+
 export function pickWhichModels(points: ReadonlyArray<ScatterPoint>): WhichPick[] {
   if (points.length === 0) return [];
   const best = [...points].sort((a, b) => b.y - a.y || a.x - b.x)[0]!;
-  const cheap = [...points].sort((a, b) => a.x - b.x || b.y - a.y)[0]!;
+  const cheap = [...topHalfByResolve(points)].sort((a, b) => a.x - b.x || b.y - a.y)[0]!;
   const frontier = paretoFrontier(points);
   const value =
     [...frontier].sort((a, b) => b.y / b.x - a.y / a.x || b.y - a.y)[0] ?? best;
@@ -265,7 +276,7 @@ export function pickWhichModels(points: ReadonlyArray<ScatterPoint>): WhichPick[
     {
       kind: "performance",
       title: "해결률이 가장 높은 모델",
-      rule: "Terminal-Bench 해결률이 가장 높은 행.",
+      rule: "Terminal-Bench 해결률이 가장 높은 모델입니다.",
       slug: best.id,
       name: best.name,
       href: best.href,
@@ -274,7 +285,7 @@ export function pickWhichModels(points: ReadonlyArray<ScatterPoint>): WhichPick[
     {
       kind: "value",
       title: "가성비가 좋은 모델",
-      rule: "런 비용↓·해결률↑ Pareto 전선 위에서 해결률÷런비용이 가장 큰 점.",
+      rule: "가성비 경계선 위 모델 가운데 비용 1달러당 해결률이 가장 높은 모델입니다.",
       slug: value.id,
       name: value.name,
       href: value.href,
@@ -282,12 +293,12 @@ export function pickWhichModels(points: ReadonlyArray<ScatterPoint>): WhichPick[
     },
     {
       kind: "cheap",
-      title: "런 비용이 가장 낮은 모델",
-      rule: "벤치마크 전체 런 비용(USD)이 가장 낮은 행.",
+      title: "실행 비용이 가장 낮은 모델",
+      rule: "해결률 상위 절반 안에서 전체 실행 비용이 가장 낮은 모델입니다.",
       slug: cheap.id,
       name: cheap.name,
       href: cheap.href,
-      detail: formatUsd(cheap.x),
+      detail: `${formatUsd(cheap.x)} · ${formatPercent(cheap.y, cheap.margin ?? undefined)}`,
     },
   ];
 }
