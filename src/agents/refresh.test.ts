@@ -105,3 +105,21 @@ describe("refreshAgentFacts", () => {
     expect(saved.benchmarks[0].score).toBe(1);
   });
 });
+
+describe("collect-ideas agent refresh", () => {
+  it("commits written facts before the job fails on collector errors", () => {
+    const doc = parseYaml(fs.readFileSync(path.join(process.cwd(), ".github/workflows/collect-ideas.yml"), "utf8")) as {
+      jobs: { collect: { steps: Array<Record<string, unknown>> } };
+    };
+    const steps = doc.jobs.collect.steps;
+    const refreshAt = steps.findIndex((step) => step.id === "refresh-agents");
+    const commitAt = steps.findIndex((step) => step.name === "Commit agent facts if changed");
+    const reportAt = steps.findIndex((step) => step.name === "Report agent refresh failures");
+
+    expect(refreshAt).toBeGreaterThanOrEqual(0);
+    expect(steps[refreshAt]?.["continue-on-error"]).toBe(true);
+    expect(commitAt).toBeGreaterThan(refreshAt);
+    expect(reportAt).toBeGreaterThan(commitAt);
+    expect(steps[reportAt]?.if).toBe("steps.refresh-agents.outcome == 'failure'");
+  });
+});

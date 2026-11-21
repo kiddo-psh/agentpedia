@@ -31,7 +31,11 @@ jobs:
           git add content/ideas.yaml
           git commit -m "content: refresh ideas backlog from weekly collect"
           git push
-      - run: npm run agents:refresh
+      # The refresher writes successful facts, then exits 1 if any collector failed.
+      # Commit those files before the job fails, or the runner discards them.
+      - id: refresh-agents
+        continue-on-error: true
+        run: npm run agents:refresh
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Commit agent facts if changed
@@ -45,3 +49,6 @@ jobs:
           git add content/agents
           git commit -m "content: refresh agent npm downloads and GitHub facts"
           git push
+      - name: Report agent refresh failures
+        if: steps.refresh-agents.outcome == 'failure'
+        run: exit 1
