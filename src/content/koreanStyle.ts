@@ -33,7 +33,8 @@ function stripNonProse(markdown: string): string {
   return markdown
     .replace(/```[\s\S]*?```/g, " ")
     .replace(/<Quote[\s\S]*?<\/Quote>/g, " ")
-    .replace(/`[^`\n]*`/g, " ");
+    .replace(/`[^`\n]*`/g, " ")
+    .replace(/<\/?Term\b[^>]*>/g, "");
 }
 
 function sentences(text: string): string[] {
