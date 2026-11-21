@@ -1,0 +1,15 @@
+# No public GitHub repo or official npm package was verified, so stars, release, and downloads are omitted.
+slug: cursor
+name: Cursor
+vendor: Anysphere
+form: [ide]
+pricingSummary:
+  value: "개인은 Free $0, Plus $8, Premium $30, Super $100, Ultra $200/월입니다."
+  sourceUrl: https://cursor.com/pricing
+  asOf: 2026-11-21
+surveyUsage:
+  value: 25.5
+  sourceUrl: https://survey.stackoverflow.co/2026/ai/data/ai-code-agent
+  asOf: 2026-10-06
+# Terminal-Bench 4.1 and SWE-bench Verified had no Cursor row on 2026-11-21.
+benchmarks: []

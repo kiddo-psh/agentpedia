@@ -50,6 +50,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <Link href="/" className="max-sm:hidden hover:text-foreground">
                 기사
               </Link>
+              <Link href="/agents" prefetch={true} className="hover:text-foreground">
+                에이전트
+              </Link>
               <Link href="/community" prefetch={true} className="hover:text-foreground">
                 커뮤니티
               </Link>

@@ -81,7 +81,7 @@ npm run ideas:collect -- --source hn --limit 10 --verbose
 |---|---|
 | cron (UTC) | `0 0 * * 1` |
 | 시각 | **월요일 09:00 Asia/Seoul (KST)** (= 월요일 00:00 UTC) |
-| 결과 | 변경이 있으면 `content/ideas.yaml`만 master에 커밋 (`content: refresh ideas backlog from weekly collect`). 변경 없으면 커밋 생략 |
+| 결과 | 변경이 있으면 `content/ideas.yaml`과 `content/agents`를 master에 커밋. 에이전트 수집이 일부만 성공해도 그 값은 커밋한 뒤 잡을 실패로 끝낸다. 변경 없으면 커밋 생략 |
 | 수동 실행 | Actions → **collect-ideas** → **Run workflow** (`workflow_dispatch`) |
 
 비밀키는 필요 없습니다(HN / RSS / YouTube Atom).

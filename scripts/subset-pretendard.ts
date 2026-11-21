@@ -15,6 +15,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import subsetFont from "subset-font";
+import { loadAllAgents } from "../src/content/agents";
 import { loadAllArticles } from "../src/content/loader";
 import {
   CATEGORY_LABEL,
@@ -226,6 +227,14 @@ async function main() {
   if (fs.existsSync(peoplePath)) add(content, fs.readFileSync(peoplePath, "utf8"));
 
   const articles = loadAllArticles().filter((a) => !a.draft);
+  const agents = loadAllAgents();
+  for (const agent of agents) {
+    add(critical, [agent.name, agent.vendor, agent.pricingSummary?.value ?? "", agent.license ?? ""].join("\n"));
+    add(content, agent.bodyMarkdown);
+    for (const row of agent.benchmarks) {
+      add(content, [row.bench, row.model, row.agentHarness, row.note ?? "", row.cost ?? ""].join(" "));
+    }
+  }
   for (const article of articles) {
     add(critical, criticalText(article));
     add(content, criticalText(article));
