@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   // Share previews need absolute URLs; BETTER_AUTH_URL is the public site URL.
   metadataBase: new URL(process.env.BETTER_AUTH_URL || "http://localhost:3000"),
   title: { default: "Agentpedia", template: "%s · Agentpedia" },
-  description: "AI 에이전트 시대의 인사이트를 읽고, 내 프로젝트에 바로 적용해 보세요.",
+  description: "코딩 에이전트와 모델의 수치를 출처·기준일과 함께 모으고, 기사는 그 맥락을 정리합니다.",
 };
 
 const brandClass = "flex items-center gap-2 text-[17px] font-semibold tracking-tight";
@@ -72,7 +72,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <footer className="border-t border-line">
           <div className="mx-auto flex w-full max-w-[1280px] flex-wrap items-center justify-between gap-2 px-4 py-8 text-xs text-muted sm:px-8">
             <span className="font-semibold text-foreground">Agentpedia</span>
-            <span>모든 기사는 원문 출처를 밝히고 요약·해석한 글입니다.</span>
+            <span>수치는 출처와 기준일을 함께 적고, 기사는 원문을 요약·해석한 글입니다.</span>
           </div>
         </footer>
       </body>

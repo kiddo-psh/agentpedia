@@ -167,8 +167,9 @@ export function createAgentpediaServer(
     { name: SERVER_NAME, version: "0.1.0" },
     {
       instructions:
-        "Agentpedia는 AI 에이전트 활용법을 정리한 기사와, 각 기사를 프로젝트에 적용하는 키트를 제공합니다. " +
-        "search_articles로 찾고, get_article로 읽고, apply_article 프롬프트나 get_apply_kit으로 적용하세요.",
+        "이 서버는 Agentpedia 기사와 적용 키트를 제공합니다. " +
+        "search_articles로 찾고, get_article로 읽고, apply_article 프롬프트나 get_apply_kit으로 적용하세요. " +
+        "에이전트·모델 수치 페이지는 이 서버에 없습니다.",
     },
   );
 

@@ -29,25 +29,27 @@ export default function Home({ searchParams }: PageProps<"/">) {
       <section className="home-hero pt-2">
         <p className="text-[13px] font-medium text-muted">AI 에이전트 백과사전</p>
         <h1 className="mt-3 max-w-[14em] text-4xl leading-[1.12] font-medium tracking-[-0.035em] text-balance sm:text-6xl">
-          읽고, 내 프로젝트에 바로 적용하세요
+          코딩 에이전트를 출처와 함께 정리합니다
         </h1>
         <p className="mt-5 max-w-[34em] text-lg leading-relaxed text-muted">
-          에이전트 시대를 이끄는 사람과 사례를 정리했습니다. 기사마다 진단 프롬프트와 적용 키트가 있어, 에이전트가
-          MCP로 바로 가져다 씁니다.
+          에이전트 페이지는 채택 수치와 벤치마크를, 모델 페이지는 벤치마크와 토큰 단가, 작업당 시간을 값·출처·기준일과
+          함께 보여 줍니다. 기사는 그 맥락을 정리하고, 적용 키트는 MCP로 가져갈 수 있습니다.
         </p>
         <div className="mt-7 flex flex-wrap gap-2.5">
           <Link
-            href="/connect"
+            href="/agents"
+            prefetch={true}
             className="inline-flex h-10 items-center rounded-full bg-foreground px-5 text-sm font-medium text-background hover:opacity-85"
           >
-            에이전트 연결하기
+            에이전트 보기
           </Link>
-          <a
-            href="#articles"
+          <Link
+            href="/models"
+            prefetch={true}
             className="inline-flex h-10 items-center rounded-full px-5 text-sm font-medium ring-1 ring-line ring-inset hover:bg-soft"
           >
-            모든 기사 보기
-          </a>
+            모델 비교
+          </Link>
         </div>
       </section>
 
