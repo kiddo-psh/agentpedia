@@ -40,21 +40,6 @@
   status: idea
   note: "agent-tools-trust-boundary가 같은 사건의 10월 공지(Phorion 권고문)를 다룬다. 새 기사 대신 그 기사의 updatedAt 갱신으로 처리할지 먼저 정한다."
 
-- slug: github-verified-mcp-connectors
-  topic: "GitHub는 MCP를 개발자 로컬 설정 문제에서 조직이 허용 목록을 관리하는 연결 계층 문제로 바꿨다"
-  category: security
-  people:
-    - "GitHub Copilot Team (GitHub-verified MCP connectors 공식 공지 팀)"
-  sources:
-    - https://github.blog/changelog/2026-10-28-connect-your-tools-to-copilot-without-all-the-setup/
-  publishedAt: 2026-10-28
-  sourceKind: blog
-  tension: "MCP는 각 개발자가 서버 URL과 credential을 직접 관리하는 유연한 로컬 확장 방식이라는 관행과 달리, GitHub는 한 번 인증하고 여러 Copilot surface에서 쓰되 enterprise allowlist로 중앙 통제하는 구조를 내놓았다."
-  kitIdea: "현재 .mcp.json·IDE 설정의 서버 목록을 인벤토리화하고 verified connector로 대체 가능한 항목, 반드시 사설로 유지할 항목, 조직 allowlist에 들어갈 항목으로 분류한다."
-  primaryVerified: true
-  confidence: high
-  status: idea
-
 - slug: copilot-security-review-local-first
   topic: "GitHub의 새 보안 에이전트는 취약점 수정 권한을 크게 주기보다 로컬 working copy까지만 고치도록 설계됐다"
   category: security
@@ -81,21 +66,6 @@
   sourceKind: blog
   tension: "agentic CI는 별도 오케스트레이터와 새 권한 모델이 필요하다는 접근과 달리, GitHub는 자연어 Markdown을 Actions YAML로 컴파일해 기존 runner·policy·sandbox를 재사용한다."
   kitIdea: "CI failure 분석이나 issue triage 하나를 Markdown agent workflow로 만들고 처음에는 read-only, sandbox, safe-output 검증과 월간 credit forecast를 강제한 뒤 쓰기 권한을 단계적으로 연다."
-  primaryVerified: true
-  confidence: high
-  status: idea
-
-- slug: copilot-cloud-sandbox-as-default
-  topic: "GitHub는 코딩 에이전트 세션의 기본 실행 장소를 개발자 노트북이 아니라 격리된 resumable cloud sandbox로 옮겼다"
-  category: trends
-  people:
-    - "GitHub Copilot Team (Copilot cloud experience 공식 공지 팀)"
-  sources:
-    - https://github.blog/changelog/2026-10-28-work-from-anywhere-with-a-new-connected-copilot-cloud-experience/
-  publishedAt: 2026-10-28
-  sourceKind: blog
-  tension: "IDE 에이전트는 로컬 머신의 연장이라는 전제와 달리, GitHub는 세션을 여러 클라이언트에서 이어 가면서 실행 자체는 기본적으로 격리된 클라우드 샌드박스에 두는 구조를 일반화했다."
-  kitIdea: "로컬에서만 돌려야 하는 작업과 cloud sandbox로 넘길 작업을 레포 정책으로 나누고, cloud 쪽에는 조직 SSO·MCP allowlist·tool approval·repo exclusion을 기본값으로 설정한다."
   primaryVerified: true
   confidence: high
   status: idea
