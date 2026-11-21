@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte, inArray, isNull } from "drizzle-orm";
+import { and, count, desc, eq, gte, inArray, isNull, sql } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { agentReviews, reviewHelpful, user, type TaskType } from "@/db/schema";
 import { DAILY_REVIEW_LIMIT, seoulDayStart } from "./limits";
@@ -52,37 +52,43 @@ export async function createReview(db: Db, input: CreateInput): Promise<Result> 
   const parsed = validateReview({ ...input, now });
   if (!parsed.ok) return parsed;
 
-  const [{ n }] = await db
-    .select({ n: count() })
-    .from(agentReviews)
-    .where(and(eq(agentReviews.userId, input.userId), gte(agentReviews.createdAt, seoulDayStart(now))));
-  if (Number(n) >= DAILY_REVIEW_LIMIT) {
-    return { ok: false, error: `리뷰는 하루에 ${DAILY_REVIEW_LIMIT}건까지 남길 수 있습니다.` };
-  }
+  // Count and insert share a per-user lock. Without it, two requests can both
+  // read 4 and both insert, so the daily cap is not a single check.
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${input.userId}, 0::bigint))`);
 
-  const [existing] = await db
-    .select({ id: agentReviews.id })
-    .from(agentReviews)
-    .where(
-      and(
-        eq(agentReviews.userId, input.userId),
-        eq(agentReviews.agentSlug, input.agentSlug),
-        eq(agentReviews.taskType, parsed.value.taskType),
-      ),
-    )
-    .limit(1);
-  if (existing) return { ok: false, error: "이 작업에 대한 리뷰를 이미 남겼습니다." };
+    const [{ n }] = await tx
+      .select({ n: count() })
+      .from(agentReviews)
+      .where(and(eq(agentReviews.userId, input.userId), gte(agentReviews.createdAt, seoulDayStart(now))));
+    if (Number(n) >= DAILY_REVIEW_LIMIT) {
+      return { ok: false, error: `리뷰는 하루에 ${DAILY_REVIEW_LIMIT}건까지 남길 수 있습니다.` };
+    }
 
-  try {
-    const [row] = await db
-      .insert(agentReviews)
-      .values({ ...rowValues(input, parsed.value), createdAt: now, updatedAt: now })
-      .returning({ id: agentReviews.id });
-    return { ok: true, id: row.id };
-  } catch (error) {
-    if (isUniqueViolation(error)) return { ok: false, error: "이 작업에 대한 리뷰를 이미 남겼습니다." };
-    throw error;
-  }
+    const [existing] = await tx
+      .select({ id: agentReviews.id })
+      .from(agentReviews)
+      .where(
+        and(
+          eq(agentReviews.userId, input.userId),
+          eq(agentReviews.agentSlug, input.agentSlug),
+          eq(agentReviews.taskType, parsed.value.taskType),
+        ),
+      )
+      .limit(1);
+    if (existing) return { ok: false, error: "이 작업에 대한 리뷰를 이미 남겼습니다." };
+
+    try {
+      const [row] = await tx
+        .insert(agentReviews)
+        .values({ ...rowValues(input, parsed.value), createdAt: now, updatedAt: now })
+        .returning({ id: agentReviews.id });
+      return { ok: true, id: row.id };
+    } catch (error) {
+      if (isUniqueViolation(error)) return { ok: false, error: "이 작업에 대한 리뷰를 이미 남겼습니다." };
+      throw error;
+    }
+  });
 }
 
 function rowValues(input: CreateInput, value: ReviewDraft) {

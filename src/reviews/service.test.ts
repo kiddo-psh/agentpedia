@@ -88,6 +88,16 @@ describe("createReview", () => {
     expect(await createReview(db, draft({ taskType: "incident", now: nextDay }))).toMatchObject({ ok: true });
   });
 
+  it("keeps concurrent submissions inside the daily limit", async () => {
+    const tasks = ["debug", "docs", "tests", "design", "refactor", "incident", "write_code"] as const;
+    const results = await Promise.all(tasks.map((taskType) => createReview(db, draft({ taskType }))));
+    const errors = results.flatMap((result) => (result.ok ? [] : [result.error]));
+    expect(results.filter((result) => result.ok)).toHaveLength(DAILY_REVIEW_LIMIT);
+    expect(errors).toHaveLength(tasks.length - DAILY_REVIEW_LIMIT);
+    expect(new Set(errors)).toEqual(new Set(["리뷰는 하루에 5건까지 남길 수 있습니다."]));
+    expect((await listAgentReviews(db, "claude-code")).reviews).toHaveLength(DAILY_REVIEW_LIMIT);
+  });
+
   it("hides a deleted review from the average and greys a task under five reviews", async () => {
     const ratings = [5, 5, 5, 3, 2];
     for (const [i, rating] of ratings.entries()) {
