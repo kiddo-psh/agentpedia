@@ -10,7 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # Product
 
-Agentpedia is a sourced reference for coding agents and models, plus articles. Read `docs/architecture.md` before treating the repo as an article-and-kit site. Numeric facts on agent and model pages need `value`, `sourceUrl`, and `asOf` (`SourcedValue` in `src/content/schema.ts`). Do not invent numbers. Article rules stay in `docs/writing-guide.md`. Korean sentences follow the 23 rules in that guide (section 11). `npm run validate:content` prints warnings for the grep-able rules and does not fail the build on them.
+Agentpedia is a sourced reference for coding agents and models, plus articles. Read `docs/architecture.md` before treating the repo as an article-and-kit site. Numeric facts on agent and model pages need `value`, `sourceUrl`, and `asOf` (`SourcedValue` in `src/content/schema.ts`). Do not invent numbers. Article rules stay in `docs/writing-guide.md`. The primary rule is story-first prose (section 3): open on the concrete situation, let each section answer the question the previous one raised, keep real transitions, vary sentence length, put descriptive `##` headings on story beats (`###` for sub-examples), and end on the takeaway. The Lauren Tan article is the reference. Anti-translationese rules and fact rules stay binding: no invented numbers, sources for every fact, and a fact diff (number tokens, URLs, `<Term id>`, `<Quote>` text) when rewriting. Section 11's mechanical sentence rules, including the 60-character limit, are guidance and yield to readability. `npm run validate:content` prints warnings for the grep-able rules and does not fail the build on them.
 
 # Commits
 
