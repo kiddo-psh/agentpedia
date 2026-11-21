@@ -2,10 +2,10 @@
 
 import { refresh } from "next/cache";
 import { headers } from "next/headers";
-import { getArticle } from "@/content/loader";
 import { getDb } from "@/db/client";
 import { getSession } from "@/lib/auth";
 import { createComment, deleteComment } from "./service";
+import { commentSlugError } from "./target";
 
 export type FormState = { error?: string; savedAt?: number };
 
@@ -14,7 +14,8 @@ export async function postComment(_prev: FormState, form: FormData): Promise<For
   if (!session) return { error: "로그인이 필요합니다." };
 
   const articleSlug = String(form.get("slug") ?? "");
-  if (!getArticle(articleSlug)) return { error: "기사를 찾을 수 없습니다." };
+  const slugError = commentSlugError(articleSlug);
+  if (slugError) return { error: slugError };
 
   const result = await createComment(await getDb(), {
     articleSlug,
