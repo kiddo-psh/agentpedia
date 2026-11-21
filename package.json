@@ -1,6 +1,7 @@
 {
   "name": "side-pjt",
   "version": "0.1.0",
+  "description": "Sourced reference for coding agents, the models they run, and articles about them.",
   "private": true,
   "scripts": {
     "dev": "next dev",

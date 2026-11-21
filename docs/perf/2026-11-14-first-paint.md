@@ -1,5 +1,7 @@
 # First paint on article pages (2026-11-14)
 
+> Point-in-time record. Not a current performance budget. See [README](README.md).
+
 Local production build, headless Chrome through `scripts/bench-vitals.mts`: Lighthouse's
 Slow 4G profile (150 ms RTT, 1.6 Mbps down), 4x CPU slowdown, 412x823 mobile viewport,
 cache disabled.
