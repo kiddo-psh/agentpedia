@@ -32,8 +32,8 @@ export default function Home({ searchParams }: PageProps<"/">) {
           코딩 에이전트를 출처와 함께 정리합니다
         </h1>
         <p className="mt-5 max-w-[34em] text-lg leading-relaxed text-muted">
-          에이전트 페이지는 채택 수치와 벤치마크를, 모델 페이지는 벤치마크와 토큰 단가, 작업당 시간을 값·출처·기준일과
-          함께 보여 줍니다. 기사는 그 맥락을 정리하고, 적용 키트는 MCP로 가져갈 수 있습니다.
+          에이전트 페이지는 채택 수치와 벤치마크를, 모델 페이지는 Terminal-Bench와 토큰 단가를 값·출처·기준일과 함께
+          보여 줍니다. 기사는 그 맥락을 정리하고, 적용 키트는 MCP로 가져갈 수 있습니다.
         </p>
         <div className="mt-7 flex flex-wrap gap-2.5">
           <Link
