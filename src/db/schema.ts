@@ -2,11 +2,15 @@ import { sql } from "drizzle-orm";
 import {
   bigserial,
   boolean,
+  check,
+  date,
   index,
   pgTable,
   primaryKey,
+  smallint,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
@@ -75,6 +79,63 @@ export const communityComments = pgTable(
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
   },
   (t) => [index("community_comments_post_created_idx").on(t.postId, t.createdAt)],
+);
+
+export const TASK_TYPES = [
+  "write_code",
+  "debug",
+  "tests",
+  "docs",
+  "review",
+  "design",
+  "incident",
+  "refactor",
+] as const;
+export type TaskType = (typeof TASK_TYPES)[number];
+
+/** One structured review per user, agent, and task. Soft delete keeps the unique slot. */
+export const agentReviews = pgTable(
+  "agent_reviews",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    agentSlug: text("agent_slug").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    model: text("model"),
+    taskType: text("task_type", { enum: TASK_TYPES }).notNull(),
+    stack: text("stack").array().notNull().default([]),
+    rating: smallint("rating").notNull(),
+    wouldUseAgain: boolean("would_use_again").notNull(),
+    body: text("body").notNull(),
+    usedSince: date("used_since"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  },
+  (t) => [
+    uniqueIndex("agent_reviews_user_agent_task_uq").on(t.userId, t.agentSlug, t.taskType),
+    index("agent_reviews_agent_created_idx").on(t.agentSlug, t.createdAt),
+    check("agent_reviews_rating_ck", sql`${t.rating} between 1 and 5`),
+    check(
+      "agent_reviews_task_type_ck",
+      sql`${t.taskType} in ('write_code', 'debug', 'tests', 'docs', 'review', 'design', 'incident', 'refactor')`,
+    ),
+  ],
+);
+
+/** One helpful vote per user and review. */
+export const reviewHelpful = pgTable(
+  "review_helpful",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    reviewId: uuid("review_id")
+      .notNull()
+      .references(() => agentReviews.id, { onDelete: "cascade" }),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.reviewId] })],
 );
 
 /** One row per (user, article); the primary key makes a second like a no-op. */
