@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ageDays, parseAgentDir, staleFactIssues } from "./agents";
+import { ageDays, loadAllAgents, parseAgentDir, staleFactIssues } from "./agents";
 import type { AgentFacts } from "./schema";
 
 const facts = `
@@ -49,6 +49,23 @@ describe("parseAgentDir", () => {
       expect(text).toMatch(/body headings start at/);
       expect(text).toMatch(/markdown only/);
     }
+  });
+});
+
+describe("loadAllAgents", () => {
+  it("loads the three seeded agents with sourced survey figures", () => {
+    const agents = loadAllAgents();
+    const bySlug = new Map(agents.map((agent) => [agent.slug, agent]));
+    expect([...bySlug.keys()].sort()).toEqual(["claude-code", "codex", "cursor"]);
+    expect(bySlug.get("claude-code")?.surveyUsage?.value).toBe(65.5);
+    expect(bySlug.get("codex")?.surveyUsage?.value).toBe(29.5);
+    expect(bySlug.get("cursor")?.surveyUsage?.value).toBe(25.5);
+    expect(bySlug.get("cursor")?.githubStars).toBeUndefined();
+    expect(bySlug.get("cursor")?.npmWeeklyDownloads).toBeUndefined();
+    expect(bySlug.get("cursor")?.benchmarks).toEqual([]);
+    expect(bySlug.get("claude-code")?.benchmarks.every((row) => row.scoreKind === "harness")).toBe(true);
+    expect(bySlug.get("codex")?.benchmarks.every((row) => row.scoreKind === "harness")).toBe(true);
+    expect(bySlug.get("claude-code")?.benchmarks.some((row) => row.scoreKind === "model")).toBe(false);
   });
 });
 

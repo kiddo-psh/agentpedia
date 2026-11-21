@@ -1,0 +1,55 @@
+# Machine-updated keys: npmWeeklyDownloads, githubStars, latestVersion.
+slug: codex
+name: OpenAI Codex
+vendor: OpenAI
+form: [cli, cloud]
+license: Apache-2.0
+repoUrl: https://github.com/openai/codex
+npmPackage: "@openai/codex"
+latestVersion:
+  value: rust-v0.171.0
+  sourceUrl: https://github.com/openai/codex/releases/tag/rust-v0.171.0
+  asOf: 2026-11-20
+pricingSummary:
+  value: "ChatGPT 플랜에 포함됩니다. 개인은 Free $0, Go $8, Plus $20/월이고 Pro는 $100/월부터입니다."
+  sourceUrl: https://developers.openai.com/codex/pricing
+  asOf: 2026-11-21
+npmWeeklyDownloads:
+  value: 27531680
+  sourceUrl: https://api.npmjs.org/downloads/point/2026-11-13:2026-11-19/@openai/codex
+  asOf: 2026-11-19
+githubStars:
+  value: 136017
+  sourceUrl: https://api.github.com/repos/openai/codex
+  asOf: 2026-11-21
+# Data table percent. The survey narrative does not round this row.
+surveyUsage:
+  value: 29.5
+  sourceUrl: https://survey.stackoverflow.co/2026/ai/data/ai-code-agent
+  asOf: 2026-10-06
+benchmarks:
+  # Terminal-Bench 4.1, read 2026-11-21. scoreKind harness: the agent column is Codex.
+  - bench: Terminal-Bench
+    version: "4.1"
+    model: GPT-6.2 Astra (max)
+    agentHarness: Codex
+    scoreKind: harness
+    score: 62.1
+    margin: 2.3
+    unit: "%"
+    cost: $1.4k
+    note: "리더보드 RELEASE DATE 열은 2026-11-17입니다."
+    url: https://www.tbench.ai/leaderboard
+    asOf: 2026-11-21
+  - bench: Terminal-Bench
+    version: "4.1"
+    model: GPT-6.2 Sol (max)
+    agentHarness: Codex
+    scoreKind: harness
+    score: 61.5
+    margin: 2.8
+    unit: "%"
+    cost: $0.3k
+    note: "리더보드 RELEASE DATE 열은 2026-11-17입니다."
+    url: https://www.tbench.ai/leaderboard
+    asOf: 2026-11-21

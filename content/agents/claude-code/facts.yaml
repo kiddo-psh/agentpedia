@@ -1,0 +1,57 @@
+# Machine-updated keys: npmWeeklyDownloads, githubStars, latestVersion.
+# Leave a sourced field out rather than guessing. Personality is not in this file yet.
+slug: claude-code
+name: Claude Code
+vendor: Anthropic
+form: [cli]
+license: Proprietary (Anthropic Commercial Terms)
+repoUrl: https://github.com/anthropics/claude-code
+npmPackage: "@anthropic-ai/claude-code"
+latestVersion:
+  value: v2.1.330
+  sourceUrl: https://github.com/anthropics/claude-code/releases/tag/v2.1.330
+  asOf: 2026-11-20
+pricingSummary:
+  value: "Pro는 월 결제 $20(연간 선결제 시 $17/월)이고 Claude Code가 포함됩니다. Max $100/월, Ultra $200/월."
+  sourceUrl: https://claude.com/pricing
+  asOf: 2026-11-21
+npmWeeklyDownloads:
+  value: 21656772
+  sourceUrl: https://api.npmjs.org/downloads/point/2026-11-13:2026-11-19/@anthropic-ai/claude-code
+  asOf: 2026-11-19
+githubStars:
+  value: 156499
+  sourceUrl: https://api.github.com/repos/anthropics/claude-code
+  asOf: 2026-11-21
+# Stack Overflow 2026 results post is 2026-10-06. The data table is 65.5%; the page narrative rounds to 66%.
+surveyUsage:
+  value: 65.5
+  sourceUrl: https://survey.stackoverflow.co/2026/ai/data/ai-code-agent
+  asOf: 2026-10-06
+benchmarks:
+  # Terminal-Bench 4.1, read 2026-11-21. scoreKind harness: the agent column is Claude Code.
+  # No SWE-bench Verified row for this product, and no fixed-harness row for Opus 5.5 or Fable 5.2.
+  - bench: Terminal-Bench
+    version: "4.1"
+    model: Opus 5.5 (max)
+    agentHarness: Claude Code
+    scoreKind: harness
+    score: 65.8
+    margin: 3.1
+    unit: "%"
+    cost: $4.7k
+    note: "리더보드 RELEASE DATE 열은 2026-09-22입니다."
+    url: https://www.tbench.ai/leaderboard
+    asOf: 2026-11-21
+  - bench: Terminal-Bench
+    version: "4.1"
+    model: Fable 5.2 (max)
+    agentHarness: Claude Code
+    scoreKind: harness
+    score: 65.8
+    margin: 2.8
+    unit: "%"
+    cost: $16.5k
+    note: "리더보드 RELEASE DATE 열은 2026-11-09입니다. Opus 5.5 행과 해결률이 같습니다."
+    url: https://www.tbench.ai/leaderboard
+    asOf: 2026-11-21
