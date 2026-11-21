@@ -137,3 +137,78 @@ export const REQUIRED_KIT_FILE = "prompt.md";
 
 /** Every kit must ship a checklist that verifies `apply.goal`, not just procedure. */
 export const REQUIRED_CHECKLIST_FILE = "checklist.md";
+
+/** How an agent is shipped. One product can be more than one (Codex is a CLI and a cloud agent). */
+export const AgentForm = z.enum(["cli", "ide", "extension", "cloud"]);
+export type AgentForm = z.infer<typeof AgentForm>;
+
+/**
+ * A number or short text that is allowed on a page only with the place it came from and the day it was true.
+ * Collectors and editors both write this shape; a bare number does not parse.
+ */
+export const SourcedValue = z.object({
+  value: z.union([z.number(), z.string().min(1)]),
+  sourceUrl: z.url(),
+  asOf: z.coerce.date(),
+});
+export type SourcedValue = z.infer<typeof SourcedValue>;
+
+export const SourcedNumber = SourcedValue.extend({
+  value: z.number(),
+});
+export type SourcedNumber = z.infer<typeof SourcedNumber>;
+
+export const SourcedText = SourcedValue.extend({
+  value: z.string().min(1),
+});
+export type SourcedText = z.infer<typeof SourcedText>;
+
+/**
+ * `model`: the model's score on a fixed harness (the leaderboard is comparing models).
+ * `harness`: the score measured with this product as the agent.
+ * A benchmark row is always one harness plus one model, so both names are required.
+ */
+export const BenchmarkScoreKind = z.enum(["model", "harness"]);
+export type BenchmarkScoreKind = z.infer<typeof BenchmarkScoreKind>;
+
+export const AgentBenchmark = z.object({
+  bench: z.string().min(1),
+  version: z.string().min(1).optional(),
+  model: z.string().min(1),
+  agentHarness: z.string().min(1),
+  scoreKind: BenchmarkScoreKind,
+  score: z.number(),
+  /** Half-width of the interval the source prints next to `score`, in the same unit. */
+  margin: z.number().nonnegative().optional(),
+  unit: z.string().min(1),
+  cost: z.string().min(1).optional(),
+  /** Source context that is not another number, such as a leaderboard date column. */
+  note: z.string().min(1).optional(),
+  url: z.url(),
+  asOf: z.coerce.date(),
+});
+export type AgentBenchmark = z.infer<typeof AgentBenchmark>;
+
+export const AgentFacts = z.object({
+  slug: z.string().regex(/^[a-z0-9-]+$/),
+  name: z.string().min(1),
+  vendor: z.string().min(1),
+  form: z.array(AgentForm).min(1),
+  license: z.string().min(1).optional(),
+  repoUrl: z.url().optional(),
+  /** Package name the npm collector reads. Not a displayed fact. */
+  npmPackage: z.string().min(1).optional(),
+  latestVersion: SourcedText.optional(),
+  pricingSummary: SourcedText.optional(),
+  npmWeeklyDownloads: SourcedNumber.optional(),
+  githubStars: SourcedNumber.optional(),
+  /** Share of respondents, as a percent. */
+  surveyUsage: SourcedNumber.optional(),
+  benchmarks: z.array(AgentBenchmark).default([]),
+  relatedArticles: z.array(z.string().regex(/^[a-z0-9-]+$/)).default([]),
+});
+export type AgentFacts = z.infer<typeof AgentFacts>;
+
+export type Agent = AgentFacts & {
+  bodyMarkdown: string;
+};
