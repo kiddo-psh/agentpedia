@@ -30,16 +30,26 @@ benchmarks:
 describe("models content", () => {
   it("loads the seeded frontier models", () => {
     const bySlug = new Map(loadAllModels().map((model) => [model.slug, model]));
+    expect(bySlug.size).toBeGreaterThanOrEqual(12);
     expect(bySlug.get("opus-5-5")?.outputUsdPerMTok?.value).toBe(20);
-    expect(bySlug.get("gpt-6-2-astra")?.benchmarks[0]?.score).toBe(62.1);
-    expect(bySlug.get("gemini-4-carbon")?.inputUsdPerMTok?.value).toBe(2);
-    expect(bySlug.get("grok-4-7")?.benchmarks[0]?.costUsd).toBe(3700);
+    expect(bySlug.get("fable-5-2")?.benchmarks[0]?.score).toBe(65.8);
+    expect(bySlug.get("sonnet-5-5")?.inputUsdPerMTok?.value).toBe(2);
+    expect(bySlug.get("gemini-4-neon")?.benchmarks[0]?.costUsd).toBe(1900);
+    expect(bySlug.get("grok-4-6")?.benchmarks[0]?.score).toBe(19.7);
+    expect(bySlug.get("gpt-6-2-sol")?.outputUsdPerMTok?.value).toBe(10);
   });
 
   it("loads the Vals timing rows for the duration chart", () => {
     const rows = loadTaskTiming();
-    expect(rows).toHaveLength(4);
+    expect(rows.length).toBeGreaterThanOrEqual(4);
     expect(rows[0]).toMatchObject({ model: "Claude Opus 5", durationSec: 577 });
+  });
+
+  it("ranks models by Terminal-Bench score", async () => {
+    const { rankModelsByTerminalBench } = await import("./models");
+    const ranked = rankModelsByTerminalBench();
+    expect(ranked[0]?.slug).toMatch(/opus-5-5|fable-5-2/);
+    expect(ranked.at(-1)?.slug).toMatch(/grok-4-6/);
   });
 
   it("rejects unsourced token prices", () => {

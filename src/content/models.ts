@@ -94,6 +94,26 @@ export function getModel(slug: string): Model | null {
   return all().find((model) => model.slug === slug) ?? null;
 }
 
+/** Prefer Terminal-Bench 4.1 when present; otherwise the first benchmark. */
+export function primaryBenchmark(model: Model) {
+  return (
+    model.benchmarks.find((row) => row.bench === "Terminal-Bench" && row.version === "4.1") ??
+    model.benchmarks[0]
+  );
+}
+
+/** Models ranked by Terminal-Bench 4.1 score, highest first. Missing scores sink to the bottom. */
+export function rankModelsByTerminalBench(models: Model[] = listModels()) {
+  return [...models].sort((a, b) => {
+    const sa = primaryBenchmark(a)?.score;
+    const sb = primaryBenchmark(b)?.score;
+    if (sa === undefined && sb === undefined) return a.name.localeCompare(b.name, "ko");
+    if (sa === undefined) return 1;
+    if (sb === undefined) return -1;
+    return sb - sa || a.name.localeCompare(b.name, "ko");
+  });
+}
+
 export function staleModelWarnings(models: Model[], now: Date): string[] {
   return models.flatMap((model) =>
     staleModelFactIssues(model, now).map((issue) => `${model.slug}: ${issue}`),

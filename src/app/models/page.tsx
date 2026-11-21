@@ -3,7 +3,7 @@ import Link from "next/link";
 import { cacheLife } from "next/cache";
 import { BarChart } from "@/components/models/BarChart";
 import { formatDate } from "@/content/labels";
-import { listModels, loadTaskTiming } from "@/content/models";
+import { listModels, loadTaskTiming, rankModelsByTerminalBench } from "@/content/models";
 import { SourceAge } from "@/components/SourceAge";
 
 export const metadata: Metadata = {
@@ -30,7 +30,7 @@ export default async function ModelsPage() {
 async function ModelsIndex() {
   "use cache";
   cacheLife("days");
-  const models = listModels();
+  const models = rankModelsByTerminalBench(listModels());
   const timing = loadTaskTiming();
 
   const terminal = models
@@ -38,8 +38,7 @@ async function ModelsIndex() {
       const row = model.benchmarks.find((bench) => bench.bench === "Terminal-Bench" && bench.version === "4.1");
       return row ? { model, row } : null;
     })
-    .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
-    .sort((a, b) => b.row.score - a.row.score);
+    .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
 
   const asOf = terminal[0]?.row.asOf;
 

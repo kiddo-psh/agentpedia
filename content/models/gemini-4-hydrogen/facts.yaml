@@ -1,0 +1,28 @@
+slug: gemini-4-hydrogen
+name: Gemini 4 Hydrogen
+vendor: Google
+openRouterId: google/gemini-4-hydrogen
+relatedAgents: []
+inputUsdPerMTok:
+  value: 1.5
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+outputUsdPerMTok:
+  value: 7.5
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+benchmarks:
+  - bench: Terminal-Bench
+    version: "4.1"
+    model: Gemini 4 Hydrogen (high)
+    agentHarness: Antigravity CLI
+    scoreKind: harness
+    score: 56.4
+    margin: 3.0
+    unit: "%"
+    cost: $0.8k
+    costUsd: 800
+    tokensBillions: 3.6
+    note: "리더보드 RELEASE DATE 열은 2026-11-12입니다."
+    url: https://www.tbench.ai/leaderboard
+    asOf: 2026-11-21

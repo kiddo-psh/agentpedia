@@ -1,0 +1,28 @@
+slug: haiku-5-5
+name: Claude Haiku 5.5
+vendor: Anthropic
+openRouterId: anthropic/claude-haiku-5.5
+relatedAgents: [claude-code]
+inputUsdPerMTok:
+  value: 0.1
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+outputUsdPerMTok:
+  value: 0.5
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+benchmarks:
+  - bench: Terminal-Bench
+    version: "4.1"
+    model: Haiku 5.5 (max)
+    agentHarness: Claude Code
+    scoreKind: harness
+    score: 40.0
+    margin: 3.6
+    unit: "%"
+    cost: $1.0k
+    costUsd: 1000
+    tokensBillions: 12.1
+    note: "리더보드 RELEASE DATE 열은 2026-10-07입니다."
+    url: https://www.tbench.ai/leaderboard
+    asOf: 2026-11-21
