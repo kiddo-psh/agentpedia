@@ -14,7 +14,7 @@ const timeFormat = new Intl.DateTimeFormat("ko-KR", {
 });
 
 /** Request-time data (session, live comments): render inside a Suspense boundary. */
-export async function Comments({ slug }: { slug: string }) {
+export async function Comments({ slug, returnPath }: { slug: string; returnPath?: string }) {
   // Auth and DB code read the clock; mark this subtree request-time before touching them.
   await connection();
   const requestHeaders = await headers();
@@ -41,6 +41,7 @@ export async function Comments({ slug }: { slug: string }) {
   }
   const me = session?.user.id;
   const count = threads.reduce((n, t) => n + (t.body !== null ? 1 : 0) + t.replies.length, 0);
+  const login = `/login?next=${encodeURIComponent(returnPath ?? `/a/${slug}#comments`)}`;
 
   return (
     <>
@@ -53,7 +54,7 @@ export async function Comments({ slug }: { slug: string }) {
           <CommentForm slug={slug} />
         ) : (
           <p className="rounded-xl bg-soft px-5 py-4 text-sm text-muted">
-            <Link href={`/login?next=${encodeURIComponent(`/a/${slug}#comments`)}`} className="font-medium text-foreground underline underline-offset-4">
+            <Link href={login} className="font-medium text-foreground underline underline-offset-4">
               로그인
             </Link>
             하고 토론에 참여하세요.

@@ -52,6 +52,12 @@ export function WithIndex({
           에이전트
         </CategoryNavLink>
         <CategoryNavLink
+          href="/models"
+          className="-mx-2.5 block rounded-lg px-2.5 py-1.5 text-muted hover:text-foreground"
+        >
+          모델
+        </CategoryNavLink>
+        <CategoryNavLink
           href="/community"
           className="-mx-2.5 block rounded-lg px-2.5 py-1.5 text-muted hover:text-foreground"
         >
