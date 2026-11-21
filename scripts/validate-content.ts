@@ -1,12 +1,11 @@
 import { loadAllAgents, staleAgentWarnings } from "../src/content/agents";
-import { loadAllModels, loadTaskTiming, staleModelWarnings } from "../src/content/models";
+import { loadAllModels, staleModelWarnings } from "../src/content/models";
 import { ContentError, loadAllArticles } from "../src/content/loader";
 
 try {
   const articles = loadAllArticles();
   const agents = loadAllAgents();
   const models = loadAllModels();
-  loadTaskTiming();
   const drafts = articles.filter((a) => a.draft).length;
   const articleSlugs = new Set(articles.map((article) => article.slug));
   const agentSlugs = new Set(agents.map((agent) => agent.slug));

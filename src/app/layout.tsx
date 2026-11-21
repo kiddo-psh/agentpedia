@@ -35,35 +35,35 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <DeferredContentFont />
         <DeferredMonoFont />
         <header className="sticky top-0 z-20 bg-background/90 backdrop-blur">
-          <div className="mx-auto flex h-16 w-full max-w-[1280px] items-center gap-8 px-4 sm:px-8">
+          <div className="mx-auto flex h-16 w-full max-w-[1280px] min-w-0 items-center gap-3 px-4 sm:gap-8 sm:px-8">
             {/* usePathname suspends on fallback dynamic params (e.g. /community/[id]). */}
             <Suspense
               fallback={
-                <span className={brandClass}>
+                <span className={`${brandClass} shrink-0`}>
                   {brand}
                 </span>
               }
             >
-              <LogoLink className={brandClass}>{brand}</LogoLink>
+              <LogoLink className={`${brandClass} shrink-0`}>{brand}</LogoLink>
             </Suspense>
-            <nav className="flex gap-6 text-sm text-muted">
-              <Link href="/" className="max-sm:hidden hover:text-foreground">
+            <nav className="flex min-w-0 flex-1 flex-nowrap items-center gap-3 overflow-x-auto text-sm text-muted sm:gap-6 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+              <Link href="/" className="max-sm:hidden shrink-0 hover:text-foreground">
                 기사
               </Link>
-              <Link href="/agents" prefetch={true} className="hover:text-foreground">
+              <Link href="/agents" prefetch={true} className="shrink-0 hover:text-foreground">
                 에이전트
               </Link>
-              <Link href="/models" prefetch={true} className="hover:text-foreground">
+              <Link href="/models" prefetch={true} className="shrink-0 hover:text-foreground">
                 모델
               </Link>
-              <Link href="/community" prefetch={true} className="hover:text-foreground">
+              <Link href="/community" prefetch={true} className="shrink-0 hover:text-foreground">
                 커뮤니티
               </Link>
-              <Link href="/connect" className="max-sm:hidden hover:text-foreground">
+              <Link href="/connect" className="max-sm:hidden shrink-0 hover:text-foreground">
                 에이전트 연결
               </Link>
             </nav>
-            <div className="ml-auto text-sm">
+            <div className="ml-auto shrink-0 text-sm">
               <UserMenu />
             </div>
           </div>

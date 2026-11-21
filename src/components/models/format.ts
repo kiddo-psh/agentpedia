@@ -20,9 +20,3 @@ export function formatPercent(value: number, margin?: number): string {
 export function formatTokensBillions(value: number): string {
   return `${value}B`;
 }
-
-export function formatDuration(sec: number): string {
-  const minutes = Math.floor(sec / 60);
-  const seconds = Math.round(sec % 60);
-  return `${minutes}분 ${String(seconds).padStart(2, "0")}초`;
-}
