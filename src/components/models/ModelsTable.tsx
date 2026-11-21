@@ -4,17 +4,23 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { SourceAge } from "@/components/SourceAge";
 import { formatDate } from "@/content/labels";
+import { EMPTY } from "./format";
 import { compareRows, type ModelsTablePayload, type SortKey } from "./metrics";
 
 const SORT_OPTIONS: { key: SortKey; label: string; defaultDir: "asc" | "desc" }[] = [
   { key: "rank", label: "순위", defaultDir: "asc" },
   { key: "score", label: "해결률", defaultDir: "desc" },
-  { key: "runCost", label: "런 비용(전체)", defaultDir: "asc" },
-  { key: "tokens", label: "토큰", defaultDir: "asc" },
-  { key: "inputPrice", label: "입력 $/1M", defaultDir: "asc" },
-  { key: "outputPrice", label: "출력 $/1M", defaultDir: "asc" },
-  { key: "name", label: "이름", defaultDir: "asc" },
+  { key: "runCost", label: "전체 실행 비용", defaultDir: "asc" },
+  { key: "tokens", label: "사용 토큰", defaultDir: "asc" },
+  { key: "inputPrice", label: "입력 단가", defaultDir: "asc" },
+  { key: "outputPrice", label: "출력 단가", defaultDir: "asc" },
+  { key: "name", label: "모델", defaultDir: "asc" },
 ];
+
+function sortChoice(label: string, key: SortKey, dir: "asc" | "desc"): string {
+  if (key === "name") return dir === "asc" ? "이름순" : "이름 역순";
+  return `${label} ${dir === "asc" ? "낮은 순" : "높은 순"}`;
+}
 
 function SortButton({
   label,
@@ -105,7 +111,11 @@ export function ModelsTable({ payload }: { payload: ModelsTablePayload }) {
           </>
         ) : null}
       </p>
-      <p className="text-[12px]">런 비용은 작업당이 아니라 리더보드가 찍은 벤치마크 전체 런 비용입니다.</p>
+      <p className="text-[12px]">
+        실행 비용은 작업 하나의 비용이 아니라, 리더보드가 벤치마크 전체를 돌리며 기록한 금액입니다. 입력 단가와 출력
+        단가는 100만 토큰당 달러입니다.
+      </p>
+      <p className="text-[12px]">— 확인하지 못한 값</p>
     </footer>
   );
 
@@ -113,7 +123,9 @@ export function ModelsTable({ payload }: { payload: ModelsTablePayload }) {
     <div className="models-table-wrap">
       <div className="models-table-controls flex flex-wrap items-end gap-3">
         <label className="text-sm text-muted">
-          <span className="mb-1 block">하네스</span>
+          <span className="mb-1 block" title="모델을 돌린 에이전트 프로그램">
+            하네스
+          </span>
           <select
             className="models-select"
             value={harness}
@@ -142,10 +154,10 @@ export function ModelsTable({ payload }: { payload: ModelsTablePayload }) {
           >
             {SORT_OPTIONS.flatMap((opt) => [
               <option key={`${opt.key}:asc`} value={`${opt.key}:asc`}>
-                {opt.label} · 오름차순
+                {sortChoice(opt.label, opt.key, "asc")}
               </option>,
               <option key={`${opt.key}:desc`} value={`${opt.key}:desc`}>
-                {opt.label} · 내림차순
+                {sortChoice(opt.label, opt.key, "desc")}
               </option>,
             ])}
           </select>
@@ -165,13 +177,13 @@ export function ModelsTable({ payload }: { payload: ModelsTablePayload }) {
                 </th>
                 <th className="py-2 pr-3 font-medium">
                   <SortButton
-                    label="벤더"
+                    label="개발사"
                     active={sortKey === "vendor"}
                     dir={sortDir}
                     onClick={() => toggleSort("vendor")}
                   />
                 </th>
-                <th className="py-2 pr-3 font-medium">
+                <th className="py-2 pr-3 font-medium" title="모델을 돌린 에이전트 프로그램">
                   <SortButton
                     label="하네스"
                     active={sortKey === "harness"}
@@ -189,7 +201,7 @@ export function ModelsTable({ payload }: { payload: ModelsTablePayload }) {
                 </th>
                 <th className="py-2 pr-3 font-medium">
                   <SortButton
-                    label="런 비용(전체)"
+                    label="전체 실행 비용"
                     active={sortKey === "runCost"}
                     dir={sortDir}
                     onClick={() => toggleSort("runCost")}
@@ -197,23 +209,23 @@ export function ModelsTable({ payload }: { payload: ModelsTablePayload }) {
                 </th>
                 <th className="py-2 pr-3 font-medium">
                   <SortButton
-                    label="토큰"
+                    label="사용 토큰"
                     active={sortKey === "tokens"}
                     dir={sortDir}
                     onClick={() => toggleSort("tokens")}
                   />
                 </th>
-                <th className="py-2 pr-3 font-medium">
+                <th className="py-2 pr-3 font-medium" title="100만 토큰당 달러">
                   <SortButton
-                    label="입력 $/1M"
+                    label="입력 단가"
                     active={sortKey === "inputPrice"}
                     dir={sortDir}
                     onClick={() => toggleSort("inputPrice")}
                   />
                 </th>
-                <th className="py-2 font-medium">
+                <th className="py-2 font-medium" title="100만 토큰당 달러">
                   <SortButton
-                    label="출력 $/1M"
+                    label="출력 단가"
                     active={sortKey === "outputPrice"}
                     dir={sortDir}
                     onClick={() => toggleSort("outputPrice")}
@@ -232,7 +244,7 @@ export function ModelsTable({ payload }: { payload: ModelsTablePayload }) {
                     <EffortBadge effort={row.effort} />
                   </td>
                   <td className="py-3 pr-3 text-muted">{row.vendor}</td>
-                  <td className="py-3 pr-3 text-muted">{row.harness ?? "없음"}</td>
+                  <td className="py-3 pr-3 text-muted">{row.harness ?? EMPTY}</td>
                   <td className="py-3 pr-3">
                     <div className="tabular-nums font-medium">{row.scoreDisplay}</div>
                     <MiniBar value={row.scoreBar} />
@@ -272,19 +284,23 @@ export function ModelsTable({ payload }: { payload: ModelsTablePayload }) {
               </p>
               <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-[13px]">
                 <div>
-                  <dt className="text-muted">런 비용(전체)</dt>
+                  <dt className="text-muted">전체 실행 비용</dt>
                   <dd className="tabular-nums">{row.runCostDisplay}</dd>
                 </div>
                 <div>
-                  <dt className="text-muted">토큰</dt>
+                  <dt className="text-muted">사용 토큰</dt>
                   <dd className="tabular-nums">{row.tokensDisplay}</dd>
                 </div>
                 <div>
-                  <dt className="text-muted">입력 $/1M</dt>
+                  <dt className="text-muted" title="100만 토큰당 달러">
+                    입력 단가
+                  </dt>
                   <dd className="tabular-nums">{row.inputDisplay}</dd>
                 </div>
                 <div>
-                  <dt className="text-muted">출력 $/1M</dt>
+                  <dt className="text-muted" title="100만 토큰당 달러">
+                    출력 단가
+                  </dt>
                   <dd className="tabular-nums">{row.outputDisplay}</dd>
                 </div>
               </dl>

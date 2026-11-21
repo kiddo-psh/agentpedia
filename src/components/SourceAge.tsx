@@ -26,7 +26,7 @@ export function SourceAge({ newestIso, staleOnly = false }: { newestIso: string;
       <span aria-hidden>·</span>
       <span
         className={stale ? "rounded bg-amber-500/15 px-1.5 py-0.5 font-medium text-amber-700 dark:text-amber-300" : undefined}
-        title={stale ? "AI 도구와 모델은 빠르게 바뀌므로 지금과 다를 수 있어요." : undefined}
+        title={stale ? "AI 도구와 모델은 빨리 바뀌어 지금과 다를 수 있습니다." : undefined}
       >
         {sourceAge(months)}
       </span>

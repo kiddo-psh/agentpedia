@@ -8,6 +8,7 @@ import {
   paretoFrontier,
   parseEffort,
   pickWhichModels,
+  topHalfByResolve,
   proportionalBars,
 } from "./metrics";
 
@@ -97,5 +98,25 @@ describe("scatter", () => {
     const picks = pickWhichModels(points);
     expect(picks.map((p) => p.kind)).toEqual(["performance", "value", "cheap"]);
     expect(picks[0]!.slug).toBe("copilot-fusion");
+    expect(picks.find((pick) => pick.kind === "cheap")!.rule).toContain("상위 절반");
+  });
+
+  it("picks the cheapest model only inside the top half by resolve rate", () => {
+    const point = (id: string, x: number, y: number) => ({
+      id,
+      name: id,
+      href: `/models/${id}`,
+      harness: "h",
+      x,
+      y,
+      margin: null,
+      effort: null,
+    });
+    const points = [point("best", 100, 90), point("top-cheap", 40, 80), point("mid", 50, 70), point("low-cheap", 1, 10)];
+    expect(topHalfByResolve(points).map((p) => p.id)).toEqual(["best", "top-cheap"]);
+    const cheap = pickWhichModels(points).find((pick) => pick.kind === "cheap")!;
+    expect(cheap.slug).toBe("top-cheap");
+    expect(cheap.detail).toContain("$40");
+    expect(cheap.detail).toContain("80%");
   });
 });

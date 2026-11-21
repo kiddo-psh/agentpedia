@@ -6,7 +6,7 @@ export function WhichModelCards({ picks }: { picks: WhichPick[] }) {
   return (
     <section className="mt-14" aria-labelledby="which-title">
       <h2 id="which-title" className="text-[22px] font-semibold tracking-tight">
-        어떤 모델을 고를까
+        목적별 모델 고르기
       </h2>
       <ul className="mt-6 grid gap-6 sm:grid-cols-3">
         {picks.map((pick) => (

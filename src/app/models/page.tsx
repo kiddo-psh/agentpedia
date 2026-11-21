@@ -27,19 +27,20 @@ async function ModelsIndex() {
   return (
     <div className="models-page mx-auto max-w-[1100px] pt-2">
       <header className="models-hero">
-        <p className="text-[13px] font-medium text-muted">도구</p>
         <h1 className="mt-2 text-4xl font-medium tracking-[-0.03em]">모델 비교</h1>
         <p className="mt-4 max-w-[42em] text-lg leading-relaxed text-muted">
-          Terminal-Bench 해결률과 벤치마크 전체 런 비용으로 한눈에 보고, 표에서 단가·토큰까지 정렬합니다. 확인하지
-          못한 칸은 비워 둡니다.
+          Terminal-Bench 해결률과 전체 실행 비용을 한눈에 비교합니다. 표에서는 토큰 단가와 사용 토큰으로도 정렬할 수
+          있습니다. 확인하지 못한 값은 —로 표시합니다.
         </p>
       </header>
 
       <section className="mt-10" aria-labelledby="scatter-title">
         <h2 id="scatter-title" className="text-[22px] font-semibold tracking-tight">
-          해결률 × 런 비용
+          해결률과 실행 비용
         </h2>
-        <p className="mt-2 text-sm text-muted">Pareto 전선은 더 싸면서 더 잘 푸는 쪽의 경계입니다.</p>
+        <p className="mt-2 text-sm text-muted">
+          가성비 경계선 위의 모델보다 더 싸면서 더 많이 푼 모델은 없습니다.
+        </p>
         <div className="mt-5">
           <ScoreCostScatter points={scatter} />
         </div>
@@ -51,7 +52,7 @@ async function ModelsIndex() {
         <h2 id="table-title" className="text-[22px] font-semibold tracking-tight">
           비교 표
         </h2>
-        <p className="mt-2 text-sm text-muted">행을 누르면 모델 상세·토론으로 이동합니다.</p>
+        <p className="mt-2 text-sm text-muted">모델을 누르면 상세 정보와 토론으로 이동합니다.</p>
         <div className="mt-5">
           <ModelsTable payload={table} />
         </div>
