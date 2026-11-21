@@ -112,9 +112,40 @@
   fill: var(--muted);
 }
 
-.models-scatter-point.is-hot circle {
+/* Theme-aware harness tones: always mix from --foreground so dark mode stays visible. */
+.models-scatter-tone-0 { --scatter-ink: color-mix(in srgb, var(--foreground) 100%, transparent); }
+.models-scatter-tone-1 { --scatter-ink: color-mix(in srgb, var(--foreground) 78%, transparent); }
+.models-scatter-tone-2 { --scatter-ink: color-mix(in srgb, var(--foreground) 58%, transparent); }
+.models-scatter-tone-3 { --scatter-ink: color-mix(in srgb, var(--foreground) 88%, var(--muted)); }
+.models-scatter-tone-4 { --scatter-ink: color-mix(in srgb, var(--foreground) 68%, var(--muted)); }
+.models-scatter-tone-5 { --scatter-ink: color-mix(in srgb, var(--foreground) 48%, var(--muted)); }
+
+.models-scatter-dot {
+  fill: var(--scatter-ink);
+  fill-opacity: 0.92;
+}
+
+.models-scatter-ci {
+  stroke: var(--scatter-ink);
+  stroke-opacity: 0.5;
+}
+
+.models-scatter-point.is-hot .models-scatter-dot {
+  fill-opacity: 1;
   stroke: var(--background);
   stroke-width: 2;
+}
+
+.models-scatter-point.is-hot .models-scatter-ci {
+  stroke-opacity: 0.9;
+}
+
+.models-scatter-swatch {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--scatter-ink);
 }
 
 .models-bench-cards {

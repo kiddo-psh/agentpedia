@@ -1,16 +1,17 @@
 import Link from "next/link";
 import { paretoFrontier, type ScatterPoint } from "./metrics";
 
-const HARNESS_COLORS: Record<string, string> = {
-  "GitHub Copilot": "#0d0d0d",
-  "Claude Code": "#5b5b5b",
-  Codex: "#8a8a8a",
-  "Antigravity CLI": "#3d3d3d",
-  "Grok Build": "#6e6e6e",
+/** Stable harness → tone index so colors come from theme CSS, not fixed hex. */
+const HARNESS_TONE: Record<string, number> = {
+  "GitHub Copilot": 0,
+  "Claude Code": 1,
+  Codex: 2,
+  "Antigravity CLI": 3,
+  "Grok Build": 4,
 };
 
-function harnessColor(harness: string): string {
-  return HARNESS_COLORS[harness] ?? "#4a4a4a";
+function harnessTone(harness: string): number {
+  return HARNESS_TONE[harness] ?? 5;
 }
 
 function logScale(value: number, min: number, max: number): number {
@@ -140,18 +141,25 @@ export function ScoreCostScatter({
           const { cx, cy } = project(point);
           const hi = highlightId === point.id;
           const m = point.margin ?? 0;
+          const tone = harnessTone(point.harness);
           const yTop = pad.top + (1 - (point.y + m - yMin) / ySpan) * innerH;
           const yBot = pad.top + (1 - (point.y - m - yMin) / ySpan) * innerH;
           return (
-            <g key={point.id} className={hi ? "models-scatter-point is-hot" : "models-scatter-point"}>
+            <g
+              key={point.id}
+              className={
+                hi
+                  ? `models-scatter-point models-scatter-tone-${tone} is-hot`
+                  : `models-scatter-point models-scatter-tone-${tone}`
+              }
+            >
               {m > 0 ? (
                 <line
                   x1={cx}
                   y1={yTop}
                   x2={cx}
                   y2={yBot}
-                  stroke={harnessColor(point.harness)}
-                  strokeOpacity={hi ? 0.9 : 0.45}
+                  className="models-scatter-ci"
                   strokeWidth={hi ? 2 : 1}
                 />
               ) : null}
@@ -161,13 +169,7 @@ export function ScoreCostScatter({
                   {point.effort ? ` (${point.effort})` : ""} · {point.harness} · {point.y}%
                   {point.margin != null ? ` ± ${point.margin}` : ""} · ${point.x.toLocaleString("en-US")}
                 </title>
-                <circle
-                  cx={cx}
-                  cy={cy}
-                  r={hi ? 6 : 4.5}
-                  fill={harnessColor(point.harness)}
-                  fillOpacity={hi ? 1 : 0.85}
-                />
+                <circle cx={cx} cy={cy} r={hi ? 6 : 4.5} className="models-scatter-dot" />
               </a>
               {!compact && (hi || point.y >= yMax - 1 || frontier.some((f) => f.id === point.id)) ? (
                 <text x={cx + 8} y={cy - 8} className="models-scatter-label">
@@ -182,8 +184,7 @@ export function ScoreCostScatter({
         {harnesses.map((harness) => (
           <li key={harness} className="inline-flex items-center gap-1.5">
             <span
-              className="inline-block h-2 w-2 rounded-full"
-              style={{ background: harnessColor(harness) }}
+              className={`models-scatter-swatch models-scatter-tone-${harnessTone(harness)}`}
               aria-hidden
             />
             {harness}
