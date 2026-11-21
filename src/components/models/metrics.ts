@@ -2,126 +2,107 @@ import type { TaskTimingRow } from "@/content/models";
 import type { Model } from "@/content/schema";
 import { EMPTY, formatDuration, formatPercent, formatTokensBillions, formatUsd } from "./format";
 
-export const METRIC_IDS = ["score", "runCost", "tokens", "inputPrice", "outputPrice", "taskTime"] as const;
-export type MetricId = (typeof METRIC_IDS)[number];
-
-export type MetricDef = {
-  id: MetricId;
-  label: string;
-  /** Short unit line under the active metric. */
-  unit: string;
-  /** One-line explanation under the tabs. */
-  blurb: string;
-  /** Sort high→low and fill bars by magnitude when true; low→high (fast/cheap-as-good) when false. */
-  higherIsBetter: boolean;
-};
-
-export const METRICS: readonly MetricDef[] = [
-  {
-    id: "score",
-    label: "해결률",
-    unit: "Terminal-Bench 4.1 · %",
-    blurb: "행마다 에이전트 하네스가 다릅니다. 모델만 비교한 값이 아니라, 그 제품으로 잰 값입니다.",
-    higherIsBetter: true,
-  },
-  {
-    id: "runCost",
-    label: "런 비용",
-    unit: "Terminal-Bench 4.1 · USD",
-    blurb: "리더보드가 찍은 전체 런 비용입니다. 값이 클수록 위·바가 깁니다. 확인하지 못한 칸은 비워 둡니다.",
-    higherIsBetter: true,
-  },
-  {
-    id: "tokens",
-    label: "토큰",
-    unit: "Terminal-Bench 4.1 · 십억(B)",
-    blurb: "리더보드가 찍은 전체 토큰량입니다.",
-    higherIsBetter: false,
-  },
-  {
-    id: "inputPrice",
-    label: "입력 $/1M",
-    unit: "OpenRouter · USD / 1M tokens",
-    blurb: "백만 입력 토큰당 목록 가격입니다. 비싼 순입니다. 캐시·할인은 반영하지 않았습니다.",
-    higherIsBetter: true,
-  },
-  {
-    id: "outputPrice",
-    label: "출력 $/1M",
-    unit: "OpenRouter · USD / 1M tokens",
-    blurb: "백만 출력 토큰당 목록 가격입니다. 비싼 순입니다. 캐시·할인은 반영하지 않았습니다.",
-    higherIsBetter: true,
-  },
-  {
-    id: "taskTime",
-    label: "작업당 시간",
-    unit: "Vals SWE-bench Verified · Mini-SWE-agent",
-    blurb: "보드가 2026-09-01에 갱신을 멈춰서 Terminal-Bench 모델과 버전이 다를 수 있습니다.",
-    higherIsBetter: false,
-  },
-] as const;
-
-export type LeaderboardRowData = {
-  id: string;
-  /** Rank among rows with a value; null when value is missing. */
-  rank: number | null;
-  name: string;
-  vendor: string;
-  href: string | null;
-  value: number | null;
-  display: string;
-  detail: string | null;
-  /** 0–1 bar fill; null when no value. */
-  bar: number | null;
-};
-
-export type MetricBoard = {
-  metric: MetricId;
-  rows: LeaderboardRowData[];
-  /** Newest asOf ISO among rows that contributed a value, when any. */
-  asOfIso: string | null;
-  sourceLabel: string;
-  sourceUrl: string | null;
-};
-
-export type LeaderboardPayload = {
-  boards: Record<MetricId, MetricBoard>;
-  defaultMetric: MetricId;
-};
-
 const TB = "Terminal-Bench";
 const TB_VERSION = "4.1";
 
+export type SortKey =
+  | "rank"
+  | "name"
+  | "vendor"
+  | "harness"
+  | "score"
+  | "runCost"
+  | "tokens"
+  | "inputPrice"
+  | "outputPrice";
+
+export type ModelTableRow = {
+  slug: string;
+  name: string;
+  vendor: string;
+  href: string;
+  /** Effort token from the Terminal-Bench model label, e.g. max / high / xhigh. */
+  effort: string | null;
+  harness: string | null;
+  score: number | null;
+  margin: number | null;
+  /** Competition rank by score (ties share; next skips). */
+  rank: number | null;
+  runCostUsd: number | null;
+  tokensBillions: number | null;
+  inputUsd: number | null;
+  outputUsd: number | null;
+  scoreDisplay: string;
+  runCostDisplay: string;
+  tokensDisplay: string;
+  inputDisplay: string;
+  outputDisplay: string;
+  /** Bar fill 0–1 proportional to the raw value (value / max), never inverted. */
+  scoreBar: number | null;
+  runCostBar: number | null;
+  tokensBar: number | null;
+  inputBar: number | null;
+  outputBar: number | null;
+};
+
+export type SourceMeta = {
+  label: string;
+  url: string | null;
+  asOfIso: string | null;
+};
+
+export type ModelsTablePayload = {
+  rows: ModelTableRow[];
+  harnesses: string[];
+  terminalBench: SourceMeta;
+  openRouter: SourceMeta;
+};
+
+export type TimingViewRow = {
+  id: string;
+  name: string;
+  vendor: string;
+  href: string | null;
+  durationSec: number;
+  durationDisplay: string;
+  score: number;
+  costUsd: number;
+  costDisplay: string;
+};
+
+export type ScatterPoint = {
+  id: string;
+  name: string;
+  href: string;
+  harness: string;
+  /** Run cost USD (x). */
+  x: number;
+  /** Resolve rate % (y). */
+  y: number;
+  /** Half-width of CI in percentage points. */
+  margin: number | null;
+  effort: string | null;
+};
+
+export type WhichPick = {
+  kind: "performance" | "value" | "cheap";
+  title: string;
+  rule: string;
+  slug: string;
+  name: string;
+  href: string;
+  detail: string;
+};
+
+/** Pull effort from a leaderboard model label like `Opus 5.5 (max)`. */
+export function parseEffort(modelLabel: string | undefined | null): string | null {
+  if (!modelLabel) return null;
+  const match = modelLabel.match(/\(([^)]+)\)\s*$/);
+  return match?.[1]?.trim() || null;
+}
+
 function terminalBench(model: Model) {
   return model.benchmarks.find((b) => b.bench === TB && b.version === TB_VERSION);
-}
-
-function sortRows(rows: LeaderboardRowData[], higherIsBetter: boolean): LeaderboardRowData[] {
-  const withValue = rows.filter((r) => r.value !== null);
-  const without = rows.filter((r) => r.value === null);
-  withValue.sort((a, b) => {
-    const av = a.value!;
-    const bv = b.value!;
-    return higherIsBetter ? bv - av : av - bv;
-  });
-  const ranked = withValue.map((row, i) => ({ ...row, rank: i + 1 }));
-  return [...ranked, ...without.map((row) => ({ ...row, rank: null }))];
-}
-
-function withBars(rows: LeaderboardRowData[], higherIsBetter: boolean): LeaderboardRowData[] {
-  const values = rows.map((r) => r.value).filter((v): v is number => v !== null);
-  if (values.length === 0) return rows;
-  const max = Math.max(...values);
-  const min = Math.min(...values);
-  const span = Math.max(max - min, Number.EPSILON);
-  return rows.map((row) => {
-    if (row.value === null) return { ...row, bar: null };
-    // Magnitude metrics (score, prices): longer bar for higher.
-    // Inverted metrics (tokens, task time): longer bar for lower relative to peers.
-    if (higherIsBetter) return { ...row, bar: Math.max(0.06, row.value / max) };
-    if (max === min) return { ...row, bar: 1 };
-    return { ...row, bar: Math.max(0.06, (max - row.value) / span) };
-  });
 }
 
 function newestIso(dates: Date[]): string | null {
@@ -129,170 +110,251 @@ function newestIso(dates: Date[]): string | null {
   return new Date(Math.max(...dates.map((d) => d.getTime()))).toISOString();
 }
 
-function buildModelMetric(
-  models: Model[],
-  metric: MetricId,
-  def: MetricDef,
-  pick: (model: Model) => {
-    value: number | null;
-    display: string;
-    detail: string | null;
-    asOf: Date | null;
-    sourceUrl: string | null;
-  },
-  sourceLabel: string,
-): MetricBoard {
-  const asOfs: Date[] = [];
-  let sourceUrl: string | null = null;
-  const base: LeaderboardRowData[] = models.map((model) => {
-    const cell = pick(model);
-    if (cell.value !== null) {
-      if (cell.asOf) asOfs.push(cell.asOf);
-      if (!sourceUrl && cell.sourceUrl) sourceUrl = cell.sourceUrl;
+/**
+ * Competition ranking: ties share the first place in the group; the next distinct
+ * value skips ahead (1, 2, 2, 4). Null values get null ranks.
+ */
+export function competitionRanks(
+  items: ReadonlyArray<{ id: string; value: number | null }>,
+  higherIsBetter: boolean,
+): Map<string, number | null> {
+  const ranked = new Map<string, number | null>();
+  const withValue = items.filter((item): item is { id: string; value: number } => item.value !== null);
+  withValue.sort((a, b) => (higherIsBetter ? b.value - a.value : a.value - b.value) || a.id.localeCompare(b.id));
+  let i = 0;
+  while (i < withValue.length) {
+    let j = i + 1;
+    while (j < withValue.length && withValue[j]!.value === withValue[i]!.value) j += 1;
+    const rank = i + 1;
+    for (let k = i; k < j; k += 1) ranked.set(withValue[k]!.id, rank);
+    i = j;
+  }
+  for (const item of items) {
+    if (!ranked.has(item.id)) ranked.set(item.id, null);
+  }
+  return ranked;
+}
+
+/** Bar length proportional to magnitude: value / max among peers. Never invert. */
+export function proportionalBars(values: ReadonlyArray<number | null>): Array<number | null> {
+  const numeric = values.filter((v): v is number => v !== null);
+  if (numeric.length === 0) return values.map(() => null);
+  const max = Math.max(...numeric);
+  if (max <= 0) return values.map((v) => (v === null ? null : 1));
+  return values.map((v) => (v === null ? null : Math.max(0.06, v / max)));
+}
+
+/**
+ * 2D Pareto frontier for minimize x (cost) and maximize y (score).
+ * Sort by ascending x; keep points that strictly improve the best y so far.
+ */
+export function paretoFrontier<T extends { x: number; y: number }>(points: ReadonlyArray<T>): T[] {
+  const sorted = [...points].sort((a, b) => a.x - b.x || b.y - a.y);
+  const frontier: T[] = [];
+  let bestY = -Infinity;
+  for (const point of sorted) {
+    if (point.y > bestY) {
+      frontier.push(point);
+      bestY = point.y;
+    }
+  }
+  return frontier;
+}
+
+export function buildModelsTable(models: Model[]): ModelsTablePayload {
+  const tbDates: Date[] = [];
+  const priceDates: Date[] = [];
+  let tbUrl: string | null = null;
+  let priceUrl: string | null = null;
+
+  const base = models.map((model) => {
+    const tb = terminalBench(model);
+    if (tb) {
+      tbDates.push(tb.asOf);
+      tbUrl ??= tb.url;
+    }
+    if (model.inputUsdPerMTok) {
+      priceDates.push(model.inputUsdPerMTok.asOf);
+      priceUrl ??= model.inputUsdPerMTok.sourceUrl;
+    }
+    if (model.outputUsdPerMTok) {
+      priceDates.push(model.outputUsdPerMTok.asOf);
+      priceUrl ??= model.outputUsdPerMTok.sourceUrl;
     }
     return {
-      id: model.slug,
-      rank: null,
+      slug: model.slug,
       name: model.name,
       vendor: model.vendor,
       href: `/models/${model.slug}`,
-      value: cell.value,
-      display: cell.display,
-      detail: cell.detail,
-      bar: null,
+      effort: parseEffort(tb?.model),
+      harness: tb?.agentHarness ?? null,
+      score: tb?.score ?? null,
+      margin: tb?.margin ?? null,
+      runCostUsd: tb?.costUsd ?? null,
+      tokensBillions: tb?.tokensBillions ?? null,
+      inputUsd: model.inputUsdPerMTok?.value ?? null,
+      outputUsd: model.outputUsdPerMTok?.value ?? null,
+      scoreDisplay: tb ? formatPercent(tb.score, tb.margin) : EMPTY,
+      runCostDisplay: tb?.costUsd !== undefined ? formatUsd(tb.costUsd) : EMPTY,
+      tokensDisplay: tb?.tokensBillions !== undefined ? formatTokensBillions(tb.tokensBillions) : EMPTY,
+      inputDisplay: model.inputUsdPerMTok ? formatUsd(model.inputUsdPerMTok.value) : EMPTY,
+      outputDisplay: model.outputUsdPerMTok ? formatUsd(model.outputUsdPerMTok.value) : EMPTY,
     };
   });
+
+  const ranks = competitionRanks(
+    base.map((row) => ({ id: row.slug, value: row.score })),
+    true,
+  );
+  const scoreBars = proportionalBars(base.map((r) => r.score));
+  const runCostBars = proportionalBars(base.map((r) => r.runCostUsd));
+  const tokensBars = proportionalBars(base.map((r) => r.tokensBillions));
+  const inputBars = proportionalBars(base.map((r) => r.inputUsd));
+  const outputBars = proportionalBars(base.map((r) => r.outputUsd));
+
+  const rows: ModelTableRow[] = base
+    .map((row, i) => ({
+      ...row,
+      rank: ranks.get(row.slug) ?? null,
+      scoreBar: scoreBars[i]!,
+      runCostBar: runCostBars[i]!,
+      tokensBar: tokensBars[i]!,
+      inputBar: inputBars[i]!,
+      outputBar: outputBars[i]!,
+    }))
+    .sort((a, b) => {
+      if (a.rank === null && b.rank === null) return a.name.localeCompare(b.name, "ko");
+      if (a.rank === null) return 1;
+      if (b.rank === null) return -1;
+      return a.rank - b.rank || b.score! - a.score! || a.name.localeCompare(b.name, "ko");
+    });
+
+  const harnesses = [...new Set(rows.map((r) => r.harness).filter((h): h is string => Boolean(h)))].sort((a, b) =>
+    a.localeCompare(b, "ko"),
+  );
+
   return {
-    metric,
-    rows: withBars(sortRows(base, def.higherIsBetter), def.higherIsBetter),
-    asOfIso: newestIso(asOfs),
-    sourceLabel,
-    sourceUrl,
+    rows,
+    harnesses,
+    terminalBench: {
+      label: "tbench.ai/leaderboard",
+      url: tbUrl,
+      asOfIso: newestIso(tbDates),
+    },
+    openRouter: {
+      label: "OpenRouter",
+      url: priceUrl,
+      asOfIso: newestIso(priceDates),
+    },
   };
 }
 
-function buildTaskTimeBoard(models: Model[], timing: TaskTimingRow[], def: MetricDef): MetricBoard {
+export function buildScatterPoints(rows: ReadonlyArray<ModelTableRow>): ScatterPoint[] {
+  return rows
+    .filter((row): row is ModelTableRow & { runCostUsd: number; score: number; harness: string } =>
+      row.runCostUsd !== null && row.score !== null && row.harness !== null,
+    )
+    .map((row) => ({
+      id: row.slug,
+      name: row.name,
+      href: row.href,
+      harness: row.harness,
+      x: row.runCostUsd,
+      y: row.score,
+      margin: row.margin,
+      effort: row.effort,
+    }));
+}
+
+export function buildTimingRows(models: Model[], timing: TaskTimingRow[]): TimingViewRow[] {
   const byName = new Map(models.map((m) => [m.name, m.slug]));
-  const rows: LeaderboardRowData[] = timing.map((row) => {
-    const slug = byName.get(row.model);
-    return {
-      id: slug ?? `timing:${row.model}`,
-      rank: null,
-      name: row.model,
-      vendor: row.vendor,
-      href: slug ? `/models/${slug}` : null,
-      value: row.durationSec,
-      display: formatDuration(row.durationSec),
-      detail: `${row.score}% · ${formatUsd(row.costUsd)}/test`,
-      bar: null,
-    };
-  });
-  const ranked = withBars(sortRows(rows, def.higherIsBetter), def.higherIsBetter);
-  return {
-    metric: "taskTime",
-    rows: ranked,
-    asOfIso: newestIso(timing.map((r) => r.asOf)),
-    sourceLabel: "vals.ai/benchmarks/swebench",
-    sourceUrl: timing[0]?.url ?? "https://www.vals.ai/benchmarks/swebench",
-  };
+  return [...timing]
+    .sort((a, b) => a.durationSec - b.durationSec)
+    .map((row) => {
+      const slug = byName.get(row.model);
+      return {
+        id: slug ?? `timing:${row.model}`,
+        name: row.model,
+        vendor: row.vendor,
+        href: slug ? `/models/${slug}` : null,
+        durationSec: row.durationSec,
+        durationDisplay: formatDuration(row.durationSec),
+        score: row.score,
+        costUsd: row.costUsd,
+        costDisplay: formatUsd(row.costUsd),
+      };
+    });
 }
 
-/** Build all metric boards from sourced model + timing data. */
-export function buildLeaderboard(models: Model[], timing: TaskTimingRow[]): LeaderboardPayload {
-  const byId = Object.fromEntries(METRICS.map((m) => [m.id, m])) as Record<MetricId, MetricDef>;
+export function pickWhichModels(points: ReadonlyArray<ScatterPoint>): WhichPick[] {
+  if (points.length === 0) return [];
+  const best = [...points].sort((a, b) => b.y - a.y || a.x - b.x)[0]!;
+  const cheap = [...points].sort((a, b) => a.x - b.x || b.y - a.y)[0]!;
+  const frontier = paretoFrontier(points);
+  const value =
+    [...frontier].sort((a, b) => b.y / b.x - a.y / a.x || b.y - a.y)[0] ?? best;
 
-  const boards: Record<MetricId, MetricBoard> = {
-    score: buildModelMetric(
-      models,
-      "score",
-      byId.score,
-      (model) => {
-        const tb = terminalBench(model);
-        if (!tb) return { value: null, display: EMPTY, detail: null, asOf: null, sourceUrl: null };
-        return {
-          value: tb.score,
-          display: formatPercent(tb.score, tb.margin),
-          detail: tb.agentHarness,
-          asOf: tb.asOf,
-          sourceUrl: tb.url,
-        };
-      },
-      "tbench.ai/leaderboard",
-    ),
-    runCost: buildModelMetric(
-      models,
-      "runCost",
-      byId.runCost,
-      (model) => {
-        const tb = terminalBench(model);
-        if (!tb || tb.costUsd === undefined) {
-          return { value: null, display: EMPTY, detail: tb?.cost ?? null, asOf: tb?.asOf ?? null, sourceUrl: tb?.url ?? null };
-        }
-        return {
-          value: tb.costUsd,
-          display: formatUsd(tb.costUsd),
-          detail: tb.agentHarness,
-          asOf: tb.asOf,
-          sourceUrl: tb.url,
-        };
-      },
-      "tbench.ai/leaderboard",
-    ),
-    tokens: buildModelMetric(
-      models,
-      "tokens",
-      byId.tokens,
-      (model) => {
-        const tb = terminalBench(model);
-        if (!tb || tb.tokensBillions === undefined) {
-          return { value: null, display: EMPTY, detail: null, asOf: tb?.asOf ?? null, sourceUrl: tb?.url ?? null };
-        }
-        return {
-          value: tb.tokensBillions,
-          display: formatTokensBillions(tb.tokensBillions),
-          detail: tb.agentHarness,
-          asOf: tb.asOf,
-          sourceUrl: tb.url,
-        };
-      },
-      "tbench.ai/leaderboard",
-    ),
-    inputPrice: buildModelMetric(
-      models,
-      "inputPrice",
-      byId.inputPrice,
-      (model) => {
-        const price = model.inputUsdPerMTok;
-        if (!price) return { value: null, display: EMPTY, detail: null, asOf: null, sourceUrl: null };
-        return {
-          value: price.value,
-          display: formatUsd(price.value),
-          detail: null,
-          asOf: price.asOf,
-          sourceUrl: price.sourceUrl,
-        };
-      },
-      "OpenRouter",
-    ),
-    outputPrice: buildModelMetric(
-      models,
-      "outputPrice",
-      byId.outputPrice,
-      (model) => {
-        const price = model.outputUsdPerMTok;
-        if (!price) return { value: null, display: EMPTY, detail: null, asOf: null, sourceUrl: null };
-        return {
-          value: price.value,
-          display: formatUsd(price.value),
-          detail: null,
-          asOf: price.asOf,
-          sourceUrl: price.sourceUrl,
-        };
-      },
-      "OpenRouter",
-    ),
-    taskTime: buildTaskTimeBoard(models, timing, byId.taskTime),
+  return [
+    {
+      kind: "performance",
+      title: "해결률이 가장 높은 모델",
+      rule: "Terminal-Bench 해결률이 가장 높은 행.",
+      slug: best.id,
+      name: best.name,
+      href: best.href,
+      detail: formatPercent(best.y, best.margin ?? undefined),
+    },
+    {
+      kind: "value",
+      title: "가성비가 좋은 모델",
+      rule: "런 비용↓·해결률↑ Pareto 전선 위에서 해결률÷런비용이 가장 큰 점.",
+      slug: value.id,
+      name: value.name,
+      href: value.href,
+      detail: `${formatPercent(value.y, value.margin ?? undefined)} · ${formatUsd(value.x)}`,
+    },
+    {
+      kind: "cheap",
+      title: "런 비용이 가장 낮은 모델",
+      rule: "벤치마크 전체 런 비용(USD)이 가장 낮은 행.",
+      slug: cheap.id,
+      name: cheap.name,
+      href: cheap.href,
+      detail: formatUsd(cheap.x),
+    },
+  ];
+}
+
+export function compareRows(a: ModelTableRow, b: ModelTableRow, key: SortKey, dir: "asc" | "desc"): number {
+  const sign = dir === "asc" ? 1 : -1;
+  const nullLast = (av: number | null, bv: number | null) => {
+    if (av === null && bv === null) return 0;
+    if (av === null) return 1;
+    if (bv === null) return -1;
+    return (av - bv) * sign;
   };
-
-  return { boards, defaultMetric: "score" };
+  switch (key) {
+    case "rank":
+      return nullLast(a.rank, b.rank) || a.name.localeCompare(b.name, "ko");
+    case "name":
+      return a.name.localeCompare(b.name, "ko") * sign;
+    case "vendor":
+      return a.vendor.localeCompare(b.vendor, "ko") * sign || a.name.localeCompare(b.name, "ko");
+    case "harness":
+      return (a.harness ?? "").localeCompare(b.harness ?? "", "ko") * sign || a.name.localeCompare(b.name, "ko");
+    case "score":
+      return nullLast(a.score, b.score) || a.name.localeCompare(b.name, "ko");
+    case "runCost":
+      return nullLast(a.runCostUsd, b.runCostUsd) || a.name.localeCompare(b.name, "ko");
+    case "tokens":
+      return nullLast(a.tokensBillions, b.tokensBillions) || a.name.localeCompare(b.name, "ko");
+    case "inputPrice":
+      return nullLast(a.inputUsd, b.inputUsd) || a.name.localeCompare(b.name, "ko");
+    case "outputPrice":
+      return nullLast(a.outputUsd, b.outputUsd) || a.name.localeCompare(b.name, "ko");
+    default: {
+      const _exhaustive: never = key;
+      return _exhaustive;
+    }
+  }
 }
