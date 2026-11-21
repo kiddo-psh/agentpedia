@@ -1,18 +1,18 @@
 {
-  "generatedAt": "2026-11-21T16:15:46.287Z",
-  "articles": 19,
+  "generatedAt": "2026-11-21T16:18:41.236Z",
+  "articles": 16,
   "critical": {
-    "glyphs": 705,
-    "hangul": 584,
-    "bytes": 142912,
+    "glyphs": 690,
+    "hangul": 569,
+    "bytes": 140972,
     "file": "src/fonts/pretendard-critical.woff2"
   },
   "content": {
-    "glyphs": 303,
-    "hangul": 296,
-    "bytes": 67904,
+    "glyphs": 293,
+    "hangul": 286,
+    "bytes": 64476,
     "file": "src/fonts/pretendard-content.woff2"
   },
-  "totalBytes": 210816,
+  "totalBytes": 205448,
   "note": "Missing glyphs fall back to system Korean fonts in --font-sans."
 }
