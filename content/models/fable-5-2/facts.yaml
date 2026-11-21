@@ -1,0 +1,28 @@
+slug: fable-5-2
+name: Claude Fable 5.2
+vendor: Anthropic
+openRouterId: anthropic/claude-fable-5.2
+relatedAgents: [claude-code]
+inputUsdPerMTok:
+  value: 8
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+outputUsdPerMTok:
+  value: 40
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+benchmarks:
+  - bench: Terminal-Bench
+    version: "4.1"
+    model: Fable 5.2 (max)
+    agentHarness: Claude Code
+    scoreKind: harness
+    score: 65.8
+    margin: 2.8
+    unit: "%"
+    cost: $16.5k
+    costUsd: 16500
+    tokensBillions: 15.7
+    note: "리더보드 RELEASE DATE 열은 2026-11-09입니다."
+    url: https://www.tbench.ai/leaderboard
+    asOf: 2026-11-21

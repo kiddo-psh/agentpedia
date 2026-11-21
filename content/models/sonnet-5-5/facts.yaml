@@ -1,0 +1,28 @@
+slug: sonnet-5-5
+name: Claude Sonnet 5.5
+vendor: Anthropic
+openRouterId: anthropic/claude-sonnet-5.5
+relatedAgents: [claude-code]
+inputUsdPerMTok:
+  value: 2
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+outputUsdPerMTok:
+  value: 10
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+benchmarks:
+  - bench: Terminal-Bench
+    version: "4.1"
+    model: Sonnet 5.5 (max)
+    agentHarness: Claude Code
+    scoreKind: harness
+    score: 63.9
+    margin: 3.0
+    unit: "%"
+    cost: $7.3k
+    costUsd: 7300
+    tokensBillions: 19.4
+    note: "리더보드 RELEASE DATE 열은 2026-09-28입니다."
+    url: https://www.tbench.ai/leaderboard
+    asOf: 2026-11-21

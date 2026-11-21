@@ -212,3 +212,36 @@ export type AgentFacts = z.infer<typeof AgentFacts>;
 export type Agent = AgentFacts & {
   bodyMarkdown: string;
 };
+
+/**
+ * Model leaderboard row. Same harness/model split as agents; optional numeric
+ * fields feed the /models charts without parsing display strings.
+ */
+export const ModelBenchmark = AgentBenchmark.extend({
+  /** Total tokens the source printed in billions, when present. */
+  tokensBillions: z.number().nonnegative().optional(),
+  /** Run or per-task cost in USD when the source prints a dollar amount. */
+  costUsd: z.number().nonnegative().optional(),
+  /** Mean seconds per task when the source prints a duration. */
+  durationSec: z.number().nonnegative().optional(),
+});
+export type ModelBenchmark = z.infer<typeof ModelBenchmark>;
+
+export const ModelFacts = z.object({
+  slug: z.string().regex(/^[a-z0-9-]+$/),
+  name: z.string().min(1),
+  vendor: z.string().min(1),
+  /** OpenRouter model id used for the token-price source URL. */
+  openRouterId: z.string().min(1).optional(),
+  /** List price for 1M input tokens, USD. */
+  inputUsdPerMTok: SourcedNumber.optional(),
+  /** List price for 1M output tokens, USD. */
+  outputUsdPerMTok: SourcedNumber.optional(),
+  benchmarks: z.array(ModelBenchmark).default([]),
+  relatedAgents: z.array(z.string().regex(/^[a-z0-9-]+$/)).default([]),
+});
+export type ModelFacts = z.infer<typeof ModelFacts>;
+
+export type Model = ModelFacts & {
+  bodyMarkdown: string;
+};

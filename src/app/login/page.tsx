@@ -9,7 +9,7 @@ export default function LoginPage() {
   return (
     <div className="mx-auto max-w-sm pt-16">
       <h1 className="text-4xl font-medium tracking-[-0.03em]">로그인</h1>
-      <p className="mt-2 text-sm text-muted">댓글과 커뮤니티 글을 쓰려면 로그인하세요.</p>
+      <p className="mt-2 text-sm text-muted">댓글, 모델 토론, 커뮤니티 글을 쓰려면 로그인하세요.</p>
       {/* LoginForm reads ?next= from the URL, which is request data. */}
       <Suspense>
         <LoginForm github={githubLogin} devPassword={devPasswordLogin} />

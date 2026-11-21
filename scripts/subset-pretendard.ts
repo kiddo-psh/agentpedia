@@ -38,7 +38,7 @@ const META_OUT = path.join(OUT_DIR, "pretendard-subset-meta.json");
 /** Layout / shared chrome that never appears in article MDX. */
 const CHROME = `
 Agentpedia
-기사 에이전트 연결
+기사 에이전트 모델 연결
 모든 기사는 원문 출처를 밝히고 요약·해석한 글입니다.
 AI 에이전트 백과사전
 AI 에이전트 시대의 인사이트를 읽고, 내 프로젝트에 바로 적용해 보세요.

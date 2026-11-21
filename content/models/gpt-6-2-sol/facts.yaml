@@ -1,0 +1,28 @@
+slug: gpt-6-2-sol
+name: GPT-6.2 Sol
+vendor: OpenAI
+openRouterId: openai/gpt-6.2-sol
+relatedAgents: [codex]
+inputUsdPerMTok:
+  value: 2
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+outputUsdPerMTok:
+  value: 10
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+benchmarks:
+  - bench: Terminal-Bench
+    version: "4.1"
+    model: GPT-6.2 Sol (max)
+    agentHarness: Codex
+    scoreKind: harness
+    score: 61.5
+    margin: 2.8
+    unit: "%"
+    cost: $0.3k
+    costUsd: 300
+    tokensBillions: 1.1
+    note: "리더보드 RELEASE DATE 열은 2026-11-17입니다."
+    url: https://www.tbench.ai/leaderboard
+    asOf: 2026-11-21

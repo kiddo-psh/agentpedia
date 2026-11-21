@@ -1,0 +1,28 @@
+slug: gemini-4-neon
+name: Gemini 4 Neon
+vendor: Google
+openRouterId: google/gemini-4-neon
+relatedAgents: []
+inputUsdPerMTok:
+  value: 3
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+outputUsdPerMTok:
+  value: 15
+  sourceUrl: https://openrouter.ai/api/v1/models
+  asOf: 2026-11-21
+benchmarks:
+  - bench: Terminal-Bench
+    version: "4.1"
+    model: Gemini 4 Neon (xhigh)
+    agentHarness: Antigravity CLI
+    scoreKind: harness
+    score: 61.2
+    margin: 2.8
+    unit: "%"
+    cost: $1.9k
+    costUsd: 1900
+    tokensBillions: 3.2
+    note: "리더보드 RELEASE DATE 열은 2026-11-18입니다."
+    url: https://www.tbench.ai/leaderboard
+    asOf: 2026-11-21
