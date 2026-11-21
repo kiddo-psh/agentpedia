@@ -194,7 +194,7 @@ function BenchmarkTable({ title, rows }: { title: string; rows: AgentBenchmark[]
                   <td className="py-3 pr-4 tabular-nums">
                     {row.score}
                     {row.unit}
-                    {row.margin !== undefined ? ` ± ${row.margin}` : ""}
+                    {row.margin !== undefined ? ` ± ${row.margin}${row.unit}` : ""}
                   </td>
                   <td className="py-3 pr-4">{row.cost ?? "없음"}</td>
                   <td className="py-3">
