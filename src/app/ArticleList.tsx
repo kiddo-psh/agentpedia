@@ -17,7 +17,7 @@ export function ArticleList({ articles, titleAs: Title = "h2" }: { articles: Art
               <p className="flex items-center gap-2 text-[13px] font-medium text-muted">
                 {CATEGORY_LABEL[a.category]}
                 {a.draft && (
-                  <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-amber-700 dark:text-amber-400">초안</span>
+                  <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-amber-800 dark:text-amber-400">초안</span>
                 )}
               </p>
               <Title className="mt-1 text-lg leading-snug font-semibold tracking-tight group-hover:underline group-hover:decoration-1 group-hover:underline-offset-4">
