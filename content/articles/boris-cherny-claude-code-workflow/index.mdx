@@ -83,30 +83,14 @@ sources:
     accessedAt: 2026-11-16
     dateNote: "페이지에 날짜가 없어 열람일을 기록했습니다. PR이나 이슈 댓글에서 @claude를 언급하면 Action이 응답하고 기본 trigger_phrase가 @claude라는 설명을 확인했습니다. 본문의 이 설명은 2026년 11월 공식 문서 기준입니다."
 ---
-세션을 나란히 돌리는 일이 하루의 기본입니다.
-Boris Cherny가 2026년 1월 2일 X에 올린 15개 게시물의 습관입니다.
 
-Cherny는 첫 게시물에서 자신을 Claude Code를 만든 사람이라고 소개했습니다.
-설정이 평범한 이유는 기본값으로도 잘 돌기 때문입니다.
-손댈 게 별로 없습니다.
-InfoQ도 Cherny가 Anthropic에서 쓰는 방식을 기사로 전했습니다.
+2026년 1월 2일, Claude Code를 만든 Boris Cherny가 X에 게시물 15개를 올렸습니다. 첫 게시물에서 만든 사람이라고 자신을 소개했습니다. 설정이 평범한 이유는 기본값으로도 잘 돌고, 손댈 게 별로 없기 때문입니다. InfoQ도 Cherny가 Anthropic에서 쓰는 방식을 기사로 전했습니다.
 
-## 검증을 맡기는 일이 가장 중요하다
+만든 사람에게는 숨은 플래그, 공들인 프롬프트, 복잡한 자동화를 기대하기 쉽습니다. 스레드에는 그런 것이 거의 없습니다. 하루는 세션을 나란히 돌리는 일에서 시작합니다.
 
-만든 사람에게 기대하기 쉬운 것은 셋입니다.
+## 검증을 먼저 맡긴다
 
-- 숨은 플래그
-- 공들인 프롬프트
-- 복잡한 자동화
-
-스레드에는 거의 없고, 매일의 습관이 있습니다.
-
-- 세션을 여러 개 돌립니다.
-- 실수를 적습니다.
-- 계획부터 세웁니다.
-- 반복 작업은 명령으로 만듭니다.
-
-마지막에 가장 중요할 팁을 하나 꼽습니다.
+하루에는 세션을 여러 개 돌리고, 실수를 적고, 계획부터 세우고, 반복 작업은 명령으로 만듭니다. 스레드 마지막에 Cherny는 가장 중요할 팁을 하나 꼽습니다.
 
 <KeyIdea title="나머지 습관을 묶는 원칙">
 팁은 Claude가 작업을 검증할 방법을 갖게 하라는 것입니다.
@@ -118,81 +102,45 @@ InfoQ도 Cherny가 Anthropic에서 쓰는 방식을 기사로 전했습니다.
 give Claude a way to verify its work. If Claude has that feedback loop, it will 2-3x the quality of the final result.
 </Quote>
 
+작업을 확인할 방법을 주면, 최종 결과의 품질이 그만큼 좋아집니다.
+
 claude.ai/code 변경은 Claude가 Chrome 확장으로 브라우저에서 직접 테스트합니다.
 
-## 세션은 여러 개고 모델은 하나다
+## 세션은 나란히 돌린다
 
-올릴 무렵 터미널에서 세션 5개를 병렬로 돌렸습니다.
-탭에 번호를 붙이고, 입력을 기다리면 알림을 받습니다.
-웹도 같아, claude.ai/code에서 로컬과 함께 세션 5~10개를 돌렸습니다.
-당시 로컬 세션은 `&`로 웹에 넘기고 `--teleport`로 오갔습니다.
-2026년 11월에는 명령줄이 터미널 세션을 클라우드로 보내지 않습니다.
-`claude --cloud`로 새 세션을 시작하고, `--teleport`로 클라우드를 터미널에 가져옵니다.
-방향은 이쪽뿐입니다.
-로컬 5개는 같은 레포의 git checkout 5개에서 각각 돕니다.
-중간에 버리는 비율은 대략 10~20%로 어림했습니다.
-당시 Cherny는 모든 작업에 Opus 4.5를 썼습니다.
-확장 사고(<Term id="extended-thinking">thinking</Term>)는 늘 켜 두었습니다.
-Sonnet보다 큽니다.
-느리기도 합니다.
-덜 이끌어도 됩니다.
-도구는 더 잘 씁니다.
-그래서 작은 모델보다 거의 항상 빨리 끝납니다.
+올릴 무렵에는 터미널 탭에 번호를 붙였습니다. 세션 5개를 병렬로 돌렸고, 입력을 기다리면 알림을 받습니다. 웹도 같아서, claude.ai/code에서 로컬과 함께 세션 5~10개를 돌렸습니다.
 
-## 실수는 팀 지침 파일에 쌓인다
+당시 로컬 세션은 `&`로 웹에 넘기고 `--teleport`로 오갔습니다. 2026년 11월에는 명령줄이 터미널 세션을 클라우드로 보내지 않습니다. `claude --cloud`로 새 세션을 시작하고, `--teleport`로 클라우드를 터미널에 가져옵니다. 방향은 클라우드에서 터미널로 오는 쪽뿐입니다. 로컬 5개는 같은 레포의 git checkout 5개에서 각각 돕니다.
 
-세션이 많을수록 같은 실수를 막아야 합니다.
-팀은 git에 넣은 `CLAUDE.md` 하나를 함께 썼습니다.
-잘못하면 바로 적고, 다음엔 그러지 않게 합니다.
+중간에 버리는 비율은 대략 10~20%로 어림했습니다. 당시 Cherny는 모든 작업에 Opus 4.5를 썼습니다. 이 모델은 Sonnet보다 크고, 느리기도 합니다. 확장 사고(<Term id="extended-thinking">thinking</Term>)는 늘 켜 두었습니다. 덜 이끌어도 되고 도구를 더 잘 써서, 작은 모델보다 거의 항상 빨리 끝납니다.
+
+## 실수는 팀 파일에 쌓인다
+
+세션이 많을수록 같은 실수를 막아야 합니다. 팀은 git에 넣은 `CLAUDE.md` 하나를 함께 썼습니다.
 
 <Quote source="thread">
 Anytime we see Claude do something incorrectly we add it to the CLAUDE.md, so Claude knows not to do it next time.
 </Quote>
 
-동료 PR에서 Claude를 자주 태그해, 그 안에서 `CLAUDE.md`를 고치게 합니다.
-Claude Code GitHub Action을 씁니다.
-2026년 11월에는 PR·이슈 댓글의 `@claude`에 반응합니다.
-InfoQ는 2026년 1월 팀 `CLAUDE.md`가 약 2.5k 토큰이었다고 전합니다.
-한 번 적으면 팀원 다음 세션이 덜 틀립니다.
-이 `CLAUDE.md`는 느린 피드백 루프입니다.
+Claude가 잘못하면 그 파일에 바로 적어, 다음엔 그러지 않게 합니다. 동료 PR에서 Claude를 자주 태그해, 그 안에서 `CLAUDE.md`를 고치게 합니다. Claude Code GitHub Action을 씁니다. 2026년 11월에는 PR·이슈 댓글의 `@claude`에 반응합니다. InfoQ는 2026년 1월 팀 `CLAUDE.md`가 약 2.5k 토큰이었다고 전합니다. 한 번 적으면 팀원 다음 세션이 덜 틀립니다. 이 `CLAUDE.md`는 느린 피드백 루프입니다.
 
-## 계획은 먼저 맞추고 구현은 한 번에 맡긴다
+## 계획은 맞추고 반복은 명령으로 만든다
 
-대부분은 <Term id="plan-mode">Plan 모드</Term>로 시작합니다.
-계획이 맞을 때까지 주고받습니다.
-그다음 auto-accept edits로 바꾸면 대개 한 번에 끝납니다.
+대부분은 <Term id="plan-mode">Plan 모드</Term>로 시작합니다. 계획이 맞을 때까지 주고받습니다.
 
 <Quote source="thread">
 From there, I switch into auto-accept edits mode and Claude can usually 1-shot it.
 </Quote>
 
-대개라서 매번은 아닙니다.
-계획을 먼저 맞추면, 끝난 뒤 무엇을 볼지가 정해집니다.
+거기서 auto-accept edits로 바꾸면, Claude가 대개 한 번에 끝냅니다. 대개라서 매번은 아닙니다. 계획을 먼저 맞추면, 끝난 뒤 무엇을 볼지가 정해집니다.
 
-## 반복 작업은 명령과 훅으로 만든다
+하루 몇 번의 작업은 `.claude/commands/`의 <Term id="slash-command">슬래시 명령</Term>으로 빼 둡니다. `/commit-push-pr`를 Cherny와 Claude가 하루에 수십 번 씁니다. 명령 안 bash가 `git status` 같은 값을 미리 계산해 왕복이 줄어듭니다. 단순화와 검증은 <Term id="subagent">서브에이전트</Term> `code-simplifier`, `verify-app`이 맡습니다. 검증만 하는 역할을 나눈 셈입니다.
 
-하루 몇 번의 작업은 `.claude/commands/`의 <Term id="slash-command">슬래시 명령</Term>입니다.
-`/commit-push-pr`를 Cherny와 Claude가 하루에 수십 번 씁니다.
-명령 안 bash가 `git status` 같은 값을 미리 계산해 왕복이 줄어듭니다.
-단순화와 검증은 <Term id="subagent">서브에이전트</Term> `code-simplifier`, `verify-app`이 맡습니다.
-검증만 하는 역할을 나눈 셈입니다.
-<Term id="agent-hook">훅</Term>도 씁니다.
-PostToolUse로 포맷해 CI 오류를 막고, 명령은 `bun run format || true`입니다.
-오래 걸리는 검증은 셋 중 하나입니다.
+<Term id="agent-hook">훅</Term>도 씁니다. PostToolUse로 포맷해 CI 오류를 막고, 명령은 `bun run format || true`입니다. 오래 걸리는 검증은 셋 중 하나입니다. 끝날 때 백그라운드 에이전트에 맡기거나, Stop 훅으로 처리하거나, ralph-wiggum 플러그인을 씁니다. 외부 도구인 Slack, BigQuery, Sentry는 직접 다룹니다.
 
-- 끝날 때 백그라운드 에이전트에 맡깁니다.
-- Stop 훅으로 처리합니다.
-- ralph-wiggum 플러그인을 씁니다.
+## 권한은 끄지 않고 습관만 남긴다
 
-직접 다루는 외부 도구도 있습니다.
-
-- Slack
-- BigQuery
-- Sentry
-
-## 권한 확인은 끄지 않고 안전한 명령만 연다
-
-빨리 가려면 권한 확인을 끄고 싶어지나, 평소에는 끄지 않습니다.
+빨리 가려면 권한 확인을 끄고 싶어집니다. 평소에는 끄지 않습니다.
 
 <Compare
   before="--dangerously-skip-permissions로 권한 확인을 아예 끕니다."
@@ -203,26 +151,8 @@ PostToolUse로 포맷해 CI 오류를 막고, 명령은 `bun run format || true`
 I don't use --dangerously-skip-permissions.
 </Quote>
 
-샌드박스 안의 긴 작업만 확인을 건너뜁니다.
-허용 목록은 팀 파일이라, 한 사람이 정리하면 모두가 씁니다.
+그 플래그는 쓰지 않습니다. 샌드박스 안의 긴 작업만 확인을 건너뜁니다. 허용 목록은 팀 파일이라, 한 사람이 정리하면 모두가 씁니다.
 
-## 병렬 세션과 검증 숫자에는 한계가 있다
+다만 시작한 세션의 대략 10~20%는 중간에 버리고, 여러 세션을 보려면 주의가 듭니다. Opus 4.5는 Sonnet보다 크고 느리기도 한데, Cherny도 그 점을 인정합니다. 거의 항상 더 빠르다는 말은 Cherny 작업에서의 판단입니다. 2026년 1월의 이야기라 모델 이름과 기능은 뒤에 바뀌었을 수 있습니다. 효과로 든 2~3배는 측정 방법이 스레드에 없고, 얼마나 될지는 레포의 테스트와 실행 수단에 달렸습니다. 정해진 사용법은 없습니다. 팀원마다 방식이 다르다는 말이 스레드 첫머리에 있습니다.
 
-시작한 세션의 대략 10~20%는 중간에 버리고, 여러 세션을 보려면 주의가 듭니다.
-Opus 4.5는 Sonnet보다 큽니다.
-느리기도 합니다.
-Cherny도 인정합니다.
-거의 항상 더 빠르다는 말은 Cherny 작업에서의 판단입니다.
-2026년 1월의 이야기라 모델 이름과 기능은 뒤에 바뀌었을 수 있습니다.
-효과로 든 2~3배는 측정 방법이 스레드에 없습니다.
-얼마나 될지는 레포의 테스트와 실행 수단에 달렸습니다.
-정해진 사용법은 없고, 팀원마다 방식이 다릅니다.
-스레드 첫머리의 말입니다.
-
-## 남길 것은 먼저 확인하는 습관이다
-
-요즘 일의 많은 부분은 코드 리뷰와 방향 잡기입니다.
-CI의 Claude Agent SDK가 리뷰를 대부분 먼저 끝내, 사람이 볼 때 코드는 이미 괜찮습니다.
-핵심은 사람보다 먼저 확인하는 장치입니다.
-남길 것은 설정 파일이 아니라 습관입니다.
-Claude가 일을 스스로 확인하게 만드는 습관입니다.
+요즘 일의 많은 부분은 코드 리뷰와 방향 잡기입니다. CI의 Claude Agent SDK가 리뷰를 대부분 먼저 끝내, 사람이 볼 때 코드는 이미 괜찮습니다. 핵심은 사람보다 먼저 확인하는 장치입니다. 남길 것은 설정 파일이 아니라, Claude가 일을 스스로 확인하게 만드는 습관입니다.
