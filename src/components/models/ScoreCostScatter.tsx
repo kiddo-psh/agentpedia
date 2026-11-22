@@ -14,6 +14,13 @@ function harnessTone(harness: string): number {
   return HARNESS_TONE[harness] ?? 5;
 }
 
+/** Hover/accessible name. Not an SVG <title>: React 19 hoists that tag into <head>. */
+function pointLabel(point: ScatterPoint): string {
+  const name = point.effort ? `${point.name} (${point.effort})` : point.name;
+  const band = point.margin != null ? `${point.y}% ± ${point.margin}` : `${point.y}%`;
+  return `${name} · ${point.harness} · ${band} · $${point.x.toLocaleString("en-US")}`;
+}
+
 function logScale(value: number, min: number, max: number): number {
   const lo = Math.log10(Math.max(min, Number.EPSILON));
   const hi = Math.log10(Math.max(max, min * 1.01));
@@ -72,6 +79,8 @@ export function ScoreCostScatter({
     <div className="models-scatter">
       <svg
         viewBox={`0 0 ${width} ${height}`}
+        width={width}
+        height={height}
         className="models-scatter-svg h-auto w-full"
         role="img"
         aria-label="모델별 해결률과 전체 실행 비용 산점도"
@@ -142,6 +151,7 @@ export function ScoreCostScatter({
           const hi = highlightId === point.id;
           const m = point.margin ?? 0;
           const tone = harnessTone(point.harness);
+          const label = pointLabel(point);
           const yTop = pad.top + (1 - (point.y + m - yMin) / ySpan) * innerH;
           const yBot = pad.top + (1 - (point.y - m - yMin) / ySpan) * innerH;
           return (
@@ -163,12 +173,7 @@ export function ScoreCostScatter({
                   strokeWidth={hi ? 2 : 1}
                 />
               ) : null}
-              <a href={point.href}>
-                <title>
-                  {point.name}
-                  {point.effort ? ` (${point.effort})` : ""} · {point.harness} · {point.y}%
-                  {point.margin != null ? ` ± ${point.margin}` : ""} · ${point.x.toLocaleString("en-US")}
-                </title>
+              <a href={point.href} aria-label={label} title={label}>
                 <circle cx={cx} cy={cy} r={hi ? 6 : 4.5} className="models-scatter-dot" />
               </a>
               {!compact && (hi || point.y >= yMax - 1 || frontier.some((f) => f.id === point.id)) ? (
