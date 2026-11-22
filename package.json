@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run --exclude .claude/worktrees/** --exclude .data/**",
+    "test": "vitest run --exclude '.claude/worktrees/**' --exclude '.data/**'",
     "validate:content": "tsx scripts/validate-content.ts",
     "fonts:subset": "tsx scripts/subset-pretendard.ts",
     "ideas:collect": "tsx scripts/collect-ideas.ts",
