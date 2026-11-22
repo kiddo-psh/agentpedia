@@ -16,6 +16,7 @@ describe("patchNextServerBundle", () => {
     expect(patched).not.toContain("ev.preinit");
     expect(patched).not.toContain("async:!0");
     expect(patched).toContain("data:text/javascript,");
+    expect(patched).toContain("largest-contentful-paint");
     expect(patched).toContain("setTimeout");
     expect(patched).toContain("self.__delayScripts");
     expect(patched).toContain("JSON.stringify(`${a.assetPrefix}/_next/${re(e)}${rf(a,!0)}`)");

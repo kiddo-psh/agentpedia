@@ -14,7 +14,7 @@ import "./globals.css";
 // Inserting the stylesheet after a short timeout keeps the server-rendered text
 // on the LCP path; font-display:swap still applies Pretendard once it arrives.
 const shellFontLoader =
-  'setTimeout(function(){var l=document.createElement("link");l.rel="stylesheet";l.href="/fonts/"+"pretendard-shell.css";document.head.appendChild(l)},150)';
+  '(function(){var started=false;function start(){if(started)return;started=true;var l=document.createElement("link");l.rel="stylesheet";l.href="/fonts/"+"pretendard-shell.css";document.head.appendChild(l)}try{var po=new PerformanceObserver(function(){po.disconnect();start()});po.observe({type:"largest-contentful-paint",buffered:true})}catch(e){start()}setTimeout(start,400)})()';
 
 export const metadata: Metadata = {
   // Share previews need absolute URLs; BETTER_AUTH_URL is the public site URL.

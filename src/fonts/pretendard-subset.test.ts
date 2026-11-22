@@ -35,6 +35,7 @@ describe("pretendard content-scanned subset", () => {
   it("keeps content face off the layout first-paint import", () => {
     const layout = fs.readFileSync(path.join(root, "app/layout.tsx"), "utf8");
     expect(layout).toContain('"/fonts/"+"pretendard-shell.css"');
+    expect(layout).toContain("largest-contentful-paint");
     expect(layout).toContain("setTimeout");
     expect(layout).not.toContain('rel="preload"');
     expect(layout).not.toMatch(/import\s+["'].*pretendard-subset\.css["']/);

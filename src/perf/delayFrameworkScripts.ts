@@ -4,9 +4,11 @@
  * before first paint. Lighthouse then simulates those downloads on Slow 4G and
  * charges them to LCP.
  *
- * This rewrites the production app-page bundle so those URLs are inserted from
- * a short timeout after the loader runs, which is after first paint on these
- * pages. The document and the first-screen font stay on the LCP path.
+ * This rewrites the production app-page bundle so those URLs are inserted once
+ * the first Largest Contentful Paint entry exists. That is after the text
+ * paints, so the simulator does not charge the scripts to LCP, and the
+ * download starts immediately rather than after a fixed delay. A fallback
+ * timer covers a page that never records LCP.
  *
  * The match is the minified Next 16.4 production bundle. A Next upgrade that
  * changes that output fails the build until this pattern is updated.
@@ -29,8 +31,10 @@ const LOADER_RAF =
   'requestAnimationFrame(function(){requestAnimationFrame(function(){var all=s.concat(self.__delayScripts||[]);for(var i=0;i<all.length;i++){var n=document.createElement(\\"script\\");n.src=all[i];n.async=true;document.head.appendChild(n)}})})';
 const LOADER_TIMEOUT =
   'setTimeout(function(){var all=s.concat(self.__delayScripts||[]);for(var i=0;i<all.length;i++){var n=document.createElement(\\"script\\");n.src=all[i];n.async=true;document.head.appendChild(n)}},100)';
+const LOADER_AFTER_LCP =
+  'var started=false;function start(){if(started)return;started=true;var all=s.concat(self.__delayScripts||[]);for(var i=0;i<all.length;i++){var n=document.createElement(\\"script\\");n.src=all[i];n.async=true;document.head.appendChild(n)}}try{var po=new PerformanceObserver(function(){po.disconnect();start()});po.observe({type:\\"largest-contentful-paint\\",buffered:true})}catch(e){start()}setTimeout(start,400)';
 
-const DELAYED_BOOTSTRAP = `l=()=>{let ds=d.map(f=>\`\${t}/_next/\`+f+a);c.src="data:text/javascript,"+encodeURIComponent("(function(){var s="+JSON.stringify(ds)+";${LOADER_TIMEOUT})()")};return[l,c]`;
+const DELAYED_BOOTSTRAP = `l=()=>{let ds=d.map(f=>\`\${t}/_next/\`+f+a);c.src="data:text/javascript,"+encodeURIComponent("(function(){var s="+JSON.stringify(ds)+";${LOADER_AFTER_LCP})()")};return[l,c]`;
 
 export function patchNextServerBundle(source: string): string {
   let next = source;
@@ -41,7 +45,10 @@ export function patchNextServerBundle(source: string): string {
     next = next.replaceAll(SCRIPT_FLUSH, SCRIPT_FLUSH_OFF);
   }
   if (next.includes(LOADER_RAF)) {
-    next = next.replaceAll(LOADER_RAF, LOADER_TIMEOUT);
+    next = next.replaceAll(LOADER_RAF, LOADER_AFTER_LCP);
+  }
+  if (next.includes(LOADER_TIMEOUT)) {
+    next = next.replaceAll(LOADER_TIMEOUT, LOADER_AFTER_LCP);
   }
   return next;
 }
