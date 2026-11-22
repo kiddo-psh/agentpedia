@@ -5,6 +5,7 @@ import { ScoreCostScatter } from "@/components/models/ScoreCostScatter";
 import { WhichModelCards } from "@/components/models/WhichModelCards";
 import { buildModelsTable, buildScatterPoints, pickWhichModels } from "@/components/models/metrics";
 import { listModels, rankModelsByTerminalBench } from "@/content/models";
+import { MODELS_HERO_LEDE, MODELS_HERO_TITLE } from "@/fonts/lcpCopy";
 import "./models.css";
 
 export const metadata: Metadata = {
@@ -27,11 +28,8 @@ async function ModelsIndex() {
   return (
     <div className="models-page mx-auto max-w-[1100px] pt-2">
       <header className="models-hero">
-        <h1 className="mt-2 text-4xl font-medium tracking-[-0.03em]">모델 비교</h1>
-        <p className="mt-4 max-w-[42em] text-lg leading-relaxed text-muted">
-          Terminal-Bench 해결률과 전체 실행 비용을 한눈에 비교합니다. 표에서는 토큰 단가와 사용 토큰으로도 정렬할 수
-          있습니다. 확인하지 못한 값은 —로 표시합니다.
-        </p>
+        <h1 className="mt-2 text-4xl font-medium tracking-[-0.03em]">{MODELS_HERO_TITLE}</h1>
+        <p className="mt-4 max-w-[42em] text-lg leading-relaxed text-muted">{MODELS_HERO_LEDE}</p>
       </header>
 
       <section className="mt-10" aria-labelledby="scatter-title">

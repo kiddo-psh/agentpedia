@@ -196,14 +196,9 @@
     animation: models-draw-rule 480ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
 
-  /* Transform only. An opacity fade on this paragraph was the LCP element and held the paint. */
-  .models-hero > h1,
-  .models-hero > h1 + p {
+  /* The lede is the mobile LCP element. Do not animate it. */
+  .models-hero > h1 {
     animation: models-settle 440ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
-  }
-
-  .models-hero > h1 + p {
-    animation-delay: 60ms;
   }
 
   .models-mini-bar-fill {
@@ -219,7 +214,7 @@
 
 @keyframes models-settle {
   from { transform: translateY(6px); }
-  to { transform: translateY(0); }
+  to { transform: none; }
 }
 
 @keyframes models-grow-bar {

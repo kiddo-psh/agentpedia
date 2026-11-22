@@ -11,6 +11,7 @@ import { listArticles } from "@/content/loader";
 import type { ArticleMeta, Category } from "@/content/schema";
 import { getDb } from "@/db/client";
 import { listArticleLikeCounts } from "@/likes/service";
+import { HOME_HERO_LEDE, HOME_HERO_TITLE } from "@/fonts/lcpCopy";
 import { ArticleList } from "./ArticleList";
 import "./home.css";
 
@@ -30,12 +31,9 @@ export default function Home({ searchParams }: PageProps<"/">) {
       <section className="home-hero pt-2">
         <p className="text-[13px] font-medium text-muted">AI 에이전트 백과사전</p>
         <h1 className="mt-3 max-w-[14em] text-4xl leading-[1.12] font-medium tracking-[-0.035em] text-balance sm:text-6xl">
-          코딩 에이전트를 출처와 함께 정리합니다
+          {HOME_HERO_TITLE}
         </h1>
-        <p className="mt-5 max-w-[34em] text-lg leading-relaxed text-muted">
-          에이전트 페이지는 채택 수치와 벤치마크를, 모델 페이지는 Terminal-Bench와 토큰 단가를 값·출처·기준일과 함께
-          보여 줍니다. 기사는 그 맥락을 정리하고, 적용 키트는 MCP로 가져갈 수 있습니다.
-        </p>
+        <p className="mt-5 max-w-[34em] text-lg leading-relaxed text-muted">{HOME_HERO_LEDE}</p>
         <div className="mt-7 flex flex-wrap gap-2.5">
           <Link
             href="/agents"
