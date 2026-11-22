@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { cacheLife } from "next/cache";
 import { ModelsTable } from "@/components/models/ModelsTable";
+import { ModelsTableDesktopBody, ModelsTableMobileList } from "@/components/models/ModelsTableView";
 import { ScoreCostScatter } from "@/components/models/ScoreCostScatter";
 import { WhichModelCards } from "@/components/models/WhichModelCards";
-import { buildModelsTable, buildScatterPoints, pickWhichModels } from "@/components/models/metrics";
+import { buildModelsTable, buildScatterPoints, compareRows, pickWhichModels } from "@/components/models/metrics";
 import { listModels, rankModelsByTerminalBench } from "@/content/models";
+import { MODELS_HERO_LEDE, MODELS_HERO_TITLE } from "@/fonts/lcpCopy";
 import "./models.css";
 
 export const metadata: Metadata = {
@@ -21,17 +23,15 @@ async function ModelsIndex() {
   cacheLife("days");
   const models = rankModelsByTerminalBench(listModels());
   const table = buildModelsTable(models);
+  const defaultRows = [...table.rows].sort((a, b) => compareRows(a, b, "rank", "asc"));
   const scatter = buildScatterPoints(table.rows);
   const picks = pickWhichModels(scatter);
 
   return (
     <div className="models-page mx-auto max-w-[1100px] pt-2">
       <header className="models-hero">
-        <h1 className="mt-2 text-4xl font-medium tracking-[-0.03em]">모델 비교</h1>
-        <p className="mt-4 max-w-[42em] text-lg leading-relaxed text-muted">
-          Terminal-Bench 해결률과 전체 실행 비용을 한눈에 비교합니다. 표에서는 토큰 단가와 사용 토큰으로도 정렬할 수
-          있습니다. 확인하지 못한 값은 —로 표시합니다.
-        </p>
+        <h1 className="mt-2 text-4xl font-medium tracking-[-0.03em]">{MODELS_HERO_TITLE}</h1>
+        <p className="mt-4 max-w-[42em] text-lg leading-relaxed text-muted">{MODELS_HERO_LEDE}</p>
       </header>
 
       <section className="mt-10" aria-labelledby="scatter-title">
@@ -54,7 +54,11 @@ async function ModelsIndex() {
         </h2>
         <p className="mt-2 text-sm text-muted">모델을 누르면 상세 정보와 토론으로 이동합니다.</p>
         <div className="mt-5">
-          <ModelsTable payload={table} />
+          <ModelsTable
+            payload={table}
+            desktopBody={<ModelsTableDesktopBody rows={defaultRows} />}
+            mobileList={<ModelsTableMobileList rows={defaultRows} />}
+          />
         </div>
       </section>
     </div>

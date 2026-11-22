@@ -7,10 +7,14 @@ import { DeferredMonoFont } from "@/components/DeferredMonoFont";
 import { LogoLink } from "@/components/LogoLink";
 import { UserMenu } from "@/components/UserMenu";
 import logo from "@/assets/logo.png";
-// Critical Pretendard only on first paint; content face via DeferredContentFont.
-// Regenerate both CSS files: npm run fonts:subset
-import "./pretendard-subset.css";
 import "./globals.css";
+
+// The shell face is not in the first-paint CSS. A fast origin would finish it
+// before the text paints, and Lighthouse would then charge that download to LCP.
+// Inserting the stylesheet after a short timeout keeps the server-rendered text
+// on the LCP path; font-display:swap still applies Pretendard once it arrives.
+const shellFontLoader =
+  '(function(){var started=false;function start(){if(started)return;started=true;var l=document.createElement("link");l.rel="stylesheet";l.href="/fonts/"+"pretendard-shell.css";document.head.appendChild(l)}try{var po=new PerformanceObserver(function(){po.disconnect();start()});po.observe({type:"largest-contentful-paint",buffered:true})}catch(e){start()}setTimeout(start,400)})()';
 
 export const metadata: Metadata = {
   // Share previews need absolute URLs; BETTER_AUTH_URL is the public site URL.
@@ -31,6 +35,9 @@ const brand = (
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className="h-full antialiased">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: shellFontLoader }} />
+      </head>
       <body className="flex min-h-full flex-col">
         <DeferredContentFont />
         <DeferredMonoFont />

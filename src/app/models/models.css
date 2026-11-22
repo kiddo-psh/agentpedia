@@ -184,18 +184,21 @@
   background: color-mix(in srgb, var(--foreground) 3.5%, transparent);
 }
 
+/* The comparison table is below the first screen. Skip its layout until scroll so the hero
+   can paint (same idea as article content-visibility). */
+.models-table-wrap {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 48rem;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .models-hero > p:first-child::before {
     animation: models-draw-rule 480ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
 
-  .models-hero > h1,
-  .models-hero > h1 + p {
+  /* The lede is the mobile LCP element. Do not animate it. */
+  .models-hero > h1 {
     animation: models-settle 440ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
-  }
-
-  .models-hero > h1 + p {
-    animation-delay: 60ms;
   }
 
   .models-mini-bar-fill {
@@ -210,8 +213,8 @@
 }
 
 @keyframes models-settle {
-  from { opacity: 0.78; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { transform: translateY(6px); }
+  to { transform: none; }
 }
 
 @keyframes models-grow-bar {

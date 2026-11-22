@@ -7,6 +7,7 @@ import {
   articleNavMissingPrefetchIssues,
   categoryMissingUseCacheIssues,
   categoryNavMissingPrefetchIssues,
+  featuredLikesDynamicHoleIssues,
   likeSessionDbWaterfallIssues,
   likeSkeletonBlankIssues,
   paramsChromeBehindSuspenseIssues,
@@ -154,6 +155,28 @@ export function LikeButtonSkeleton() {
   it("passes live LikeButtonSkeleton with heart", () => {
     const src = fs.readFileSync(path.join(root, "src/components/likes/LikeButton.tsx"), "utf8");
     expect(likeSkeletonBlankIssues(src)).toEqual([]);
+  });
+});
+
+describe("featuredLikesDynamicHoleIssues", () => {
+  it("fails when the home ranking waits on connection()", () => {
+    const past = `
+export default function Home() {
+  return <h2>좋아요 많은 기사</h2>;
+}
+async function getHomeLikeCounts() {
+  await connection();
+  return listArticleLikeCounts(await getDb());
+}
+`;
+    const issues = featuredLikesDynamicHoleIssues(past);
+    expect(issues.length).toBeGreaterThan(0);
+    expect(issues.join("\n")).toContain("use cache");
+  });
+
+  it("passes the live home page", () => {
+    const src = fs.readFileSync(path.join(root, "src/app/page.tsx"), "utf8");
+    expect(featuredLikesDynamicHoleIssues(src)).toEqual([]);
   });
 });
 

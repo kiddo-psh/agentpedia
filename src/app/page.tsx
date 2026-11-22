@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { connection } from "next/server";
-import { cache, Suspense } from "react";
+import { cacheLife } from "next/cache";
+import { unstable_rethrow } from "next/navigation";
+import { Suspense } from "react";
 import { ArticleNavLink } from "@/components/ArticleNavLink";
 import { ArticlePagination, ArticleSortControls } from "@/components/ArticleListControls";
 import { CategoryChips, WithIndex } from "@/components/SiteIndex";
@@ -10,6 +11,7 @@ import { listArticles } from "@/content/loader";
 import type { ArticleMeta, Category } from "@/content/schema";
 import { getDb } from "@/db/client";
 import { listArticleLikeCounts } from "@/likes/service";
+import { HOME_HERO_LEDE, HOME_HERO_TITLE } from "@/fonts/lcpCopy";
 import { ArticleList } from "./ArticleList";
 import "./home.css";
 
@@ -29,12 +31,9 @@ export default function Home({ searchParams }: PageProps<"/">) {
       <section className="home-hero pt-2">
         <p className="text-[13px] font-medium text-muted">AI 에이전트 백과사전</p>
         <h1 className="mt-3 max-w-[14em] text-4xl leading-[1.12] font-medium tracking-[-0.035em] text-balance sm:text-6xl">
-          코딩 에이전트를 출처와 함께 정리합니다
+          {HOME_HERO_TITLE}
         </h1>
-        <p className="mt-5 max-w-[34em] text-lg leading-relaxed text-muted">
-          에이전트 페이지는 채택 수치와 벤치마크를, 모델 페이지는 Terminal-Bench와 토큰 단가를 값·출처·기준일과 함께
-          보여 줍니다. 기사는 그 맥락을 정리하고, 적용 키트는 MCP로 가져갈 수 있습니다.
-        </p>
+        <p className="mt-5 max-w-[34em] text-lg leading-relaxed text-muted">{HOME_HERO_LEDE}</p>
         <div className="mt-7 flex flex-wrap gap-2.5">
           <Link
             href="/agents"
@@ -79,11 +78,26 @@ export default function Home({ searchParams }: PageProps<"/">) {
   );
 }
 
-// Both rankings in a likes-sorted request use the same live totals.
-const getHomeLikeCounts = cache(async () => {
-  await connection();
-  return listArticleLikeCounts(await getDb());
-});
+/**
+ * Public like totals for the home ranking. `cacheLife("minutes")` has a 5-minute stale
+ * window, so Cache Components include the three cards in the static shell.
+ */
+async function getCachedArticleLikeCounts(): Promise<Record<string, number>> {
+  "use cache";
+  cacheLife("minutes");
+  try {
+    const counts = await listArticleLikeCounts(await getDb());
+    return Object.fromEntries(counts);
+  } catch (err) {
+    unstable_rethrow(err);
+    console.error("[likes] cached article counts failed", err);
+    return {};
+  }
+}
+
+function likeCountMap(counts: Record<string, number>): Map<string, number> {
+  return new Map(Object.entries(counts));
+}
 
 async function HomeArticleList({
   articles,
@@ -93,7 +107,8 @@ async function HomeArticleList({
   searchParams: PageProps<"/">["searchParams"];
 }) {
   const { sort, page } = parseListQuery(await searchParams);
-  const sorted = sort === "likes" ? sortArticles(articles, sort, await getHomeLikeCounts()) : articles;
+  const sorted =
+    sort === "likes" ? sortArticles(articles, sort, likeCountMap(await getCachedArticleLikeCounts())) : articles;
   const slice = paginateArticles(sorted, page);
 
   return (
@@ -116,18 +131,22 @@ async function HomeArticleList({
 
 const coverClass = "flex aspect-[16/7] items-end justify-between rounded-2xl sm:aspect-[16/10]";
 
+const LOADING_PHRASES = ["좋아요를 세는 중", "순위를 고르는 중", "글을 불러오는 중"] as const;
+
 function FeaturedSkeleton({ count }: { count: number }) {
   return (
     <ul aria-hidden="true" className="grid gap-5 sm:grid-cols-3">
       {Array.from({ length: count }, (_, i) => (
         <li key={i}>
-          <div className={`${coverClass} home-placeholder bg-soft`} />
-          <div className="mt-4 h-5 w-24 rounded bg-soft" />
+          <div className="home-loading-cover flex aspect-[16/7] items-center justify-center overflow-hidden rounded-2xl bg-soft sm:aspect-[16/10]">
+            <p className="home-loading-line">{LOADING_PHRASES[i] ?? LOADING_PHRASES[0]}</p>
+          </div>
+          <div className="home-placeholder mt-4 h-5 w-24 rounded bg-soft" />
           <div className="mt-1.5 h-[2lh] text-[19px] leading-snug">
-            <div className="h-4 w-5/6 rounded bg-soft" />
+            <div className="home-placeholder h-4 w-5/6 rounded bg-soft" />
           </div>
           <div className="mt-1.5 h-[2lh] text-[14.5px] leading-relaxed">
-            <div className="h-3 w-3/4 rounded bg-soft" />
+            <div className="home-placeholder h-3 w-3/4 rounded bg-soft" />
           </div>
         </li>
       ))}
@@ -136,7 +155,7 @@ function FeaturedSkeleton({ count }: { count: number }) {
 }
 
 async function Featured({ articles }: { articles: ArticleMeta[] }) {
-  const likeCounts = await getHomeLikeCounts();
+  const likeCounts = likeCountMap(await getCachedArticleLikeCounts());
   const featured = sortArticles(articles, "likes", likeCounts).slice(0, 3);
   return (
     <ul className="home-featured grid gap-5 sm:grid-cols-3">

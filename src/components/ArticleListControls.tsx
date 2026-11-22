@@ -56,7 +56,7 @@ export function ArticlePagination({
           이전
         </Link>
       ) : (
-        <span aria-hidden className="opacity-40">
+        <span aria-hidden className="text-muted">
           이전
         </span>
       )}
@@ -71,7 +71,7 @@ export function ArticlePagination({
           다음
         </Link>
       ) : (
-        <span aria-hidden className="opacity-40">
+        <span aria-hidden className="text-muted">
           다음
         </span>
       )}

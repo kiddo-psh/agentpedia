@@ -1,20 +1,19 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { SourceAge } from "@/components/SourceAge";
 import { formatDate } from "@/content/labels";
-import { EMPTY } from "./format";
+import { ModelsTableDesktopBody, ModelsTableMobileList } from "./ModelsTableView";
 import { compareRows, type ModelsTablePayload, type SortKey } from "./metrics";
 
 const SORT_OPTIONS: { key: SortKey; label: string; defaultDir: "asc" | "desc" }[] = [
   { key: "rank", label: "순위", defaultDir: "asc" },
+  { key: "name", label: "모델", defaultDir: "asc" },
   { key: "score", label: "해결률", defaultDir: "desc" },
   { key: "runCost", label: "전체 실행 비용", defaultDir: "asc" },
   { key: "tokens", label: "사용 토큰", defaultDir: "asc" },
   { key: "inputPrice", label: "입력 단가", defaultDir: "asc" },
   { key: "outputPrice", label: "출력 단가", defaultDir: "asc" },
-  { key: "name", label: "모델", defaultDir: "asc" },
 ];
 
 function sortChoice(label: string, key: SortKey, dir: "asc" | "desc"): string {
@@ -41,30 +40,26 @@ function SortButton({
   );
 }
 
-function MiniBar({ value }: { value: number | null }) {
-  if (value === null) return <span className="models-mini-bar is-empty" aria-hidden />;
-  return (
-    <span className="models-mini-bar" aria-hidden>
-      <span className="models-mini-bar-fill" style={{ ["--bar" as string]: String(value) }} />
-    </span>
-  );
-}
-
-function EffortBadge({ effort }: { effort: string | null }) {
-  if (!effort) return null;
-  return <span className="models-effort">{effort}</span>;
-}
-
-export function ModelsTable({ payload }: { payload: ModelsTablePayload }) {
+export function ModelsTable({
+  payload,
+  desktopBody,
+  mobileList,
+}: {
+  payload: ModelsTablePayload;
+  desktopBody: ReactNode;
+  mobileList: ReactNode;
+}) {
   const [sortKey, setSortKey] = useState<SortKey>("rank");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [harness, setHarness] = useState<string>("all");
+  const isDefault = sortKey === "rank" && sortDir === "asc" && harness === "all";
 
   const rows = useMemo(() => {
+    if (isDefault) return null;
     const filtered =
       harness === "all" ? payload.rows : payload.rows.filter((row) => row.harness === harness);
     return [...filtered].sort((a, b) => compareRows(a, b, sortKey, sortDir));
-  }, [payload.rows, harness, sortKey, sortDir]);
+  }, [isDefault, payload.rows, harness, sortKey, sortDir]);
 
   const toggleSort = (key: SortKey) => {
     const opt = SORT_OPTIONS.find((o) => o.key === key);
@@ -74,50 +69,6 @@ export function ModelsTable({ payload }: { payload: ModelsTablePayload }) {
       setSortDir(opt?.defaultDir ?? "asc");
     }
   };
-
-  const sourceFoot = (
-    <footer className="models-source-foot mt-4 space-y-1 text-sm text-muted">
-      <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span>Terminal-Bench 4.1</span>
-        {payload.terminalBench.url ? (
-          <a href={payload.terminalBench.url} className="underline underline-offset-2" target="_blank" rel="noreferrer">
-            {payload.terminalBench.label}
-          </a>
-        ) : (
-          <span>{payload.terminalBench.label}</span>
-        )}
-        {payload.terminalBench.asOfIso ? (
-          <>
-            <span aria-hidden>·</span>
-            <span>기준일 {formatDate(new Date(payload.terminalBench.asOfIso))}</span>
-            <SourceAge newestIso={payload.terminalBench.asOfIso} />
-          </>
-        ) : null}
-      </p>
-      <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
-        <span>토큰 단가</span>
-        {payload.openRouter.url ? (
-          <a href={payload.openRouter.url} className="underline underline-offset-2" target="_blank" rel="noreferrer">
-            {payload.openRouter.label}
-          </a>
-        ) : (
-          <span>{payload.openRouter.label}</span>
-        )}
-        {payload.openRouter.asOfIso ? (
-          <>
-            <span aria-hidden>·</span>
-            <span>기준일 {formatDate(new Date(payload.openRouter.asOfIso))}</span>
-            <SourceAge newestIso={payload.openRouter.asOfIso} />
-          </>
-        ) : null}
-      </p>
-      <p className="text-[12px]">
-        실행 비용은 작업 하나의 비용이 아니라, 리더보드가 벤치마크 전체를 돌리며 기록한 금액입니다. 입력 단가와 출력
-        단가는 100만 토큰당 달러입니다.
-      </p>
-      <p className="text-[12px]">— 확인하지 못한 값</p>
-    </footer>
-  );
 
   return (
     <div className="models-table-wrap">
@@ -233,83 +184,54 @@ export function ModelsTable({ payload }: { payload: ModelsTablePayload }) {
                 </th>
               </tr>
             </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.slug} className="border-t border-line align-top">
-                  <td className="py-3 pr-3 tabular-nums text-muted">{row.rank ?? "—"}</td>
-                  <td className="py-3 pr-3">
-                    <Link href={row.href} prefetch={true} className="font-medium hover:underline">
-                      {row.name}
-                    </Link>
-                    <EffortBadge effort={row.effort} />
-                  </td>
-                  <td className="py-3 pr-3 text-muted">{row.vendor}</td>
-                  <td className="py-3 pr-3 text-muted">{row.harness ?? EMPTY}</td>
-                  <td className="py-3 pr-3">
-                    <div className="tabular-nums font-medium">{row.scoreDisplay}</div>
-                    <MiniBar value={row.scoreBar} />
-                  </td>
-                  <td className="py-3 pr-3">
-                    <div className="tabular-nums">{row.runCostDisplay}</div>
-                    <MiniBar value={row.runCostBar} />
-                  </td>
-                  <td className="py-3 pr-3">
-                    <div className="tabular-nums">{row.tokensDisplay}</div>
-                    <MiniBar value={row.tokensBar} />
-                  </td>
-                  <td className="py-3 pr-3 tabular-nums">{row.inputDisplay}</td>
-                  <td className="py-3 tabular-nums">{row.outputDisplay}</td>
-                </tr>
-              ))}
-            </tbody>
+            {isDefault || !rows ? desktopBody : <ModelsTableDesktopBody rows={rows} />}
           </table>
         </div>
       </div>
 
-      <ul className="models-card-list mt-4 space-y-3 md:hidden">
-        {rows.map((row) => (
-          <li key={row.slug} className="models-card border-t border-line pt-3">
-            <Link href={row.href} prefetch={true} className="block">
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="text-[15px] font-medium">
-                  {row.rank != null ? `${row.rank}. ` : ""}
-                  {row.name}
-                  <EffortBadge effort={row.effort} />
-                </span>
-                <span className="tabular-nums text-sm font-medium">{row.scoreDisplay}</span>
-              </div>
-              <p className="mt-1 text-[12px] text-muted">
-                {row.vendor}
-                {row.harness ? ` · ${row.harness}` : ""}
-              </p>
-              <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-[13px]">
-                <div>
-                  <dt className="text-muted">전체 실행 비용</dt>
-                  <dd className="tabular-nums">{row.runCostDisplay}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted">사용 토큰</dt>
-                  <dd className="tabular-nums">{row.tokensDisplay}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted" title="100만 토큰당 달러">
-                    입력 단가
-                  </dt>
-                  <dd className="tabular-nums">{row.inputDisplay}</dd>
-                </div>
-                <div>
-                  <dt className="text-muted" title="100만 토큰당 달러">
-                    출력 단가
-                  </dt>
-                  <dd className="tabular-nums">{row.outputDisplay}</dd>
-                </div>
-              </dl>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {isDefault || !rows ? mobileList : <ModelsTableMobileList rows={rows} />}
 
-      {sourceFoot}
+      <footer className="models-source-foot mt-4 space-y-1 text-sm text-muted">
+        <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span>Terminal-Bench 4.1</span>
+          {payload.terminalBench.url ? (
+            <a href={payload.terminalBench.url} className="underline underline-offset-2" target="_blank" rel="noreferrer">
+              {payload.terminalBench.label}
+            </a>
+          ) : (
+            <span>{payload.terminalBench.label}</span>
+          )}
+          {payload.terminalBench.asOfIso ? (
+            <>
+              <span aria-hidden>·</span>
+              <span>기준일 {formatDate(new Date(payload.terminalBench.asOfIso))}</span>
+              <SourceAge newestIso={payload.terminalBench.asOfIso} />
+            </>
+          ) : null}
+        </p>
+        <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span>토큰 단가</span>
+          {payload.openRouter.url ? (
+            <a href={payload.openRouter.url} className="underline underline-offset-2" target="_blank" rel="noreferrer">
+              {payload.openRouter.label}
+            </a>
+          ) : (
+            <span>{payload.openRouter.label}</span>
+          )}
+          {payload.openRouter.asOfIso ? (
+            <>
+              <span aria-hidden>·</span>
+              <span>기준일 {formatDate(new Date(payload.openRouter.asOfIso))}</span>
+              <SourceAge newestIso={payload.openRouter.asOfIso} />
+            </>
+          ) : null}
+        </p>
+        <p className="text-[12px]">
+          실행 비용은 작업 하나의 비용이 아니라, 리더보드가 벤치마크 전체를 돌리며 기록한 금액입니다. 입력 단가와 출력
+          단가는 100만 토큰당 달러입니다.
+        </p>
+        <p className="text-[12px]">— 확인하지 못한 값</p>
+      </footer>
     </div>
   );
 }
