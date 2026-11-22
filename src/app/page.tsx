@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cacheLife } from "next/cache";
+import { unstable_rethrow } from "next/navigation";
 import { Suspense } from "react";
 import { ArticleNavLink } from "@/components/ArticleNavLink";
 import { ArticlePagination, ArticleSortControls } from "@/components/ArticleListControls";
@@ -90,6 +91,7 @@ async function getCachedArticleLikeCounts(): Promise<Record<string, number>> {
     const counts = await listArticleLikeCounts(await getDb());
     return Object.fromEntries(counts);
   } catch (err) {
+    unstable_rethrow(err);
     console.error("[likes] cached article counts failed", err);
     return {};
   }
