@@ -47,10 +47,10 @@ export function Pyramid({
               }}
             >
               <span className="block text-[15px] leading-snug font-semibold">
-                <span className="mr-1.5 tabular-nums opacity-60">{String(i + 1).padStart(2, "0")}</span>
+                <span className="mr-1.5 tabular-nums">{String(i + 1).padStart(2, "0")}</span>
                 {layer.name}
               </span>
-              {layer.detail && <span className="mt-0.5 block text-[13px] leading-snug opacity-75">{layer.detail}</span>}
+              {layer.detail && <span className="mt-0.5 block text-[13px] leading-snug">{layer.detail}</span>}
             </li>
           );
         })}
