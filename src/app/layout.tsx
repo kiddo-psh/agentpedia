@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import { DeferredContentFont } from "@/components/DeferredContentFont";
 import { DeferredMonoFont } from "@/components/DeferredMonoFont";
 import { LogoLink } from "@/components/LogoLink";
 import { UserMenu } from "@/components/UserMenu";
@@ -14,7 +13,7 @@ import "./globals.css";
 // Inserting the stylesheet after a short timeout keeps the server-rendered text
 // on the LCP path; font-display:swap still applies Pretendard once it arrives.
 const shellFontLoader =
-  '(function(){var started=false;function start(){if(started)return;started=true;var l=document.createElement("link");l.rel="stylesheet";l.href="/fonts/"+"pretendard-shell.css";document.head.appendChild(l)}try{var po=new PerformanceObserver(function(){po.disconnect();start()});po.observe({type:"largest-contentful-paint",buffered:true})}catch(e){start()}setTimeout(start,400)})()';
+  '(function(){function sheet(name){var l=document.createElement("link");l.rel="stylesheet";l.href="/fonts/"+name;document.head.appendChild(l)}var started=false;function start(){if(started)return;started=true;sheet("pretendard-shell.css");sheet("pretendard-rest.css")}try{var po=new PerformanceObserver(function(){po.disconnect();start()});po.observe({type:"largest-contentful-paint",buffered:true})}catch(e){start()}setTimeout(start,400)})()';
 
 export const metadata: Metadata = {
   // Share previews need absolute URLs; BETTER_AUTH_URL is the public site URL.
@@ -39,7 +38,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: shellFontLoader }} />
       </head>
       <body className="flex min-h-full flex-col">
-        <DeferredContentFont />
         <DeferredMonoFont />
         <header className="sticky top-0 z-20 bg-background/90 backdrop-blur">
           <div className="mx-auto flex h-16 w-full max-w-[1280px] min-w-0 items-center gap-3 px-4 sm:gap-8 sm:px-8">

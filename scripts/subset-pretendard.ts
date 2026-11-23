@@ -2,19 +2,23 @@
  * Content-scanned Pretendard Variable subsets for first paint.
  *
  * Scans published article text + UI chrome, then writes:
- *   - src/fonts/pretendard-critical.woff2  (shell / title / brief / chrome)
- *   - src/fonts/pretendard-content.woff2   (remaining published glyphs)
- *   - src/app/pretendard-subset.css        (critical @font-face — layout first paint)
- *   - src/app/pretendard-content.css      (content @font-face — DeferredContentFont)
+ *   - public/fonts/pretendard-shell.woff2     (first-screen glyphs)
+ *   - public/fonts/pretendard-ui.woff2        (remaining chrome)
+ *   - public/fonts/pretendard-content.woff2   (published glyphs not in the shell)
+ *   - public/fonts/pretendard-fallback.woff2  (all Hangul syllables, plus Latin and symbols)
+ *   - public/fonts/pretendard-shell.css       (every face; loaded after first paint)
  *   - src/fonts/pretendard-subset-meta.json
  *
- * Missing glyphs (UGC, new copy before regen) fall back to the stack in globals.css
- * (Apple SD Gothic Neo / Malgun Gothic / sans-serif). Regenerate after content or
- * chrome string changes: `npm run fonts:subset` (also runs from prebuild).
+ * The shell face is listed first. A page downloads only the later faces whose
+ * unicode-range matches a character the earlier faces do not cover. The fallback
+ * face covers every Hangul syllable, so a new article still renders in Pretendard
+ * before anyone regenerates the scanned subsets. `npm run fonts:subset` also runs
+ * from prebuild.
  */
 import fs from "node:fs";
 import path from "node:path";
 import subsetFont from "subset-font";
+import { cmapCodepoints, contentCodepoints } from "../src/fonts/fontCoverage";
 import { loadAllAgents } from "../src/content/agents";
 import { loadAllArticles } from "../src/content/loader";
 import { BRIEF_CHROME, HOME_HERO_LEDE, HOME_HERO_TITLE, MODELS_HERO_LEDE, MODELS_HERO_TITLE } from "../src/fonts/lcpCopy";
@@ -34,8 +38,33 @@ const SOURCE_TTF = path.join(ROOT, "node_modules/pretendard/dist/public/variable
 const PUBLIC_FONTS = path.join(ROOT, "public/fonts");
 const OUT_DIR = path.join(ROOT, "src/fonts");
 const CRITICAL_CSS_OUT = path.join(PUBLIC_FONTS, "pretendard-shell.css");
-const CONTENT_CSS_OUT = path.join(ROOT, "src/app/pretendard-content.css");
+const REST_CSS_OUT = path.join(PUBLIC_FONTS, "pretendard-rest.css");
 const META_OUT = path.join(OUT_DIR, "pretendard-subset-meta.json");
+
+/** Blocks the fallback face must contain so a new article cannot miss a syllable. */
+const FALLBACK_BLOCKS: Array<[number, number]> = [
+  [0x20, 0x7e],
+  [0xa0, 0xff],
+  [0x2000, 0x206f],
+  [0x20a0, 0x20cf],
+  [0x2190, 0x21ff],
+  [0x2200, 0x22ff],
+  [0x2460, 0x24ff],
+  [0x25a0, 0x25ff],
+  [0x3000, 0x303f],
+  [0x1100, 0x11ff],
+  [0x3130, 0x318f],
+  [0xac00, 0xd7a3],
+  [0xff00, 0xffef],
+];
+
+function blockChars(blocks: Array<[number, number]>): string {
+  let out = "";
+  for (const [lo, hi] of blocks) {
+    for (let code = lo; code <= hi; code++) out += String.fromCodePoint(code);
+  }
+  return out;
+}
 
 /** Layout / shared chrome that never appears in article MDX. */
 const CHROME = `
@@ -278,6 +307,13 @@ async function main() {
     add(shell, [featured.title, featured.summary, featured.brief.what, featured.brief.why, featured.brief.action, featured.apply.time].join("\n"));
     for (const person of featured.persons) add(shell, [person.name, person.nameKo ?? "", person.role].join("\n"));
   }
+  // Symbols and CJK that Pretendard can draw, but the hangul scan missed.
+  // They belong in the small ui face so a page does not download the fallback.
+  for (const code of contentCodepoints().keys()) {
+    if (code >= 0xac00 && code <= 0xd7a3) continue;
+    critical.add(String.fromCodePoint(code));
+    content.add(String.fromCodePoint(code));
+  }
   const uiOnly = new Set([...critical].filter((ch) => !shell.has(ch)));
   add(uiOnly, " ");
 
@@ -286,25 +322,36 @@ async function main() {
 
   const shellPath = path.join(PUBLIC_FONTS, "pretendard-shell.woff2");
   const uiPath = path.join(PUBLIC_FONTS, "pretendard-ui.woff2");
-  const contentPath = path.join(OUT_DIR, "pretendard-content.woff2");
+  const contentPath = path.join(PUBLIC_FONTS, "pretendard-content.woff2");
+  const fallbackPath = path.join(PUBLIC_FONTS, "pretendard-fallback.woff2");
 
   const shellBytes = await writeSubset(shell, shellPath);
   const uiBytes = await writeSubset(uiOnly, uiPath);
   const contentBytes = await writeSubset(contentOnly, contentPath);
+  const fallbackChars = new Set(blockChars(FALLBACK_BLOCKS));
+  for (const code of contentCodepoints().keys()) fallbackChars.add(String.fromCodePoint(code));
+  const fallbackBytes = await writeSubset(fallbackChars, fallbackPath);
 
   const shellRange = toUnicodeRanges([...shell].map((c) => c.codePointAt(0)!));
   const uiRange = toUnicodeRanges([...uiOnly].map((c) => c.codePointAt(0)!));
   const contentRange = toUnicodeRanges([...contentOnly].map((c) => c.codePointAt(0)!));
+  const claimed = new Set<number>();
+  for (const ch of shell) claimed.add(ch.codePointAt(0)!);
+  for (const ch of uiOnly) claimed.add(ch.codePointAt(0)!);
+  for (const ch of contentOnly) claimed.add(ch.codePointAt(0)!);
+  const fallbackOnly = [...(await cmapCodepoints(fs.readFileSync(fallbackPath)))].filter(
+    (code) => !claimed.has(code),
+  );
+  const fallbackRange = toUnicodeRanges(fallbackOnly);
 
   const header = `/*
  * Generated by scripts/subset-pretendard.ts — do not edit by hand.
  * Copyright (c) 2021 Kil Hyung-jin, with Reserved Font Name Pretendard (SIL OFL 1.1).
  *
- * shell  = first-screen glyphs, loaded after first paint from public/fonts.
- * ui      = remaining chrome glyphs (DeferredContentFont, after window load).
- * content = article body glyphs not in shell or the old critical pack.
- * Glyphs outside both faces fall back to Apple SD Gothic Neo / Malgun Gothic / sans-serif
- * (see --font-sans in globals.css). Regenerate: npm run fonts:subset
+ * Faces are listed narrowest first. The browser downloads a file only when a
+ * character matches that face and no earlier face. The fallback face covers
+ * every Hangul syllable, so copy added after the last scan still renders.
+ * Regenerate: npm run fonts:subset
  */`;
 
   fs.writeFileSync(
@@ -314,10 +361,11 @@ ${cssBlock("/fonts/pretendard-shell.woff2", shellRange, { variation: true })}
 `,
   );
   fs.writeFileSync(
-    CONTENT_CSS_OUT,
+    REST_CSS_OUT,
     `${header}
 ${cssBlock("/fonts/pretendard-ui.woff2", uiRange, { variation: true })}
-${cssBlock("pretendard-content.woff2", contentRange, { variation: true })}
+${cssBlock("/fonts/pretendard-content.woff2", contentRange, { variation: true })}
+${cssBlock("/fonts/pretendard-fallback.woff2", fallbackRange, { variation: true })}
 `,
   );
 
@@ -340,7 +388,12 @@ ${cssBlock("pretendard-content.woff2", contentRange, { variation: true })}
       glyphs: contentOnly.size,
       hangul: hangulCount(contentOnly),
       bytes: contentBytes,
-      file: "src/fonts/pretendard-content.woff2",
+      file: "public/fonts/pretendard-content.woff2",
+    },
+    fallback: {
+      bytes: fallbackBytes,
+      file: "public/fonts/pretendard-fallback.woff2",
+      hangulSyllables: 0xd7a3 - 0xac00 + 1,
     },
     totalBytes: shellBytes + uiBytes + contentBytes,
     note: "Missing glyphs fall back to system Korean fonts in --font-sans.",
