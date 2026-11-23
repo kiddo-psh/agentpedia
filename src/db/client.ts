@@ -20,6 +20,14 @@ async function connect(): Promise<Db> {
   const { PGlite } = await import("@electric-sql/pglite");
   const { drizzle } = await import("drizzle-orm/pglite");
   const { migrate } = await import("drizzle-orm/pglite/migrator");
+  // `next build` prerenders with several worker processes. They all inherit this phase, and a
+  // shared PGlite directory corrupts when they migrate together (CI: "unexpected data beyond EOF"
+  // while creating suggestions). Each worker gets its own in-memory database instead.
+  if (process.env.NEXT_PHASE === "phase-production-build") {
+    const db = drizzle(new PGlite(), { schema });
+    await migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
+    return db as unknown as Db;
+  }
   // PGlite creates its own folder but not missing parents.
   fs.mkdirSync(path.join(process.cwd(), ".data"), { recursive: true });
   // PGlite is single-process. `next dev` and a local `next start` running side by side must not

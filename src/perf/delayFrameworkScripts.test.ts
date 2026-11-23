@@ -39,6 +39,15 @@ describe("patchNextServerBundle", () => {
   it("emits a bootstrap script the browser can parse", () => {
     const source = frameworkBootstrapSource(["/_next/static/chunks/app.js"]);
     expect(source.endsWith("})()")).toBe(true);
+    expect(source).not.toContain("400))()");
     expect(() => new Function(source)).not.toThrow();
+  });
+
+  it("repairs a cached bundle that still emits the broken data URL", () => {
+    const cached =
+      'self.__delayScripts;encodeURIComponent("(function(){var s="+JSON.stringify(ds)+";setTimeout(start,400))()")';
+    const patched = patchNextServerBundle(cached);
+    expect(patched).toContain("setTimeout(start,400)})()");
+    expect(patched).not.toContain("setTimeout(start,400))()");
   });
 });

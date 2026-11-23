@@ -19,7 +19,8 @@
     "mcp:smoke": "tsx scripts/mcp-smoke.mts",
     "preview": "tsx scripts/preview.mts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx scripts/migrate.mts"
+    "db:migrate": "tsx scripts/migrate.mts",
+    "check:hydration": "tsx scripts/check-hydration.ts"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.16",
@@ -57,6 +58,7 @@
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "puppeteer-core": "^24.43.1",
     "simple-git-hooks": "^2.14.0",
     "subset-font": "^2.9.0",
     "tailwindcss": "4.3.3",
