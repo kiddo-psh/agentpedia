@@ -63,6 +63,10 @@ export function patchNextServerBundle(source: string): string {
   if (next.includes(LOADER_TIMEOUT)) {
     next = next.replaceAll(LOADER_TIMEOUT, LOADER_AFTER_LCP);
   }
+  // A cached bundle can already contain the marker and the broken generator
+  // (`setTimeout(start,400))()`), so the rewrite above does not run again.
+  // React prints that one src twice: the preload href and `<script id="_R_">`.
+  next = next.replaceAll("setTimeout(start,400))()", "setTimeout(start,400)})()");
   return next;
 }
 
