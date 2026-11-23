@@ -31,10 +31,23 @@ const LOADER_RAF =
   'requestAnimationFrame(function(){requestAnimationFrame(function(){var all=s.concat(self.__delayScripts||[]);for(var i=0;i<all.length;i++){var n=document.createElement(\\"script\\");n.src=all[i];n.async=true;document.head.appendChild(n)}})})';
 const LOADER_TIMEOUT =
   'setTimeout(function(){var all=s.concat(self.__delayScripts||[]);for(var i=0;i<all.length;i++){var n=document.createElement(\\"script\\");n.src=all[i];n.async=true;document.head.appendChild(n)}},100)';
-const LOADER_AFTER_LCP =
-  'var started=false;function start(){if(started)return;started=true;var all=s.concat(self.__delayScripts||[]);for(var i=0;i<all.length;i++){var n=document.createElement(\\"script\\");n.src=all[i];n.async=true;document.head.appendChild(n)}}try{var po=new PerformanceObserver(function(){po.disconnect();start()});po.observe({type:\\"largest-contentful-paint\\",buffered:true})}catch(e){start()}setTimeout(start,400)';
+/** Browser source. Kept as real JS so a test can parse it. */
+export const FRAMEWORK_BOOTSTRAP_BODY =
+  'var started=false;function start(){if(started)return;started=true;var all=s.concat(self.__delayScripts||[]);for(var i=0;i<all.length;i++){var n=document.createElement("script");n.src=all[i];n.async=true;document.head.appendChild(n)}}try{var po=new PerformanceObserver(function(){po.disconnect();start()});po.observe({type:"largest-contentful-paint",buffered:true})}catch(e){start()}setTimeout(start,400)';
 
-const DELAYED_BOOTSTRAP = `l=()=>{let ds=d.map(f=>\`\${t}/_next/\`+f+a);c.src="data:text/javascript,"+encodeURIComponent("(function(){var s="+JSON.stringify(ds)+";${LOADER_AFTER_LCP})()")};return[l,c]`;
+export function frameworkBootstrapSource(files: string[]): string {
+  // The closing brace is concatenated, not written inside ${...}, because a
+  // template literal would treat that brace as the end of the interpolation
+  // and emit a script that throws `Unexpected token ')'`.
+  return `(function(){var s=${JSON.stringify(files)};${FRAMEWORK_BOOTSTRAP_BODY}})()`;
+}
+
+const LOADER_AFTER_LCP = FRAMEWORK_BOOTSTRAP_BODY.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+
+const DELAYED_BOOTSTRAP =
+  'l=()=>{let ds=d.map(f=>`${t}/_next/`+f+a);c.src="data:text/javascript,"+encodeURIComponent("(function(){var s="+JSON.stringify(ds)+";' +
+  LOADER_AFTER_LCP +
+  '})()")};return[l,c]';
 
 export function patchNextServerBundle(source: string): string {
   let next = source;

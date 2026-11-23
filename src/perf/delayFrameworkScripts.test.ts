@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { patchNextServerBundle } from "./delayFrameworkScripts";
+import { frameworkBootstrapSource, patchNextServerBundle } from "./delayFrameworkScripts";
 
 const TURBO = `
 function rt(e,t,r,n,a,i,s){var o;let l,u=[],c={src:"",crossOrigin:r},d=((null==(o=e.rootMainFilesTree)?void 0:o[s])||e.rootMainFiles).map(re);if(0===d.length)throw Error("Invariant: missing bootstrap script. This is a bug in Next.js");if(n){c.src=\`\${t}/_next/\`+d[0]+a,c.integrity=n[d[0]];for(let e=1;e<d.length;e++){let r=\`\${t}/_next/\`+d[e]+a,i=n[d[e]];u.push(r,i)}l=()=>{for(let e=0;e<u.length;e+=2)ev.preinit(u[e],{as:"script",integrity:u[e+1],crossOrigin:r,nonce:i})}}else{c.src=\`\${t}/_next/\`+d[0]+a;for(let e=1;e<d.length;e++){let r=\`\${t}/_next/\`+d[e]+a;u.push(r)}l=()=>{for(let e=0;e<u.length;e++)ev.preinit(u[e],{as:"script",nonce:i,crossOrigin:r})}}return[l,c]}
@@ -34,5 +34,11 @@ describe("patchNextServerBundle", () => {
   it("is idempotent", () => {
     const once = patchNextServerBundle(TURBO);
     expect(patchNextServerBundle(once)).toBe(once);
+  });
+
+  it("emits a bootstrap script the browser can parse", () => {
+    const source = frameworkBootstrapSource(["/_next/static/chunks/app.js"]);
+    expect(source.endsWith("})()")).toBe(true);
+    expect(() => new Function(source)).not.toThrow();
   });
 });
