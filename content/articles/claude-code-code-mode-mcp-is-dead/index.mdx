@@ -1,0 +1,110 @@
+---
+slug: claude-code-code-mode-mcp-is-dead
+title: "Claude Code Code Mode와 MCP가 끝났다는 반응"
+summary: "2026년 11월 17일 ClaudeDevs가 Code Mode를 알렸고, 다음 날 한 인용 글은 MCP가 끝났다고 적었습니다. 공식 문서는 MCP 도구를 스크립트 안에서 그대로 부릅니다. 켜고 끈 측정값은 이 글에 없습니다."
+category: trends
+people: []
+tags: ["claude-code", "code-mode", "mcp", "tools"]
+difficulty: practical
+brief:
+  what: "2026년 11월 17일 ClaudeDevs가 Code Mode를 알렸고, 다음 날 melvynx는 MCP가 끝났다고 적었습니다."
+  why: "공식 문서는 MCP 도구를 없애지 않습니다. 스크립트 안의 호출은 MCP 도구 이름으로 권한 규칙을 탑니다."
+  action: "키트는 같은 검색을 켜고 끌 비교표를 비워 둡니다. 턴·토큰·시간은 독자가 재고, 이 글은 숫자를 짓지 않습니다."
+apply:
+  goal: "같은 검색 요약을 Code Mode를 켜고 끄고 재는 빈 표를 남기고, 측정값은 비워 둡니다."
+  changes:
+    - "`docs/code-mode-on-off.md`에 빈 비교표 추가(docs/ 없으면 생성, 같은 이름이면 다른 이름). 과제 문장, 켜기/끄기 칸(턴·토큰·시간), MCP 도구가 스크립트에 남는지 적는 칸. 숫자는 비움"
+    - "표에 적는 실행 방법은 공식 문서 URL 한 줄. 환경 변수와 설정 파일은 바꾸지 않음"
+  doesNotDo:
+    - "`CLAUDE_CODE_EXPERIMENTAL_CODE_MODE`를 켜거나 끄지 않습니다. REPL 훅이나 권한 규칙을 추가하지 않습니다. 그 일은 Code Mode 경계 키트의 범위입니다."
+    - "턴, 토큰, 시간, 절감률을 추정하거나 채우지 않습니다. 애플리케이션 코드를 수정하지 않습니다."
+    - "검증 명령을 CLAUDE.md에 덧붙이지 않습니다. 키와 토큰 값은 출력하지 않습니다."
+  fitsWhen: "Claude Code를 쓰는 프로젝트이고, 여러 파일을 찾아 요약하는 일이 반복되는 곳"
+  time: "15~30분"
+tryIt: "이 레포의 마크다운 파일 수와, .mcp.json·.claude 설정에 MCP 서버 이름이 있는지만 표로 적어줘. CLAUDE_CODE_EXPERIMENTAL_CODE_MODE 값은 바꾸지 말고 보이면 적기만 해. 턴·토큰·시간은 적지 마. 마크다운이 여러 개이거나 MCP 이름이 있으면 '키트 권장', 아니면 '당장 불필요'. 아무 파일도 바꾸지 마."
+draft: true
+publishedAt: 2026-11-23
+keyIdeas:
+  - "Code Mode는 도구를 하나씩 부르지 않고, Claude가 쓴 JavaScript가 여러 호출을 세션에서 실행합니다. 실험 기능이고 기본은 꺼져 있습니다."
+  - "2026년 11월 18일 melvynx의 인용 글은 MCP가 끝났다고 적지만, 그 한 줄은 공식 문서의 결론이 아닙니다."
+  - "문서에서 스크립트 안의 각 호출은 Bash나 MCP 도구 이름으로 deny·ask 규칙과 PreToolUse 훅을 탑니다."
+  - "JavaScript와 파일·웹·MCP 도구 호출은 Claude Code 샌드박스 밖에서 돕니다. 셸 명령만 샌드박스 설정을 탑니다."
+  - "같은 검색 요약의 턴·토큰·시간은 독자가 켜고 끄고 재야 합니다. 이 글은 그 숫자를 가지고 있지 않습니다."
+sources:
+  - id: cc-docs-code-mode
+    title: "Run tool calls from code with Code Mode - Claude Code Docs"
+    url: https://code.claude.com/docs/en/code-mode
+    author: Anthropic
+    kind: blog
+    accessedAt: 2026-11-23
+    dateNote: "공식 문서에 게시일이 없어 열람일을 적습니다. 2026년 11월 23일에 읽었습니다. MCP 도구 이름과 샌드박스 밖 실행은 이 페이지의 Permissions 절에서 확인했습니다."
+  - id: claude-devs-code-mode
+    title: "ClaudeDevs Code Mode 공지 (X)"
+    url: https://x.com/ClaudeDevs/status/2122801681939234950
+    author: ClaudeDevs
+    kind: thread
+    publishedAt: 2026-11-17
+    dateNote: "x.com 본문은 로그인 없이 열리지 않아 fxtwitter API로 읽었습니다. created_at은 Tue Nov 17 21:18:55 +0000 2026입니다. 본문과 옵트인 환경 변수는 그 응답에서 확인했습니다."
+  - id: melvyn-mcp-dead
+    title: "melvynx의 Code Mode 인용 글 (X)"
+    url: https://x.com/melvynx/status/2122962158384456154
+    author: melvynx
+    kind: thread
+    publishedAt: 2026-11-18
+    dateNote: "fxtwitter API로 읽었습니다. created_at은 Wed Nov 18 07:56:35 +0000 2026입니다. 본문은 ClaudeDevs 공지를 인용한 글이고, 글자 그대로 Finnaly MCP is dead입니다. 답글이 아닙니다."
+---
+
+2026년 11월 18일, X 계정 melvynx가 전날 ClaudeDevs 공지를 인용했습니다. 본문은 한 줄입니다.
+
+<Quote source="melvyn-mcp-dead">
+Finnaly MCP is dead
+</Quote>
+
+맞춤법이 틀린 그 줄은 MCP가 끝났다는 선언입니다. 공지 자체는 그보다 짧고, 실험이라고 말합니다.
+
+<Quote source="claude-devs-code-mode">
+Check out Code Mode, a new, experimental way for Claude Code to work with tools. Claude writes scripts that chain your tools together in sophisticated ways, and it can answer you while long commands are still running.
+</Quote>
+
+Claude가 도구를 잇는 스크립트를 쓰고, 긴 명령이 도는 동안에도 답을 할 수 있다는 공지입니다. 옵트인은 `CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1`입니다. 공지 시각은 2026년 11월 17일 21:18 UTC이고, 인용 글은 다음 날 07:56 UTC입니다.
+
+## 공지는 도구를 스크립트로 잇는 일이다
+
+질문은 그 스크립트가 도구를 없애느냐입니다. 공식 문서의 답은 호출 방식이 바뀐다는 쪽입니다. Code Mode가 꺼져 있으면 Claude는 Bash, Read, Edit 같은 도구를 직접 요청하고, 결과를 읽은 뒤 다음을 고릅니다. 켜져 있으면 Claude가 JavaScript를 쓰고, Claude Code가 그 코드를 세션에서 실행합니다. 코드 한 덩어리가 명령을 병렬로 돌리고, 한 결과를 다음 호출에 넣고, Claude가 읽을 부분만 돌려줄 수 있습니다.
+
+<KeyIdea title="도구는 남고 호출이 코드 안으로 들어갑니다">
+Code Mode는 실험 기능이고 기본은 꺼져 있습니다. 릴리스마다 바뀌거나 빠질 수 있다고 문서가 적습니다. 버전 하한은 Claude Code v2.1.323입니다. 더 오래된 버전은 환경 변수가 있어도 Code Mode 없이 시작합니다.
+</KeyIdea>
+
+대화 화면에는 편집 diff 같은 도구 호출이 보이고, 코드는 `Ctrl+O`로 여는 트랜스크립트에 접혀 있습니다. 문서가 권하는 자리는 여러 파일에 같은 변경이 반복되거나, 검색 결과를 거른 뒤 읽거나, 서로 독립인 명령을 동시에 돌릴 때입니다.
+
+## 문서는 MCP 도구 이름을 그대로 둔다
+
+그래서 "MCP가 끝났다"는 반응과 문서를 나란히 놓으면 결이 다릅니다. 문서의 권한 절은 스크립트 안의 각 호출이 평소 도구 이름으로 `deny`·`ask` 규칙과 PreToolUse 훅을 탄다고 적습니다. 그 이름에는 Bash와 <Term id="mcp">MCP</Term> 도구가 함께 있습니다.
+
+<Quote source="cc-docs-code-mode">
+Each tool call in the code goes through your deny and ask permission rules and PreToolUse hooks under the tool's usual name, such as Bash or an MCP tool's name.
+</Quote>
+
+스크립트 안의 호출도 Bash이거나 MCP 도구 이름인 채로 규칙과 훅을 탑니다. MCP 서버를 치우라는 문장은 이 페이지에 없습니다. <Term id="cc-code-mode">Code Mode</Term>는 그 도구를 하나씩 대화로 왕복하지 않고, JavaScript가 이어서 부르게 하는 쪽에 가깝습니다.
+
+## 그 호출은 샌드박스 밖에 있다
+
+권한 규칙이 남았다고 호출이 샌드박스 안으로 들어가는 것은 아닙니다. 문서가 이어서 적습니다.
+
+<Quote source="cc-docs-code-mode">
+The JavaScript itself and its file, web, and MCP tool calls run outside the sandbox.
+</Quote>
+
+JavaScript와 파일·웹·MCP 도구 호출은 샌드박스 밖에서 돕니다. 샌드박스 설정이 적용되는 것은 코드가 돌리는 셸 명령입니다. 문서가 그 호출까지 격리하려면 Claude Code 자체를 컨테이너나 가상 머신에서 돌리라고 적습니다. 이 페이지는 MCP가 사라졌다고 말하지 않고, MCP 호출이 샌드박스 밖에 남는다고 말합니다.
+
+<Compare
+  before="도구를 하나씩 요청하고 결과를 읽은 뒤 다음을 고릅니다."
+  after="JavaScript가 여러 호출을 잇습니다. MCP 도구는 그 이름으로 규칙과 훅을 탑니다."
+/>
+
+## 같은 검색을 켜고 끄고 재는 일이다
+
+줄어드는지 늘어나는지는 이 글이 재지 않았습니다. 문서가 예로 드는 자리는 검색 결과를 거른 뒤 읽는 일입니다. 여러 파일을 찾아 요약하는 같은 과제를, Code Mode를 끈 세션과 `CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1`로 켠 세션에서 각각 시키고, 턴과 토큰과 시간을 본인 화면에서 적으면 됩니다. 이 글의 표는 그 칸이 비어 있습니다. 프로젝트 설정의 `env`는 이 변수를 무시하므로, 저장소가 대신 켜 주지는 않습니다.
+
+가져갈 구분은 반응과 문서입니다. 인용 글의 한 줄은 MCP가 끝났다는 말이고, 문서는 MCP 도구를 스크립트 안에서 부릅니다. 왕복이 줄었는지는 같은 검색을 두 번 돌려 봐야 합니다.
