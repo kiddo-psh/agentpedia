@@ -2,7 +2,7 @@
 slug: codex
 name: OpenAI Codex
 vendor: OpenAI
-form: [cli, cloud]
+form: [ cli, cloud ]
 license: Apache-2.0
 repoUrl: https://github.com/openai/codex
 npmPackage: "@openai/codex"
@@ -15,13 +15,13 @@ pricingSummary:
   sourceUrl: https://developers.openai.com/codex/pricing
   asOf: 2026-11-21
 npmWeeklyDownloads:
-  value: 27531680
-  sourceUrl: https://api.npmjs.org/downloads/point/2026-11-13:2026-11-19/@openai/codex
-  asOf: 2026-11-19
+  value: 27601227
+  sourceUrl: https://api.npmjs.org/downloads/point/2026-11-16:2026-11-22/@openai/codex
+  asOf: 2026-11-22
 githubStars:
-  value: 136017
+  value: 136174
   sourceUrl: https://api.github.com/repos/openai/codex
-  asOf: 2026-11-21
+  asOf: 2026-11-23
 # Data table percent. The survey narrative does not round this row.
 surveyUsage:
   value: 29.5

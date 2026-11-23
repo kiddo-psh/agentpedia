@@ -3,7 +3,7 @@
 slug: claude-code
 name: Claude Code
 vendor: Anthropic
-form: [cli]
+form: [ cli ]
 license: Proprietary (Anthropic Commercial Terms)
 repoUrl: https://github.com/anthropics/claude-code
 npmPackage: "@anthropic-ai/claude-code"
@@ -12,17 +12,18 @@ latestVersion:
   sourceUrl: https://github.com/anthropics/claude-code/releases/tag/v2.1.330
   asOf: 2026-11-20
 pricingSummary:
-  value: "Pro는 월 결제 $20(연간 선결제 시 $17/월)이고 Claude Code가 포함됩니다. Max $100/월, Ultra $200/월."
+  value: "Pro는 월 결제 $20(연간 선결제 시 $17/월)이고 Claude Code가 포함됩니다. Max $100/월, Ultra
+    $200/월."
   sourceUrl: https://claude.com/pricing
   asOf: 2026-11-21
 npmWeeklyDownloads:
-  value: 21656772
-  sourceUrl: https://api.npmjs.org/downloads/point/2026-11-13:2026-11-19/@anthropic-ai/claude-code
-  asOf: 2026-11-19
+  value: 22171378
+  sourceUrl: https://api.npmjs.org/downloads/point/2026-11-16:2026-11-22/@anthropic-ai/claude-code
+  asOf: 2026-11-22
 githubStars:
-  value: 156499
+  value: 156741
   sourceUrl: https://api.github.com/repos/anthropics/claude-code
-  asOf: 2026-11-21
+  asOf: 2026-11-23
 # Stack Overflow 2026 results post is 2026-10-06. The data table is 65.5%; the page narrative rounds to 66%.
 surveyUsage:
   value: 65.5
