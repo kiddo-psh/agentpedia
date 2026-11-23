@@ -96,7 +96,9 @@ async function main() {
           const page = await browser.newPage();
           await page.setViewport(viewport);
           const errors: string[] = [];
-          page.on("pageerror", (error) => errors.push(error.message));
+          page.on("pageerror", (error) => {
+            errors.push(error instanceof Error ? error.message : String(error));
+          });
           page.on("console", (message) => {
             if (message.type() === "error") errors.push(message.text());
           });
