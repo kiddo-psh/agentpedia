@@ -121,3 +121,8 @@
   name: Yoav Goldberg
   nameKo: 요아브 골드버그
   role: NLP 연구자, X 계정 yoavgo
+
+- id: simon-willison
+  name: Simon Willison
+  nameKo: 사이먼 윌리슨
+  role: Datasette를 만들고 Django를 공동 개발한 사람
