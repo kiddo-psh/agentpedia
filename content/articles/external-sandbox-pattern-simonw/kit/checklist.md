@@ -5,7 +5,9 @@
 - [ ] Pi 설정은 "별도 저장소, 확인 안 함"으로만 적었다.
 
 ## 결과
-- [ ] `docs/external-sandbox-probe.md`의 허용 목록 밖 요청은 실제 출력이거나 "실행 안 함"이다.
+- [ ] 활성 allow의 origin을 읽었고, 고른 호스트는 그 목록에 없다. 정책을 못 읽었으면 요청 없이 "결론 없음"이다.
+- [ ] `docs/external-sandbox-probe.md`의 요청은 실제 출력이거나 "실행 안 함" 또는 "결론 없음"이다.
+- [ ] 토큰과 credential 값은 보고서에 없다.
 - [ ] Claude Code는 셸만 게스트로 가고 Read/Edit는 호스트에 남는다고 적혀 있다.
 - [ ] Codex 네트워크 기본값이 꺼져 있다는 문장은 README에서 온 것으로 적혀 있다.
 
