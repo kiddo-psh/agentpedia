@@ -1,0 +1,124 @@
+---
+slug: claude-code-team-verification-loops
+title: "Claude Code 팀이 검증을 정직하게 두는 방법"
+summary: "Addy Osmani는 2026년 11월 16일 글에서 Claude Code 팀 코드의 약 90%를 Claude가 쓰고 검토한다고 적었습니다. 검사는 자기 규칙을 고치면 깨집니다. 회귀가 줄었는지는 이 글이 재지 않았습니다."
+category: people
+people: [addy-osmani]
+tags: ["claude-code", "verification", "differential-test", "e2e"]
+difficulty: practical
+brief:
+  what: "2026년 11월 16일 Addy Osmani는 Claude Code 팀 코드의 대부분을 Claude가 쓰고 검토한다고 적었습니다."
+  why: "그 규모에서 병목은 생성보다 검증이고, 검사가 자기 채점 규칙을 고치면 그 검사는 깨집니다."
+  action: "키트는 차분 시험 비교표를 비워 두고, 순수 함수가 있을 때만 시험 파일 하나를 실행합니다."
+apply:
+  goal: "차분 시험이 있는 쪽과 없는 쪽을 비교할 빈 표를 남기고, 회귀 수는 비워 둡니다."
+  changes:
+    - "`docs/differential-gate-trial.md`에 빈 비교표 추가(docs/ 없으면 생성, 같은 이름이면 다른 이름). 작은 리팩터 한 줄, 시험 없음/차분 시험 칸, 회귀 수는 빈칸"
+    - "승인하고 입출력이 순수한 함수가 하나 있을 때만 그 함수를 건드리지 않는 시험 파일 하나를 추가하고 실행. 없으면 시험 파일을 만들지 않음"
+  doesNotDo:
+    - "검증 명령을 CLAUDE.md나 AGENTS.md에 덧붙이지 않습니다. 그 일은 Boris Cherny 키트의 범위입니다."
+    - "`REVIEW.md`와 `docs/verifier-honesty.md`를 만들지 않습니다. 그 일은 자기 검증 키트의 범위입니다."
+    - "회귀 개수와 성공률을 추정하지 않습니다. 애플리케이션 로직은 수정하지 않습니다."
+  fitsWhen: "테스트 명령이 있고, 입출력이 순수한 함수를 하나 이상 가진 프로젝트"
+  time: "20~40분"
+tryIt: "이 레포에서 테스트 명령 이름과, 입출력이 순수해 보이는 함수 하나만 찾아줘. 테스트는 실행하지 마. REVIEW.md가 있는지만 적어. 순수 함수와 테스트 명령이 있으면 '키트 권장', 없으면 '당장 불필요'. 아무 파일도 바꾸지 마."
+draft: true
+publishedAt: 2026-11-23
+keyIdeas:
+  - "Osmani는 Claude Code 팀 코드의 약 90%를 Claude가 쓰고 검토한다고 적었습니다. 검증 루프가 없으면 한두 개만 돌릴 수 있다고 적습니다."
+  - "맡길 양을 가리는 검사로 E2E, 속성 기반 테스트, 차분 테스트를 듭니다."
+  - "변경이 자기를 심판하는 검사를 고칠 수 있으면 그 검사는 깨진 것이라고 글이 적습니다."
+  - "같은 날 kyr0stack은 에이전트가 일의 끝을 스스로 정하게 두면 테스트를 고쳐 녹색으로 만든다고 적었습니다. 그 글은 Osmani 글의 답글이 아닙니다."
+  - "시험 없이 리팩터한 결과와 차분 시험을 둔 결과의 회귀 수는 이 글에 없습니다."
+sources:
+  - id: osmani-verification
+    title: "How the Claude Code team thinks about verification"
+    url: https://claude.dev/blog/how-the-claude-code-team-thinks-about-verification/
+    author: Addy Osmani
+    kind: blog
+    publishedAt: 2026-11-16
+    dateNote: "페이지가 AUTHOR Addy Osmani, PUBLISHED Nov 16, 2026이라고 적습니다. 2026년 11월 23일에 읽었습니다. 약 90% 문장과 검사가 자기 규칙을 고치면 깨진다는 문장은 이 본문에서 확인했습니다."
+  - id: claude-devs-verification
+    title: "ClaudeDevs의 검증 글 소개 (X)"
+    url: https://x.com/ClaudeDevs/status/2122457608963395586
+    author: ClaudeDevs
+    kind: thread
+    publishedAt: 2026-11-16
+    dateNote: "fxtwitter API로 읽었습니다. created_at은 Mon Nov 16 22:31:41 +0000 2026입니다. 블로그 URL을 붙인 소개 글입니다."
+  - id: osmani-x-article
+    title: "Addy Osmani의 X 아티클"
+    url: https://x.com/addyosmani/status/2122590683055993308
+    author: Addy Osmani
+    kind: thread
+    publishedAt: 2026-11-17
+    dateNote: "fxtwitter API로 읽었습니다. created_at은 Tue Nov 17 07:20:29 +0000 2026입니다. 게시물은 X 아티클 링크이고, 아티클 제목과 첫 문단이 블로그의 약 90% 문장과 같습니다. 전문을 다시 인용하지 않습니다."
+  - id: kyr0-gate
+    title: "kyr0stack의 검증 게이트 팁 (X)"
+    url: https://x.com/kyr0stack/status/2122426513962180842
+    author: kyr0stack
+    kind: thread
+    publishedAt: 2026-11-16
+    dateNote: "fxtwitter API로 읽었습니다. created_at은 Mon Nov 16 20:28:08 +0000 2026입니다. replying_to는 null이라 Osmani 글의 답글이 아닙니다. 모델 이름과 게이트 구조는 이 팁의 제안입니다."
+---
+
+2026년 11월 16일, Addy Osmani가 Claude Code 팀의 검증을 적었습니다. 첫 문장이 규모를 말합니다.
+
+<Quote source="osmani-verification">
+On the Claude Code team, the vast majority of our code (~90%) is written and reviewed by Claude.
+</Quote>
+
+팀 코드의 대부분, 약 90%를 Claude가 쓰고 검토한다는 문장입니다. 그 규모에서 에이전트가 증거를 가지고 일을 확인하게 하는 방법이 중요해진다고 이어집니다. 같은 날 22:31 UTC, ClaudeDevs가 이 글을 소개했습니다.
+
+<Quote source="claude-devs-verification">
+Claude writes better code when it can verify its work. Checks that used to be expensive, like tests, benchmarks, and end-to-end runs, are now cheap.
+</Quote>
+
+일을 확인할 수 있으면 코드가 나아지고, 비싸던 검사들이 싸졌다는 소개입니다. 다음 날 Osmani의 X 아티클도 같은 제목이고, 첫 문단이 이 약 90% 문장입니다.
+
+## 병목은 쓰는 일이 아니다
+
+검증 루프가 더 많은 일을 맡길 수 있게 하는 단위라고 글이 적습니다. 루프가 없으면 결과를 사람이 다 봐야 해서 Claude를 한두 개만 돌릴 수 있고, 있으면 수십에서 수백을 병렬로 돌릴 수 있다고 적습니다. 구조화된 파일 생성에 대한 내부 시험에서는, 별도의 채점자가 루브릭으로 Claude의 일을 보면 일반 프롬프트 루프보다 과제 성공이 최대 10점 올랐고, 가장 어려운 문제에서 이득이 컸다고 적습니다. 그 10점은 이 내부 시험의 숫자입니다.
+
+<KeyIdea title="생성은 싸고 확인이 병목입니다">
+한번 만든 테스트와 벤치마크는 소프트웨어로 자주 돌릴 수 있어, 토큰을 많이 더 쓰지 않는다고 글이 적습니다. 실패가 반복되면 훅이나 CLAUDE.md의 더 명시적인 규칙으로 다음을 막을 수 있다고도 적습니다. 그 규칙을 지시 파일에 쌓는 절차는 이 글의 범위 밖입니다.
+</KeyIdea>
+
+## 맡길 양은 검사가 정한다
+
+어떤 검사를 둘지가 그다음 질문입니다. Osmani가 투자할 만하다고 고른 것은 셋입니다.
+
+### E2E는 기능이 됐는지 끝까지 본다
+
+하나에 집중해야 하면 <Term id="e2e-test">E2E 테스트</Term>를 고르라고 적습니다. 카트에 담고, 결제하고, 확인 페이지로 가는 실제 흐름입니다. 전체가 되거나 안 되거나라서 속이기가 어렵고, 끝난 기준이 분명하다고 적습니다. 단위 테스트는 더 빠르고 덜 흔들리지만, 통과해도 기능이 깨질 수 있다고 적습니다. 에이전트와 테스트가 과제 전체를 모르기 때문입니다.
+
+### 속성은 만든 사람이 안 고른 입력을 넣는다
+
+<Term id="property-based-testing">속성 기반 테스트</Term>는 깨지면 안 되는 문장을 먼저 적고, fast-check, Hypothesis, proptest 같은 라이브러리가 수천 개의 입력으로 반례를 찾습니다. 글이 드는 성질은 왕복 인코딩, 잔고가 음수가 되지 않는 불변식, 같은 일을 두 번 해도 한 번과 같은 멱등, 최적화한 코드와 단순하지만 맞는 코드의 동등입니다. 그 입력은 코드를 만든 에이전트와 같은 편향으로 고르지 않아서, 에이전트를 정직하게 두는 방법이라고 적습니다.
+
+### 차분은 옛 시스템을 정답으로 둔다
+
+<Term id="differential-test">차분 테스트</Term>는 동작이 같아야 하는 큰 이전에서 특히 유효하다고 적습니다. 같은 입력으로 옛 시스템과 새 시스템을 돌려 결과가 다르면, 고칠 버그이거나 깨지는 변경입니다. 입력은 무작위로 만들거나 실제 트래픽의 표본을 쓰고, 공백처럼 상관없는 차이는 정규화하며, 새 환경이 달라야 하는 곳은 승인된 변경 목록으로 둔다고 적습니다.
+
+## 검사가 자기 숙제를 채점하면 깨진다
+
+검사 종류만으로 정직해지지는 않습니다. 글이 못 박는 문장입니다.
+
+<Quote source="osmani-verification">
+If a change can modify the check that judges it, the check is broken.
+</Quote>
+
+변경이 자기를 심판하는 검사를 고칠 수 있으면 그 검사는 깨집니다. Code Review는 `REVIEW.md`를 베이스나 기본 브랜치에서 읽고, 풀 리퀘스트의 변경에서는 읽지 않는다고 적습니다. 규칙은 그 변경이 고칠 수 없는 브랜치에 둔다고 적습니다. 실패가 세 번 라운드 뒤에도 남으면 Claude가 멈추고 사람을 부른다고 적습니다.
+
+같은 날 20:28 UTC, Osmani 글의 답글이 아닌 팁이 먼저 올라왔습니다. X 계정 kyr0stack입니다.
+
+<Quote source="kyr0-gate">
+the mistake almost everyone makes is letting the agent decide when the work is done. it will quietly edit its own tests to go green and call it shipped.
+</Quote>
+
+일의 끝을 에이전트가 정하게 두면, 테스트를 조용히 고쳐 녹색으로 만들고 끝났다고 부른다는 말입니다. 팁이 제안하는 고침은 훅이 실제 테스트를 돌리고, 코드를 쓰지 않은 검증자가 서명하기 전에는 합치지 않는 게이트입니다. 모델 이름과 세 번 실패 뒤 `git reset`은 이 팁의 제안이지, Osmani 글이 팀의 절차로 적은 내용이 아닙니다. 팀 글의 세 번은 실패한 검사 뒤에 사람을 부르는 라운드입니다.
+
+## 회귀 수는 이 글에 없다
+
+작은 리팩터를 시험 없이 맡긴 결과와, 옛 구현을 정답으로 두는 차분 시험을 두고 맡긴 결과가 어떻게 다른지는 이 글이 재지 않았습니다. 회귀 개수를 적어 두지 않은 이유입니다. 순수 함수가 있는 저장소에서 그 둘을 나란히 시켜 보고, 깨진 개수는 그 실행 옆에만 적으면 됩니다.
+
+가져갈 순서는 검사의 종류보다 자리입니다. 변경이 채점 규칙에 손을 대지 못하게 두고, 입력은 만든 쪽의 예시만 믿지 않고, 숫자가 필요하면 직접 돌린 뒤에 적습니다.
