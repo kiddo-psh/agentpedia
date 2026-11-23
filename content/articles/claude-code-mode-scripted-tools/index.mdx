@@ -1,13 +1,13 @@
 ---
 slug: claude-code-mode-scripted-tools
 title: "Claude Code Code Mode가 도구 호출을 스크립트로 묶는 방식"
-summary: "2026년 11월 Anthropic은 Claude Code의 실험 기능 Code Mode를 공개했습니다. Claude가 도구를 한 번씩 부르지 않고 JavaScript로 묶어 실행합니다. 언제 쓰고, auto 모드 분류기가 무엇을 못 보는지, 훅으로 어떻게 보완하는지를 정리합니다."
+summary: "2026년 11월 Anthropic은 Claude Code의 실험 기능 Code Mode를 공개했습니다. Claude가 도구 호출을 JavaScript로 묶어 실행합니다. auto 모드 분류기는 실행 중에 정해지는 값을 보지 못합니다. 언제 쓰는지와 훅으로 메우는 법을 정리합니다."
 category: trends
 people: []
 tags: ["claude-code", "code-mode", "tools", "hooks", "permissions", "auto-mode"]
 difficulty: practical
 brief:
-  what: "2026년 11월 17일(UTC) Anthropic은 Claude Code 실험 기능 Code Mode를 공개했습니다. Claude가 도구 호출을 JavaScript로 묶어 한 번에 실행합니다."
+  what: "2026년 11월 17일(UTC) Anthropic은 Claude Code 실험 기능 Code Mode를 공개했습니다. Claude가 도구 호출을 JavaScript 하나로 실행합니다."
   why: "auto 모드에서는 분류기가 개별 도구 호출이 아니라 스크립트를 보고, 검색으로 얻은 경로 같은 런타임 값은 보지 못합니다."
   action: "키트가 레포의 훅·권한 규칙을 읽어 스크립트 경계와 런타임 사각을 보고서로 남기고, 승인하면 REPL PreToolUse 훅 초안만 추가합니다."
 apply:
@@ -27,7 +27,7 @@ publishedAt: 2026-11-18
 keyIdeas:
   - "Code Mode에서는 Claude가 Bash·Read·Edit를 한 번씩 부르지 않고, 여러 호출을 담은 JavaScript를 한 번에 실행합니다."
   - "스크립트는 중간 결과를 걸러 모델이 읽을 출력을 줄이고, 병렬 실행과 조건 분기를 코드로 처리합니다."
-  - "auto 모드 분류기는 개별 도구 호출이 아니라 스크립트를 심사하며, 검색으로 얻은 경로 같은 런타임 값은 보지 못합니다."
+  - "auto 모드 분류기는 개별 호출 대신 스크립트를 심사합니다. 검색으로 얻은 경로처럼 실행 중에 정해지는 값은 보지 못합니다."
   - "deny·ask 규칙과 PreToolUse 훅은 스크립트 안의 각 도구 호출에 그대로 적용됩니다. 스크립트 자체는 matcher REPL로 검사합니다."
   - "반복 검색·다파일 수정·병렬 명령에는 맞고, 한두 번 읽고 판단하는 탐색에는 자유 턴이 낫습니다. 실험 기능이라 요건과 한계가 있습니다."
 sources:
@@ -37,7 +37,7 @@ sources:
     author: Anthropic
     kind: blog
     accessedAt: 2026-11-18
-    dateNote: "공식 문서에 게시 날짜가 없어 열람일을 적습니다. 실험 기능이라 이후 릴리스에서 바뀔 수 있습니다."
+    dateNote: "공식 문서에 게시 날짜가 없어 열람일을 적습니다. 2026년 11월 18일에 읽었습니다. 실험 기능이라 이후 릴리스에서 바뀔 수 있습니다. 공식 문서는 코드를 어떤 가상 머신이나 샌드박스에서 돌리는지 밝히지 않습니다."
   - id: claude-devs-code-mode
     title: "ClaudeDevs Code Mode 공지 (X)"
     url: https://x.com/ClaudeDevs/status/2122801681939234950
@@ -58,28 +58,28 @@ sources:
     author: Anthropic
     kind: blog
     accessedAt: 2026-11-18
-    dateNote: "공식 문서에 게시 날짜가 없어 열람일을 적습니다. PreToolUse와 Code Mode에서의 훅 타임아웃 차이를 확인했습니다."
+    dateNote: "공식 문서에 게시 날짜가 없어 열람일을 적습니다. 2026년 11월 열람에서 PreToolUse와 Code Mode의 훅 타임아웃·실패 처리 차이를 확인했습니다."
 ---
 
-2026년 11월 17일(UTC), Anthropic의 개발자 계정 ClaudeDevs는 X에서 Claude Code의 실험 기능 <Term id="cc-code-mode">Code Mode</Term>를 알렸습니다. Claude가 도구를 하나씩 부르지 않고, 도구를 이어 붙인 스크립트를 쓰게 한다는 내용이었습니다. 공식 문서 제목도 같습니다. 도구 호출을 코드로 실행하라는 말입니다.
+2026년 11월 17일(UTC), Anthropic의 ClaudeDevs가 X에 실험 기능을 알렸습니다. <Term id="cc-code-mode">Code Mode</Term>는 기본으로 꺼져 있고, 켜려면 `CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1`이 필요합니다.
 
 <Quote source="claude-devs-code-mode">
 Check out Code Mode, a new, experimental way for Claude Code to work with tools. Claude writes scripts that chain your tools together in sophisticated ways, and it can answer you while long commands are still running.
 </Quote>
 
-Claude가 도구를 정교하게 이어 붙인 스크립트를 쓰고, 긴 명령이 도는 동안에도 답할 수 있다는 공지입니다. 끄는 기본값은 그대로입니다. 쓰려면 `CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1`로 켜야 합니다.
+Claude가 도구를 스크립트로 잇고, 긴 명령이 아직 도는 동안에도 답을 할 수 있습니다.
 
-## 도구를 한 번씩 부르는 습관이 곧 안전하다는 뜻은 아니다
+## 한 호출씩 보던 감각이 흔들린다
 
-평소 Claude Code는 Bash, Read, Edit 같은 도구를 한 번 부르고, 결과를 읽은 뒤 다음을 고릅니다. 사람이 중간 결과를 보고 끼어들기 쉽습니다. 그래서 "한 호출씩 검토하는 편이 더 안전하다"는 감각이 생기기 쉽습니다.
+평소 Claude Code는 Bash, Read, Edit를 한 번 부르고 결과를 읽은 뒤 다음 호출을 고릅니다. 사람이 중간 결과에 끼어들기 쉬워서, 한 호출씩 보면 안전하다는 감각이 생깁니다.
 
-Code Mode는 그 감각을 흔듭니다. 2026년 11월 18일에 읽은 공식 문서에 따르면, Claude는 같은 작업을 JavaScript 한 덩어리로 쓰고 Claude Code가 그 코드를 세션에서 실행합니다. 코드 안에서 명령을 병렬로 돌리고, 한 결과로 다음 호출을 고르고, 모델이 읽을 부분만 돌려줄 수 있습니다.
+Code Mode에서 Claude는 같은 작업을 JavaScript 한 덩어리로 쓰고, Claude Code가 그 코드를 세션에서 실행합니다. 코드는 명령을 병렬로 돌릴 수 있습니다. 한 결과로 다음 호출을 고를 수 있고, 모델이 읽을 부분만 돌려줄 수 있습니다.
 
-<KeyIdea title="중간 판단이 스크립트 안으로 들어간다">
-자유 턴에서는 모델이 도구 결과를 컨텍스트에 올린 뒤 다음 행동을 고릅니다. Code Mode에서는 그 중간 걸러 내기와 분기가 스크립트 실행 중에 일어납니다. 사람이 대화에서 보는 것은 호출과 결과의 일부이고, 스크립트 전문은 트랜스크립트 뷰어(`Ctrl+O`)에서 펼쳐 봐야 합니다.
+<KeyIdea title="중간 판단이 스크립트로 들어갑니다">
+자유 턴에서는 모델이 결과를 본 뒤 다음을 고릅니다. Code Mode에서는 걸러 내기와 분기가 실행 중에 일어납니다. 대화에는 호출과 결과의 일부만 보입니다. 스크립트 전문은 트랜스크립트 뷰어에 있습니다. 단축키는 `Ctrl+O`입니다.
 </KeyIdea>
 
-문서가 든 예는 재시도 한도를 올리는 작업입니다. 파일을 찾고, 고치고, 테스트를 돌리는 일을 한 스크립트에 담습니다.
+문서의 예는 재시도 한도를 올리는 일입니다. 한 스크립트가 파일을 찾고, 고치고, 테스트를 돌립니다.
 
 ```javascript
 const files = await $`rg -l "function retryPolicy" src`.text();
@@ -88,52 +88,54 @@ await edit(target, "maxAttempts: 3", "maxAttempts: 5");
 ({ edited: target, tests: $`npm test -- retryPolicy`.nothrow() });
 ```
 
-대화 화면에는 편집 diff 같은 도구 호출이 보이고, 위 코드 자체는 기본적으로 접혀 있습니다.
+대화 화면에는 편집 diff가 보입니다. 위 코드는 기본적으로 접혀 있습니다.
 
-## 여러 관련 호출이 이어질 때 Code Mode를 쓴다
+## 이어지는 호출만 스크립트로 묶는다
 
-문서는 Code Mode를 이런 작업에 써 보라고 적습니다. 여러 파일에 같은 변경이 반복될 때, 검색 결과를 걸러야 Claude가 읽을 양이 줄어들 때, 서로 독립인 명령을 동시에 돌릴 수 있을 때입니다.
+문서는 여러 파일에 같은 변경이 반복되거나, 검색 결과를 걸러 읽을 양을 줄이거나, 서로 독립인 명령을 동시에 돌릴 때 Code Mode를 권합니다. 한두 번 읽고 방향을 정하는 탐색, 사람과의 짧은 계획 대화, 호출마다 판단을 눈으로 보는 작업에는 자유 턴이 맞습니다.
 
-반대로 한두 번 읽고 방향을 정하는 탐색, 사람과의 짧은 계획 대화, 호출마다 다른 판단을 눈으로 확인하고 싶은 작업에는 자유 턴이 맞습니다. 스크립트로 묶으면 중간 출력이 모델 컨텍스트에 덜 올라가는 대신, 그 출력을 사람이 대화에서 바로 보기 어려워질 수 있습니다.
+스크립트로 묶으면 중간 출력이 컨텍스트에 덜 올라갑니다. 사람은 그 출력을 대화에서 보기 어려울 수 있고, 왕복도 줄어듭니다.
 
 <Compare
-  before="도구를 한 번씩 부르고, 매번 결과를 컨텍스트에 올린 뒤 다음을 고른다. 사람이 호출 단위로 끼어들기 쉽다."
-  after="관련 호출을 JavaScript로 묶어 한 번에 실행한다. 중간 결과는 코드가 걸러 내고, 모델과 사람은 스크립트가 돌려준 요약과 보이는 호출을 본다."
+  before="한 번씩 부르고 결과를 올린 뒤 다음을 고릅니다."
+  after="관련 호출을 JavaScript로 묶어 한 번에 실행합니다."
 />
 
-API 쪽에는 비슷한 이름이 이미 있습니다. Anthropic API의 <Term id="programmatic-tool-calling">프로그램형 도구 호출</Term>은 모델이 코드 실행 환경 안에서 도구를 함수처럼 이어서 부르게 합니다. 중간 결과는 코드가 처리하고, 최종 출력만 모델 컨텍스트로 올립니다. 아이디어는 닮았지만 경계는 다릅니다. API에서는 어떤 도구를 코드에서 부를지를 개발자가 `allowed_callers`로 정합니다. Claude Code Code Mode에서는 대화형 세션의 기존 권한 규칙과 <Term id="agent-hook">훅</Term>이 실제 동작을 가릅니다. 이 글의 초점은 Claude Code 쪽입니다.
+API에는 비슷한 기능이 있습니다. <Term id="programmatic-tool-calling">프로그램형 도구 호출</Term>입니다. 모델이 코드 실행 안에서 도구를 함수처럼 잇고, 중간 결과는 코드가 처리합니다. 최종 출력만 모델 컨텍스트로 올라갑니다. 부를 도구는 개발자가 `allowed_callers`로 정합니다. Claude Code에서는 권한 규칙이 동작을 가릅니다. <Term id="agent-hook">훅</Term>도 동작을 가릅니다.
 
-## auto 모드 분류기는 스크립트를 보고 런타임 값은 못 본다
+## 분류기는 실행 중에 정해진 값을 못 본다
 
-권한 이야기에서 가장 중요한 문장은 여기입니다. <Term id="auto-mode">auto 모드</Term>를 켠 채 Code Mode를 쓰면, <Term id="transcript-classifier">분류기</Term>는 도구를 하나씩 심사하지 않습니다. 실행 직전 코드 덩어리를 심사합니다.
+<Term id="auto-mode">auto 모드</Term>와 함께 쓰면 심사 단위가 바뀝니다. <Term id="transcript-classifier">분류기</Term>는 코드 덩어리를 심사하고, 도구를 하나씩 심사하지 않습니다.
 
 <Quote source="cc-docs-code-mode">
 Auto mode: the classifier reviews each piece of code before it runs, not each tool call. It doesn't see values computed at run time, such as a path taken from search output, so keep rules or hooks for calls you must control.
 </Quote>
 
-auto 모드에서는 분류기가 각 도구 호출이 아니라 코드 조각을 먼저 본다는 뜻입니다. 검색 출력에서 골라 낸 경로처럼 실행 중에야 정해지는 값은 분류기 눈에 들어오지 않습니다. 그래서 반드시 막아야 하는 호출은 규칙이나 훅으로 남기라고 문서는 말합니다.
+검색으로 고른 경로는 실행 중에 정해져서 분류기 눈에 들어오지 않습니다. 반드시 막을 호출은 규칙으로 남기거나 훅으로 남깁니다.
 
-deny·ask 규칙과 PreToolUse 훅은 스크립트 안의 각 도구 호출에 도구 이름 그대로 적용됩니다. Bash 훅이라면 명령을 조각까지 검사해야 합니다. 문서 예처럼 `app` 폴더에서 `git push`를 하면 훅에는 `cd 'app' && git push` 형태로 들어올 수 있습니다. 스크립트 텍스트 자체를 보려면 matcher를 `REPL`로 두고 `tool_input.code`의 JavaScript를 읽으면 됩니다. 2026년 11월 훅 문서도 Code Mode에서는 PreToolUse 타임아웃·실패 처리가 다를 수 있다고 적어 두었습니다.
+deny 규칙과 ask 규칙은 스크립트 안의 각 호출에 적용됩니다. PreToolUse 훅도 도구 이름 그대로 적용됩니다. Bash 훅은 명령 조각까지 봐야 합니다. `app`에서 `git push`를 하면 훅 입력은 `cd 'app' && git push`일 수 있습니다. 스크립트 텍스트는 matcher `REPL`로 보고, JavaScript는 `tool_input.code`에 있습니다.
 
-| 계층 | Code Mode에서 보는 것 | 못 보는·놓치기 쉬운 것 |
+| 계층 | 보는 것 | 놓치기 쉬운 것 |
 |---|---|---|
-| auto 분류기 | 실행 전 JavaScript 텍스트 | 검색·계산으로 나중에 정해진 경로·인자 |
-| deny·ask·Bash 규칙 | 각 도구 호출의 명령 문자열 | 규칙이 못 잡는 다른 표기 |
-| PreToolUse (Bash 등) | 각 호출의 입력 | 훅이 검사하지 않는 필드 |
-| PreToolUse (REPL) | 스크립트 전체 | 런타임에만 생기는 값(실행 전 검사 한계) |
+| auto 분류기 | 실행 전 스크립트 | 나중에 정해진 값 |
+| deny·ask·Bash | 호출의 명령 | 다른 표기 |
+| PreToolUse | 호출 입력 | 검사 밖 필드 |
+| REPL 훅 | 스크립트 전체 | 실행 중에만 있는 값 |
 
-정리하면, Code Mode는 승인 피로를 줄이려고 만든 auto 모드의 빈칸을 메우지 않습니다. 오히려 분류기가 보는 단위를 스크립트로 바꿉니다. 개별 호출을 사람이 더 잘 보게 되는 기능이 아닙니다.
+Code Mode는 auto 모드의 빈칸을 메우지 않습니다. 분류기가 보는 단위를 스크립트로 바꿀 뿐, 개별 호출을 더 잘 보여 주지는 않습니다.
 
-## 실험 기능이라 켜기 전에 요건과 한계를 본다
+## 켜려면 버전과 계정이 맞아야 한다
 
-문서는 켜기 전에 받아들일 한계를 먼저 보라고 합니다. Code Mode 세션은 Code Mode가 켜진 터미널에서만 이어갈 수 있습니다. 코드가 백그라운드로 가지 않으면 끝날 때까지 기다리며, 권한 프롬프트에 쓴 시간을 포함해 10분에서 멈춥니다. Remote Control, Chrome, 컴퓨터 사용, 데스크톱으로 옮기기, 백그라운드 세션으로 바꾸기는 쓸 수 없습니다. `-p`, Agent SDK, VS Code 패널, 클라우드 세션에서도 Code Mode는 동작하지 않습니다.
+Code Mode 세션은 기능이 켜진 터미널에서만 이어집니다. 코드가 백그라운드로 가지 않으면 끝날 때까지 기다리고, 권한 프롬프트 시간을 넣어 10분에서 멈춥니다.
 
-버전은 Claude Code v2.1.323 이상, 네이티브 설치, Anthropic API로 직접 붙는 구독·Console 계정이 필요합니다. 게이트웨이·Bedrock·일부 클라우드 호스팅, HIPAA·제로 데이터 보존 설정, API 키 헬퍼·OpenTelemetry 내보내기·`DISABLE_TELEMETRY` 같은 설정과 겹치면 시작되지 않을 수 있습니다. 프로젝트의 settings로는 환경 변수가 무시되고, 사용자 설정이나 셸에서 켜야 합니다. 조직은 관리형 설정에 `0`을 넣어 막을 수 있습니다.
+Remote Control, Chrome, 컴퓨터 사용, 데스크톱으로 옮기기, 백그라운드 세션으로 바꾸기는 쓸 수 없습니다. `-p`, Agent SDK, VS Code 패널, 클라우드 세션에서는 동작하지 않습니다.
 
-이 한계 때문에 "항상 켜 두는 기본 모드"로 쓰기보다, 관련 호출이 많은 작업 세션에만 켜 보는 편이 문서의 취지에 가깝습니다. 구현체(가상 머신·샌드박스 엔진)에 대한 추측은 이 글이 본 공식 문서에는 없습니다. 동작과 권한 경계만 문서 기준으로 적었습니다.
+버전은 Claude Code v2.1.323 이상입니다. 네이티브 설치가 필요하고, Anthropic API에 직접 붙는 계정이 필요합니다. 구독 계정이나 Console 계정입니다.
 
-## 스크립트로 묶을수록 런타임 가드가 남는다
+게이트웨이, Bedrock, 일부 클라우드 호스팅, HIPAA, 제로 데이터 보존이 겹치면 시작되지 않을 수 있습니다. API 키 헬퍼, OpenTelemetry 내보내기, `DISABLE_TELEMETRY`도 그렇습니다. 프로젝트 settings는 이 환경 변수를 무시합니다. 사용자 설정에서 켜거나 셸에서 켭니다. 조직은 관리형 설정에 `0`을 넣어 막을 수 있습니다.
 
-Code Mode의 이득은 분명합니다. 반복 검색과 일괄 수정, 병렬 명령을 한 스크립트에 담으면 왕복과 컨텍스트를 줄일 수 있습니다. 대가도 분명합니다. auto 분류기는 스크립트 텍스트를 보고, 실행 중에 정해지는 값은 보지 못합니다. 그 빈칸은 deny·ask 규칙과 PreToolUse 훅이 담당합니다.
+관련 호출이 많은 세션에만 켜는 편이 문서의 취지입니다.
 
-가져갈 실무 규칙은 단순합니다. 관련 호출이 많은 작업만 스크립트로 묶고, 검색으로 고른 경로처럼 런타임에 정해지는 위험한 호출은 훅과 규칙으로 막습니다. 스크립트 자체에 위험 패턴이 있는지는 `REPL` 훅으로 검사합니다. 한 호출씩 보는 습관이 안전을 보장한다고 믿기보다, 분류기가 보는 단위가 바뀌었는지를 먼저 확인하는 편이 맞습니다.
+## 문서가 실행 환경을 비워 둔다
+
+Code Mode에서는 PreToolUse 타임아웃이 다를 수 있습니다. 실패 처리도 다를 수 있습니다. 스크립트 자체의 위험 패턴은 `REPL` 훅으로 검사합니다. 공식 문서는 코드를 어느 가상 머신이나 샌드박스에서 돌리는지 밝히지 않습니다. 한 호출씩 보는 습관이 안전을 보장하지는 않습니다.

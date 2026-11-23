@@ -40,7 +40,7 @@ benchmarks:
     margin: 3.1
     unit: "%"
     cost: $4.7k
-    note: "리더보드 RELEASE DATE 열은 2026-09-22입니다."
+    note: "리더보드에 적힌 출시일: 2026-09-22입니다."
     url: https://www.tbench.ai/leaderboard
     asOf: 2026-11-21
   - bench: Terminal-Bench
@@ -52,6 +52,6 @@ benchmarks:
     margin: 2.8
     unit: "%"
     cost: $16.5k
-    note: "리더보드 RELEASE DATE 열은 2026-11-09입니다. Opus 5.5 행과 해결률이 같습니다."
+    note: "리더보드에 적힌 출시일: 2026-11-09입니다. Opus 5.5 행과 해결률이 같습니다."
     url: https://www.tbench.ai/leaderboard
     asOf: 2026-11-21

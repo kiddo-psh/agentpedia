@@ -15,7 +15,7 @@ export default function ConnectPage() {
       <h1 className="pt-2 text-4xl leading-tight font-medium tracking-[-0.03em] sm:text-5xl">에이전트에 연결하기</h1>
       <p className="text-muted">
         Agentpedia는 <strong>MCP 서버</strong>를 제공합니다. 연결하면 에이전트가 기사를 검색하고 읽고, 적용 키트를
-        받아 내 프로젝트에 바로 적용할 수 있어요. 설치할 것은 없고, 로그인도 필요 없습니다.
+        받아 내 프로젝트에 바로 적용할 수 있습니다. 설치나 로그인은 필요 없습니다.
       </p>
 
       <h2>Claude Code</h2>

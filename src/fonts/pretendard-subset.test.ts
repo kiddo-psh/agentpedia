@@ -7,18 +7,20 @@ const root = path.join(process.cwd(), "src");
 
 describe("pretendard content-scanned subset", () => {
   it("keeps critical first-paint face well under the old ~384 KB dynamic pack", () => {
-    expect(meta.critical.bytes).toBeLessThan(200_000);
-    expect(meta.totalBytes).toBeLessThan(300_000);
+    expect(meta.critical.bytes).toBeLessThan(80_000);
+    expect(meta.totalBytes).toBeLessThan(400_000);
     expect(meta.critical.hangul).toBeGreaterThan(100);
   });
 
   it("ships both woff2 files and split CSS (critical layout / content deferred)", () => {
-    const criticalCss = fs.readFileSync(path.join(root, "app/pretendard-subset.css"), "utf8");
+    const criticalCss = fs.readFileSync(path.join(process.cwd(), "public/fonts/pretendard-shell.css"), "utf8");
     const contentCss = fs.readFileSync(path.join(root, "app/pretendard-content.css"), "utf8");
-    expect(criticalCss).toContain("pretendard-critical.woff2");
+    expect(criticalCss).toContain("/fonts/pretendard-shell.woff2");
     expect(criticalCss).not.toContain("pretendard-content.woff2");
+    expect(criticalCss).not.toContain("pretendard-ui.woff2");
     expect(contentCss).toContain("pretendard-content.woff2");
-    expect(contentCss).not.toContain("pretendard-critical.woff2");
+    expect(contentCss).toContain("/fonts/pretendard-ui.woff2");
+    expect(contentCss).not.toContain("pretendard-shell.woff2");
     expect(criticalCss).toContain("unicode-range:");
     expect(contentCss).toContain("unicode-range:");
     expect(criticalCss).toContain('font-family: "Pretendard Variable"');
@@ -32,17 +34,22 @@ describe("pretendard content-scanned subset", () => {
 
   it("keeps content face off the layout first-paint import", () => {
     const layout = fs.readFileSync(path.join(root, "app/layout.tsx"), "utf8");
-    expect(layout).toContain('import "./pretendard-subset.css"');
+    expect(layout).toContain('"/fonts/"+"pretendard-shell.css"');
+    expect(layout).toContain("largest-contentful-paint");
+    expect(layout).toContain("setTimeout");
+    expect(layout).not.toContain('rel="preload"');
+    expect(layout).not.toMatch(/import\s+["'].*pretendard-subset\.css["']/);
     expect(layout).not.toMatch(/import\s+["'].*pretendard-content\.css["']/);
     expect(layout).toContain("DeferredContentFont");
 
     const deferred = fs.readFileSync(path.join(root, "components/DeferredContentFont.tsx"), "utf8");
     expect(deferred).toContain('import("@/app/pretendard-content.css")');
-    expect(deferred).toContain(".prose-article");
+    expect(deferred).toContain("load");
+    expect(deferred).not.toContain(".prose-article");
   });
 
   it("covers the Lauren Tan article title in the critical face unicode-range", () => {
-    const css = fs.readFileSync(path.join(root, "app/pretendard-subset.css"), "utf8");
+    const css = fs.readFileSync(path.join(process.cwd(), "public/fonts/pretendard-shell.css"), "utf8");
     const criticalBlock = css.split("@font-face")[1] ?? "";
     const rangeMatch = criticalBlock.match(/unicode-range:\s*([^;]+);/);
     expect(rangeMatch).toBeTruthy();

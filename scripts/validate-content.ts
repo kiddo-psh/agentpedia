@@ -1,12 +1,12 @@
 import { loadAllAgents, staleAgentWarnings } from "../src/content/agents";
-import { loadAllModels, loadTaskTiming, staleModelWarnings } from "../src/content/models";
+import { koreanStyleWarnings } from "../src/content/koreanStyle";
+import { loadAllModels, staleModelWarnings } from "../src/content/models";
 import { ContentError, loadAllArticles } from "../src/content/loader";
 
 try {
   const articles = loadAllArticles();
   const agents = loadAllAgents();
   const models = loadAllModels();
-  loadTaskTiming();
   const drafts = articles.filter((a) => a.draft).length;
   const articleSlugs = new Set(articles.map((article) => article.slug));
   const agentSlugs = new Set(agents.map((agent) => agent.slug));
@@ -31,6 +31,21 @@ try {
   }
   for (const warning of staleModelWarnings(models, new Date())) {
     console.warn(`stale model fact: ${warning}`);
+  }
+  for (const article of articles) {
+    for (const warning of koreanStyleWarnings(article.bodyMarkdown)) {
+      console.warn(`style ${article.slug}: ${warning}`);
+    }
+  }
+  for (const agent of agents) {
+    for (const warning of koreanStyleWarnings(agent.bodyMarkdown)) {
+      console.warn(`style agent ${agent.slug}: ${warning}`);
+    }
+  }
+  for (const model of models) {
+    for (const warning of koreanStyleWarnings(model.bodyMarkdown)) {
+      console.warn(`style model ${model.slug}: ${warning}`);
+    }
   }
   console.log(
     `content ok: ${articles.length} articles (${drafts} draft), ${agents.length} agents, ${models.length} models`,

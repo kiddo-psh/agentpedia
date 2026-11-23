@@ -109,7 +109,7 @@ export function likeSkeletonBlankIssues(source: string): string[] {
     !/Heart|heart|aria-label|좋아요/.test(skeleton);
   if (blankOnly) {
     return [
-      "LikeButtonSkeleton must show a heart (and count placeholder), not a blank circle. See docs/article-load-like-perf.md.",
+      "LikeButtonSkeleton must show a heart (and count placeholder), not a blank circle.",
     ];
   }
   return [];
@@ -124,6 +124,26 @@ export function categoryMissingUseCacheIssues(source: string): string[] {
     ];
   }
   return [];
+}
+
+/**
+ * The home ranking used to call connection() and stream after the article list.
+ * Cached public counts belong in the static shell.
+ */
+export function featuredLikesDynamicHoleIssues(source: string): string[] {
+  if (!/좋아요 많은 기사/.test(source)) return [];
+  const issues: string[] = [];
+  if (/connection\(/.test(source)) {
+    issues.push(
+      'Do not await connection() for home like counts. Cache them with "use cache" and cacheLife("minutes") so the three cards are in the static shell.',
+    );
+  }
+  if (!/"use cache"/.test(source) || !/cacheLife\(\s*"minutes"\s*\)/.test(source)) {
+    issues.push(
+      'Cache public home like counts with "use cache" and cacheLife("minutes") (same shell rule as getPublicLikeCount).',
+    );
+  }
+  return issues;
 }
 
 /** Below-fold article layout must opt into content-visibility (prod experiment). */

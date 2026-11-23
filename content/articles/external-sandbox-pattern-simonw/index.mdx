@@ -1,0 +1,114 @@
+---
+slug: external-sandbox-pattern-simonw
+title: "Simon Willison의 외부 샌드박스 패턴"
+summary: "2026년 11월 17일 Simon Willison은 에이전트는 호스트에 두고, 실행되는 코드만 WASM·QEMU·Apple Container에 넣는 패턴을 적었습니다. 이 저장소 README는 Claude Code와 Codex 연결을 문서화하고, Pi 설정은 다른 저장소에 둡니다."
+category: security
+people: [simon-willison]
+tags: ["sandbox", "claude-code", "codex", "prompt-injection"]
+difficulty: practical
+brief:
+  what: "2026년 11월 17일 Simon Willison은 에이전트는 밖에 두고 코드만 샌드박스에서 실행하는 패턴을 공개했습니다."
+  why: "로컬 모델을 시험할 때 실수나 프롬프트 인젝션이 호스트를 건드리지 않게 하려는 동기입니다."
+  action: "키트는 이미 떠 있는 서버에만 허용 목록 밖 요청을 시켜 보고, 결과를 지어내지 않습니다."
+apply:
+  goal: "떠 있는 외부 샌드박스에 허용 목록 밖 요청을 한 번 시켜 실제 결과만 보고서에 남깁니다."
+  changes:
+    - "`docs/external-sandbox-probe.md`에 보고서 추가(docs/ 없으면 생성, 같은 이름이면 다른 이름). 서버 URL, README가 말하는 연결, 읽은 allow 출처(값은 비밀 제외), 그 목록에 없는 호스트의 실제 출력. 서버가 없거나 정책을 못 읽으면 요청 없음"
+    - "루프백 서버가 응답하고 활성 allow를 읽은 뒤에만, 그 목록에 없는 호스트로 한 번 실행. 정책을 못 읽으면 요청하지 않음. 설치와 서버 기동은 하지 않음"
+  doesNotDo:
+    - "샌드박스 서버, uv, 컨테이너, QEMU를 설치하거나 새로 띄우지 않습니다. 호스트 전역 신뢰 저장소에 인증서를 넣지 않습니다."
+    - "비밀을 출력하거나 자격 증명 치환에 실제 키를 넣지 않습니다. 애플리케이션 코드를 수정하지 않습니다."
+    - "검증 명령을 CLAUDE.md에 덧붙이지 않습니다. 막혔다는 문장을 실행 결과 없이 적지 않습니다."
+  fitsWhen: "루프백에서 External Sandbox 서버가 이미 떠 있거나, README대로 연결만 점검하려는 개발 머신"
+  time: "20~40분"
+tryIt: "이 머신에서 EXTERNAL_SANDBOX_API_URL, CODEX_HOME이 .codex-external-sandbox인지, 127.0.0.1:8686·8687·8688 중 /health가 응답하는지만 적어줘. 서버를 띄우거나 curl로 바깥 호스트를 치지 마. 응답하는 서버가 있으면 '키트 권장', 없으면 '서버 없음'. 아무 파일도 바꾸지 마."
+draft: true
+publishedAt: 2026-11-23
+keyIdeas:
+  - "Simon Willison의 외부 샌드박스는 에이전트를 호스트에 두고, 실행되는 코드만 리눅스 게스트에 넣습니다."
+  - "2026년 11월 17일 글은 v86 WASM, Apple Container, Quicksand QEMU 서버 셋을 같은 로컬 API로 소개합니다."
+  - "저장소 README는 Claude Code 셸 접두와 Codex 설정을 담고, Pi 확장은 별도 저장소라고만 적습니다."
+  - "Claude Code 연결은 셸 명령을 게스트로 보내고, Read와 Edit는 호스트 파일을 그대로 봅니다."
+  - "Codex 가이드는 게스트 네트워크가 기본으로 꺼져 있다고 적습니다. 허용 목록 밖 요청이 막히는지는 이 글이 실행해 보지 않았습니다."
+sources:
+  - id: simon-blog
+    title: "External sandboxes for coding agents"
+    url: https://simonwillison.net/2026/Nov/17/external-sandboxes-for-coding-agents/
+    author: Simon Willison
+    kind: blog
+    publishedAt: 2026-11-17
+    dateNote: "페이지가 Posted 17th November 2026 at 10:52 pm이라고 적습니다. 시간대는 페이지에 없습니다. 2026년 11월 23일에 읽었습니다."
+  - id: simon-x
+    title: "Simon Willison의 외부 샌드박스 소개 (X)"
+    url: https://x.com/simonw/status/2122500307557265651
+    author: Simon Willison
+    kind: thread
+    publishedAt: 2026-11-17
+    dateNote: "fxtwitter API로 읽었습니다. created_at은 Tue Nov 17 01:21:22 +0000 2026입니다. 링크는 blog.primeradiant.com이고, 첨부 그림의 alt 텍스트도 그 응답에 있습니다. simonwillison.net 글과는 주소가 다릅니다."
+  - id: ext-sandbox-readme
+    title: "prime-radiant-inc/external-sandbox README"
+    url: https://github.com/prime-radiant-inc/external-sandbox
+    author: Prime Radiant
+    kind: blog
+    accessedAt: 2026-11-23
+    dateNote: "2026년 11월 23일에 raw README(main)와 claude-code/README.md, codex/README.md를 읽었습니다. GitHub API의 created_at은 2026-10-09T19:40:27Z, pushed_at은 2026-11-16T23:01:30Z입니다. Pi 확장 저장소의 README는 열지 않았습니다."
+---
+
+2026년 11월 17일 01:21 UTC, Simon Willison이 X에 적었습니다. 코딩 에이전트가 쓴 코드를 가두는 방법을 찾고 있다는 글입니다.
+
+<Quote source="simon-x">
+I've been exploring new ways to sandbox code written by coding agents - here's a description of the external sandbox pattern, where agents run on your Mac but execute code in a WebAssembly or QEMU or Apple Container sandbox - with demos for Claude Code, Codex and Pi
+</Quote>
+
+에이전트는 Mac에 두고, 코드는 WebAssembly나 QEMU, Apple Container <Term id="sandbox">샌드박스</Term>에서 실행한다는 소개입니다. 데모 대상으로 Claude Code, Codex, Pi를 적습니다. 같은 날 simonwillison.net 글은 시각을 10:52 pm으로 적고, 시간대는 적지 않습니다. 동기는 로컬 모델을 시험할 때입니다.
+
+<Quote source="simon-blog">
+I've been exploring new ways to sandbox code that is executed by agents, with a focus on making it safer to try out local models without worrying that a mistake or prompt injection attack might cause them to take damaging actions on a machine.
+</Quote>
+
+실수나 프롬프트 인젝션이 머신에서 해를 끼칠 일을 줄이려는 탐색입니다. X의 그림 alt는 나가는 길을 둘로 적습니다. 마운트한 폴더와, 허용 목록 프록시를 통한 인터넷입니다.
+
+## 에이전트는 호스트에 남긴다
+
+글이 이름 붙인 패턴은 이렇습니다. 에이전트가 실행하는 코드는 전용 샌드박스 안에서 돌고, 에이전트 자신은 그 밖에 있습니다. Prime Radiant와 함께 만들었고, Prime Radiant는 Superpowers 등을 만든 AI 연구실이라고 글이 소개합니다. 선택인 HTTP/HTTPS 허용 목록 프록시로 코드가 말할 호스트를 정하고, 비밀을 에이전트와 공유하지 않은 채 인증된 API를 부르게 하는 자격 증명 치환이 있다고 적습니다. 치환이 어떤 헤더를 바꾸는지까지는 이 글이 적지 않습니다.
+
+## 같은 API로 서버 셋을 내놓았다
+
+보여주는 구현은 셋이고, 로컬호스트 API는 같다고 글이 적습니다.
+
+- external-sandbox-v86은 Node.js 서버가 v86으로 Alpine Linux를 WebAssembly 안에서 돌립니다.
+- external-sandbox-container는 Python 웹 서버가 Apple Containers 안의 Alpine Linux를 돌립니다.
+- external-sandbox-quicksand는 Python 웹 서버가 Microsoft Quicksand를 쓰고, Quicksand가 QEMU와 Alpine Linux를 Python 패키지에 넣습니다.
+
+Pi, Claude Code, Codex가 코드를 실행할 때 그 샌드박스로 API를 보내게 설정할 수 있다고 글이 적습니다. 저장소 `prime-radiant-inc/external-sandbox`의 README는 이 저장소를 프로젝트 홈이라고 부릅니다. 프로토콜 명세, 적합성 실행기, Claude Code 셸 접두와 스트리밍 클라이언트, Codex 설정 안내가 여기 있습니다. 구현과 UI, Pi 확장은 저장소가 따로이고 따로 릴리스됩니다. Pi 확장은 npm에 올린다고 README가 적습니다. 그 확장의 README는 이 글을 쓰며 열지 않았으므로, Pi가 어떤 도구를 어떻게 넘기는지는 여기 적지 않습니다.
+
+README가 예로 드는 포트는 v86이 8686, container가 8687, Quicksand가 8688입니다. 적합성 실행기는 의존성을 설치한 뒤 Codex, Claude, Pi, 유료 모델 호출, 인터넷이 필요 없다고 적습니다. 과거 검증 결과는 그 커밋에 대한 것이고, 이후 리비전이 모든 프로파일을 통과했다는 주장이 아니라고도 적습니다. GitHub API로 본 이 저장소의 생성 시각은 2026-10-09, 마지막 push는 2026-11-16입니다.
+
+## README가 말하는 연결만 된다
+
+Claude Code 폴더의 README는 셸 접두가 명령 전체를 서버의 `/exec/ws`로 보내고, 호스트에서 그 명령을 평가하거나 다시 조립하지 않는다고 적습니다. 실행은 리눅스 게스트입니다. 스트리밍 클라이언트는 macOS 또는 Linux, 호스트의 uv, Python 3.11 이상이 필요합니다.
+
+<Quote source="ext-sandbox-readme">
+Claude and its model connection stay on the host; native file tools such as Read/Edit still access host files.
+</Quote>
+
+Claude와 모델 연결은 호스트에 남고, Read와 Edit 같은 파일 도구는 호스트 파일을 그대로 봅니다. 이 연결은 그 권한을 바꾸지 않는다고 README가 적습니다. 접두가 셸 훅, 상태 줄, stdio MCP 기동 명령에도 적용된다는 문장은 Claude 환경 변수 문서를 가리킵니다. 서버를 띄우는 명령은 각 구현 README를 먼저 보라고 적혀 있습니다.
+
+Codex README는 호스트의 Codex가 프로세스와 파일 작업을 `/codex`로 보내고, 명령은 게스트에서 돈다고 적습니다. 시험한 버전은 Codex CLI 0.164.0이고, 더 새 CLI는 호환을 다시 봐야 한다고 적습니다. `danger-full-access`는 게스트 안의 Codex 플랫폼 샌드박스를 추가로 두지 말라는 요청이고, 마운트와 네트워크 정책은 백엔드가 그대로 강제한다고 적습니다.
+
+## 네트워크는 기본으로 꺼져 있다
+
+허용 목록 밖 요청이 막히는지는 백엔드 기본값과 맞물립니다. Codex README는 게스트 네트워킹이 기본으로 꺼져 있고, 승인된 접근이 필요할 때 그 백엔드의 `--proxy-config`를 쓰라고 적습니다.
+
+<Quote source="ext-sandbox-readme">
+Guest networking is disabled by default; use the selected backend's --proxy-config option when commands need approved network access.
+</Quote>
+
+홈 README의 프록시 프로파일은 대상 서버를 `{"allow": []}`로 띄우게 하고, 테스트가 로컬 허용 규칙을 넣었다가 원래 정책으로 되돌린다고 적습니다. 이 조건은 적합성 테스트의 시작이고, 이 글이 어떤 호스트에서 curl이 거절되는 것을 본 기록은 아닙니다.
+
+<Compare
+  before="에이전트와 실행되는 코드가 같은 머신 권한으로 돕니다."
+  after="에이전트는 호스트에 남고, 셸과 Codex의 프로세스·파일 작업은 게스트로 갑니다. Read와 Edit는 호스트에 남습니다."
+/>
+
+그래서 확인할 요청은 하나입니다. 이미 떠 있는 서버에, 허용 목록에 없는 호스트로 나가게 시켜 보고, 돌아온 문장을 그대로 적는 일입니다. 서버가 없으면 그 사실만 남습니다. 막혔다는 문장은 그 출력 옆에만 씁니다.

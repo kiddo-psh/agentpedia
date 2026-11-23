@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { connection } from "next/server";
-import { cache, Suspense } from "react";
+import { cacheLife } from "next/cache";
+import { unstable_rethrow } from "next/navigation";
+import { Suspense } from "react";
 import { ArticleNavLink } from "@/components/ArticleNavLink";
 import { ArticlePagination, ArticleSortControls } from "@/components/ArticleListControls";
 import { CategoryChips, WithIndex } from "@/components/SiteIndex";
@@ -10,6 +11,7 @@ import { listArticles } from "@/content/loader";
 import type { ArticleMeta, Category } from "@/content/schema";
 import { getDb } from "@/db/client";
 import { listArticleLikeCounts } from "@/likes/service";
+import { HOME_HERO_LEDE, HOME_HERO_TITLE } from "@/fonts/lcpCopy";
 import { ArticleList } from "./ArticleList";
 import "./home.css";
 
@@ -29,25 +31,24 @@ export default function Home({ searchParams }: PageProps<"/">) {
       <section className="home-hero pt-2">
         <p className="text-[13px] font-medium text-muted">AI 에이전트 백과사전</p>
         <h1 className="mt-3 max-w-[14em] text-4xl leading-[1.12] font-medium tracking-[-0.035em] text-balance sm:text-6xl">
-          읽고, 내 프로젝트에 바로 적용하세요
+          {HOME_HERO_TITLE}
         </h1>
-        <p className="mt-5 max-w-[34em] text-lg leading-relaxed text-muted">
-          에이전트 시대를 이끄는 사람과 사례를 정리했습니다. 기사마다 진단 프롬프트와 적용 키트가 있어, 에이전트가
-          MCP로 바로 가져다 씁니다.
-        </p>
+        <p className="mt-5 max-w-[34em] text-lg leading-relaxed text-muted">{HOME_HERO_LEDE}</p>
         <div className="mt-7 flex flex-wrap gap-2.5">
           <Link
-            href="/connect"
+            href="/agents"
+            prefetch={true}
             className="inline-flex h-10 items-center rounded-full bg-foreground px-5 text-sm font-medium text-background hover:opacity-85"
           >
-            에이전트 연결하기
+            에이전트 보기
           </Link>
-          <a
-            href="#articles"
+          <Link
+            href="/models"
+            prefetch={true}
             className="inline-flex h-10 items-center rounded-full px-5 text-sm font-medium ring-1 ring-line ring-inset hover:bg-soft"
           >
-            모든 기사 보기
-          </a>
+            모델 비교
+          </Link>
         </div>
       </section>
 
@@ -77,11 +78,26 @@ export default function Home({ searchParams }: PageProps<"/">) {
   );
 }
 
-// Both rankings in a likes-sorted request use the same live totals.
-const getHomeLikeCounts = cache(async () => {
-  await connection();
-  return listArticleLikeCounts(await getDb());
-});
+/**
+ * Public like totals for the home ranking. `cacheLife("minutes")` has a 5-minute stale
+ * window, so Cache Components include the three cards in the static shell.
+ */
+async function getCachedArticleLikeCounts(): Promise<Record<string, number>> {
+  "use cache";
+  cacheLife("minutes");
+  try {
+    const counts = await listArticleLikeCounts(await getDb());
+    return Object.fromEntries(counts);
+  } catch (err) {
+    unstable_rethrow(err);
+    console.error("[likes] cached article counts failed", err);
+    return {};
+  }
+}
+
+function likeCountMap(counts: Record<string, number>): Map<string, number> {
+  return new Map(Object.entries(counts));
+}
 
 async function HomeArticleList({
   articles,
@@ -91,7 +107,8 @@ async function HomeArticleList({
   searchParams: PageProps<"/">["searchParams"];
 }) {
   const { sort, page } = parseListQuery(await searchParams);
-  const sorted = sort === "likes" ? sortArticles(articles, sort, await getHomeLikeCounts()) : articles;
+  const sorted =
+    sort === "likes" ? sortArticles(articles, sort, likeCountMap(await getCachedArticleLikeCounts())) : articles;
   const slice = paginateArticles(sorted, page);
 
   return (
@@ -114,18 +131,22 @@ async function HomeArticleList({
 
 const coverClass = "flex aspect-[16/7] items-end justify-between rounded-2xl sm:aspect-[16/10]";
 
+const LOADING_PHRASES = ["좋아요를 세는 중", "순위를 고르는 중", "글을 불러오는 중"] as const;
+
 function FeaturedSkeleton({ count }: { count: number }) {
   return (
     <ul aria-hidden="true" className="grid gap-5 sm:grid-cols-3">
       {Array.from({ length: count }, (_, i) => (
         <li key={i}>
-          <div className={`${coverClass} home-placeholder bg-soft`} />
-          <div className="mt-4 h-5 w-24 rounded bg-soft" />
+          <div className="home-loading-cover flex aspect-[16/7] items-center justify-center overflow-hidden rounded-2xl bg-soft sm:aspect-[16/10]">
+            <p className="home-loading-line">{LOADING_PHRASES[i] ?? LOADING_PHRASES[0]}</p>
+          </div>
+          <div className="home-placeholder mt-4 h-5 w-24 rounded bg-soft" />
           <div className="mt-1.5 h-[2lh] text-[19px] leading-snug">
-            <div className="h-4 w-5/6 rounded bg-soft" />
+            <div className="home-placeholder h-4 w-5/6 rounded bg-soft" />
           </div>
           <div className="mt-1.5 h-[2lh] text-[14.5px] leading-relaxed">
-            <div className="h-3 w-3/4 rounded bg-soft" />
+            <div className="home-placeholder h-3 w-3/4 rounded bg-soft" />
           </div>
         </li>
       ))}
@@ -134,7 +155,7 @@ function FeaturedSkeleton({ count }: { count: number }) {
 }
 
 async function Featured({ articles }: { articles: ArticleMeta[] }) {
-  const likeCounts = await getHomeLikeCounts();
+  const likeCounts = likeCountMap(await getCachedArticleLikeCounts());
   const featured = sortArticles(articles, "likes", likeCounts).slice(0, 3);
   return (
     <ul className="home-featured grid gap-5 sm:grid-cols-3">

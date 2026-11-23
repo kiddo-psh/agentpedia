@@ -1,5 +1,9 @@
 # Agentpedia MVP 설계
 
+> **보관.** 2026-11-11 MVP 초안이다. 당시 가설은 "기사를 읽은 개발자가 키트로 자기 프로젝트에 적용한다"였다.
+> 지금 구조는 [docs/architecture.md](../architecture.md)가 코드 기준으로 적는다. 아래 본문은 고치지 않았다.
+> 본문과 어긋나는 예: 좋아요·커뮤니티·건의를 제외로 두었고, 에이전트·모델 라우트와 `facts.yaml`이 없으며, DB 표에 `likes`·`suggestions`·`community_posts`·`community_comments`·댓글 `citation_quote`·이벤트 `share`가 없다. MCP 패키지를 `@modelcontextprotocol/sdk`와 `mcp-handler`로 적었지만 코드는 `@modelcontextprotocol/server`다.
+
 > 상태: 초안 · 2026-11-11
 > 핵심 가설: **"기사를 읽은 개발자가 그 방법을 자기 프로젝트에 실제로 적용한다."**
 > MVP는 이 가설 하나만 검증한다. 커뮤니티는 가설이 맞았을 때 붙인다.

@@ -7,10 +7,19 @@ import { Suspense, type ReactNode } from "react";
 import * as runtime from "react/jsx-runtime";
 import remarkGfm from "remark-gfm";
 import { Comments } from "@/components/comments/Comments";
+import { ScoreCostScatter } from "@/components/models/ScoreCostScatter";
+import { EMPTY, formatPercent, formatTokensBillions, formatUsd, isRedundantModelBody } from "@/components/models/format";
+import {
+  buildModelsTable,
+  buildScatterPoints,
+  parseEffort,
+} from "@/components/models/metrics";
 import { SourceAge } from "@/components/SourceAge";
+import { getAgent } from "@/content/agents";
 import { formatDate } from "@/content/labels";
 import { getModel, listModels } from "@/content/models";
-import type { ModelBenchmark, SourcedNumber } from "@/content/schema";
+import type { Model, ModelBenchmark, SourcedNumber } from "@/content/schema";
+import "../models.css";
 
 const PLACEHOLDER = "__none__";
 const money = new Intl.NumberFormat("en-US", {
@@ -55,13 +64,22 @@ async function ModelView({ slug, comments }: { slug: string; comments: ReactNode
   "use cache";
   cacheLife("days");
   const model = getModel(slug)!;
-  const { default: Content } = await evaluate(model.bodyMarkdown, {
-    ...runtime,
-    remarkPlugins: [[remarkGfm, { singleTilde: false }]],
-  });
+  const showBody = !isRedundantModelBody(model.bodyMarkdown);
+  const Content = showBody
+    ? (
+        await evaluate(model.bodyMarkdown, {
+          ...runtime,
+          remarkPlugins: [[remarkGfm, { singleTilde: false }]],
+        })
+      ).default
+    : null;
+  const table = buildModelsTable(listModels());
+  const scatter = buildScatterPoints(table.rows);
+  const tb = model.benchmarks.find((row) => row.bench === "Terminal-Bench" && row.version === "4.1");
+  const effort = parseEffort(tb?.model);
 
   return (
-    <article className="mx-auto max-w-[720px]">
+    <article className="mx-auto max-w-[760px]">
       <header className="mb-10">
         <nav className="mb-5 text-sm text-muted" aria-label="위치">
           <Link href="/models" prefetch={true} className="hover:text-foreground">
@@ -72,7 +90,10 @@ async function ModelView({ slug, comments }: { slug: string; comments: ReactNode
           </span>
           <span>{model.name}</span>
         </nav>
-        <h1 className="text-3xl leading-[1.22] font-medium tracking-[-0.035em] sm:text-[44px]">{model.name}</h1>
+        <h1 className="text-3xl leading-[1.22] font-medium tracking-[-0.035em] sm:text-[44px]">
+          {model.name}
+          {effort ? <span className="models-effort ml-2 align-middle text-base">{effort}</span> : null}
+        </h1>
         <p className="mt-4 text-sm text-muted">
           <span className="font-medium text-foreground">{model.vendor}</span>
           {model.openRouterId ? (
@@ -91,13 +112,27 @@ async function ModelView({ slug, comments }: { slug: string; comments: ReactNode
         </p>
       </header>
 
-      <section aria-labelledby="price-title">
+      <KeyStrip model={model} tb={tb} />
+      <p className="mt-2 text-[12px] text-muted">— 확인하지 못한 값. 입력 단가는 100만 토큰당 달러입니다.</p>
+
+      {scatter.length > 0 ? (
+        <section className="mt-10" aria-labelledby="mini-scatter-title">
+          <h2 id="mini-scatter-title" className="text-[18px] font-semibold tracking-tight">
+            해결률과 실행 비용으로 본 위치
+          </h2>
+          <div className="mt-4">
+            <ScoreCostScatter points={scatter} highlightId={slug} compact />
+          </div>
+        </section>
+      ) : null}
+
+      <section className="mt-14" aria-labelledby="price-title">
         <h2 id="price-title" className="text-[22px] font-semibold tracking-tight">
           토큰 단가
         </h2>
         <div className="mt-4 grid gap-6 sm:grid-cols-2">
-          <PriceFact label="입력 / 1M" fact={model.inputUsdPerMTok} />
-          <PriceFact label="출력 / 1M" fact={model.outputUsdPerMTok} />
+          <PriceFact label="입력 단가" fact={model.inputUsdPerMTok} />
+          <PriceFact label="출력 단가" fact={model.outputUsdPerMTok} />
         </div>
       </section>
 
@@ -105,7 +140,7 @@ async function ModelView({ slug, comments }: { slug: string; comments: ReactNode
         <h2 id="bench-title" className="text-[22px] font-semibold tracking-tight">
           벤치마크
         </h2>
-        <BenchmarkTable rows={model.benchmarks} />
+        <BenchmarkCards rows={model.benchmarks} />
       </section>
 
       {model.relatedAgents.length > 0 ? (
@@ -113,26 +148,65 @@ async function ModelView({ slug, comments }: { slug: string; comments: ReactNode
           <h2 id="agents-title" className="text-[22px] font-semibold tracking-tight">
             관련 에이전트
           </h2>
-          <ul className="mt-4 flex flex-wrap gap-3 text-sm">
-            {model.relatedAgents.map((agent) => (
-              <li key={agent}>
-                <Link href={`/agents/${agent}`} prefetch={true} className="underline underline-offset-2">
-                  {agent}
-                </Link>
-              </li>
-            ))}
+          <ul className="mt-4 flex flex-wrap gap-3">
+            {model.relatedAgents.map((agentSlug) => {
+              const agent = getAgent(agentSlug);
+              return (
+                <li key={agentSlug}>
+                  <Link href={`/agents/${agentSlug}`} prefetch={true} className="models-agent-card">
+                    <span className="block text-[15px] font-medium">{agent?.name ?? agentSlug}</span>
+                    <span className="mt-1 block text-[12px] text-muted">{agent?.vendor ?? agentSlug}</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </section>
       ) : null}
 
-      <div className="prose-article mt-16">
-        <Content />
-      </div>
+      {Content ? (
+        <div className="prose-article mt-16">
+          <Content />
+        </div>
+      ) : null}
 
       <section id="comments" className="mt-16 scroll-mt-24" aria-labelledby="comments-title">
         {comments}
       </section>
     </article>
+  );
+}
+
+function KeyStrip({ model, tb }: { model: Model; tb: ModelBenchmark | undefined }) {
+  return (
+    <dl className="models-key-strip border-y border-line py-5">
+      <div>
+        <dt className="text-[12px] text-muted">Terminal-Bench 4.1 해결률</dt>
+        <dd className="mt-1 text-lg font-medium tabular-nums">
+          {tb ? formatPercent(tb.score, tb.margin) : EMPTY}
+        </dd>
+      </div>
+      <div>
+        <dt className="text-[12px] text-muted">전체 실행 비용</dt>
+        <dd className="mt-1 text-lg font-medium tabular-nums">
+          {tb?.costUsd !== undefined ? formatUsd(tb.costUsd) : tb?.cost ?? EMPTY}
+        </dd>
+      </div>
+      <div>
+        <dt className="text-[12px] text-muted">사용 토큰</dt>
+        <dd className="mt-1 text-lg font-medium tabular-nums">
+          {tb?.tokensBillions !== undefined ? formatTokensBillions(tb.tokensBillions) : EMPTY}
+        </dd>
+      </div>
+      <div>
+        <dt className="text-[12px] text-muted" title="100만 토큰당 달러">
+          입력 단가
+        </dt>
+        <dd className="mt-1 text-lg font-medium tabular-nums">
+          {model.inputUsdPerMTok ? money.format(model.inputUsdPerMTok.value) : EMPTY}
+        </dd>
+      </div>
+    </dl>
   );
 }
 
@@ -153,57 +227,58 @@ function PriceFact({ label, fact }: { label: string; fact: SourcedNumber | undef
             </span>
           </>
         ) : (
-          <span className="text-muted">없음</span>
+          <span className="text-muted">{EMPTY}</span>
         )}
       </dd>
     </div>
   );
 }
 
-function BenchmarkTable({ rows }: { rows: ModelBenchmark[] }) {
-  if (rows.length === 0) return <p className="mt-2 text-sm text-muted">확인한 값이 없습니다.</p>;
+function BenchmarkCards({ rows }: { rows: ModelBenchmark[] }) {
+  if (rows.length === 0) return <p className="mt-2 text-sm text-muted">아직 확인한 벤치마크 점수가 없습니다.</p>;
   return (
-    <div className="mt-3 overflow-x-auto">
-      <table className="w-full min-w-[720px] border-b border-line text-left text-sm">
-        <thead className="text-muted">
-          <tr>
-            <th className="py-2 pr-4 font-medium">벤치</th>
-            <th className="py-2 pr-4 font-medium">하네스</th>
-            <th className="py-2 pr-4 font-medium">점수</th>
-            <th className="py-2 pr-4 font-medium">비용</th>
-            <th className="py-2 pr-4 font-medium">토큰</th>
-            <th className="py-2 font-medium">시점</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={`${row.bench}-${row.agentHarness}-${row.score}`} className="border-t border-line align-top">
-              <td className="py-3 pr-4">
-                <a href={row.url} target="_blank" rel="noreferrer" className="underline underline-offset-2">
-                  {row.bench}
-                  {row.version ? ` ${row.version}` : ""}
-                </a>
-                <span className="mt-1 block text-muted">{row.scoreKind === "model" ? "모델 점수" : "하네스 점수"}</span>
-              </td>
-              <td className="py-3 pr-4">{row.agentHarness}</td>
-              <td className="py-3 pr-4 tabular-nums">
+    <ul className="models-bench-cards mt-4">
+      {rows.map((row) => (
+        <li key={`${row.bench}-${row.agentHarness}-${row.score}`} className="models-bench-card">
+          <p className="text-sm">
+            <a href={row.url} target="_blank" rel="noreferrer" className="font-medium underline underline-offset-2">
+              {row.bench}
+              {row.version ? ` ${row.version}` : ""}
+            </a>
+            <span className="text-muted"> · {row.scoreKind === "model" ? "고정 하네스 점수" : "제품 하네스 점수"}</span>
+          </p>
+          <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-[13px] sm:grid-cols-3">
+            <div>
+              <dt className="text-muted">하네스</dt>
+              <dd>{row.agentHarness}</dd>
+            </div>
+            <div>
+              <dt className="text-muted">해결률</dt>
+              <dd className="tabular-nums font-medium">
                 {row.score}
                 {row.unit}
                 {row.margin !== undefined ? ` ± ${row.margin}${row.unit}` : ""}
-              </td>
-              <td className="py-3 pr-4">{row.cost ?? "없음"}</td>
-              <td className="py-3 pr-4">{row.tokensBillions !== undefined ? `${row.tokensBillions}B` : "없음"}</td>
-              <td className="py-3">
-                <span className="inline-flex flex-wrap items-center gap-x-2">
-                  <span>{formatDate(row.asOf)}</span>
-                  <SourceAge newestIso={row.asOf.toISOString()} />
-                </span>
-                {row.note ? <span className="mt-1 block text-muted">{row.note}</span> : null}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+              </dd>
+            </div>
+            <div>
+              <dt className="text-muted">전체 실행 비용</dt>
+              <dd>{row.cost ?? EMPTY}</dd>
+            </div>
+            <div>
+              <dt className="text-muted">사용 토큰</dt>
+              <dd>{row.tokensBillions !== undefined ? `${row.tokensBillions}B` : EMPTY}</dd>
+            </div>
+            <div className="sm:col-span-2">
+              <dt className="text-muted">시점</dt>
+              <dd className="inline-flex flex-wrap items-center gap-x-2">
+                <span>{formatDate(row.asOf)}</span>
+                <SourceAge newestIso={row.asOf.toISOString()} />
+              </dd>
+              {row.note ? <p className="mt-1 text-muted">{row.note}</p> : null}
+            </div>
+          </dl>
+        </li>
+      ))}
+    </ul>
   );
 }

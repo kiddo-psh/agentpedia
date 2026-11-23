@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { loadAllModels, loadTaskTiming, parseModelDir, staleModelFactIssues } from "./models";
+import { loadAllModels, parseModelDir, staleModelFactIssues } from "./models";
 import { ModelFacts } from "./schema";
 import fs from "node:fs";
 import os from "node:os";
@@ -30,7 +30,15 @@ benchmarks:
 describe("models content", () => {
   it("loads the seeded frontier models", () => {
     const bySlug = new Map(loadAllModels().map((model) => [model.slug, model]));
-    expect(bySlug.size).toBeGreaterThanOrEqual(12);
+    expect(bySlug.size).toBeGreaterThanOrEqual(13);
+    expect(bySlug.get("copilot-fusion")?.benchmarks[0]).toMatchObject({
+      score: 71.2,
+      margin: 2.9,
+      agentHarness: "GitHub Copilot",
+      costUsd: 2000,
+      tokensBillions: 3.3,
+    });
+    expect(bySlug.get("copilot-fusion")?.inputUsdPerMTok).toBeUndefined();
     expect(bySlug.get("opus-5-5")?.outputUsdPerMTok?.value).toBe(20);
     expect(bySlug.get("fable-5-2")?.benchmarks[0]?.score).toBe(65.8);
     expect(bySlug.get("sonnet-5-5")?.inputUsdPerMTok?.value).toBe(2);
@@ -39,16 +47,10 @@ describe("models content", () => {
     expect(bySlug.get("gpt-6-2-sol")?.outputUsdPerMTok?.value).toBe(10);
   });
 
-  it("loads the Vals timing rows for the duration chart", () => {
-    const rows = loadTaskTiming();
-    expect(rows.length).toBeGreaterThanOrEqual(4);
-    expect(rows[0]).toMatchObject({ model: "Claude Opus 5", durationSec: 577 });
-  });
-
   it("ranks models by Terminal-Bench score", async () => {
     const { rankModelsByTerminalBench } = await import("./models");
     const ranked = rankModelsByTerminalBench();
-    expect(ranked[0]?.slug).toMatch(/opus-5-5|fable-5-2/);
+    expect(ranked[0]?.slug).toBe("copilot-fusion");
     expect(ranked.at(-1)?.slug).toMatch(/grok-4-6/);
   });
 

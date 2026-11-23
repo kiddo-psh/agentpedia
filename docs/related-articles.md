@@ -8,7 +8,7 @@
 
 Anthropic 블로그의 기사 페이지(예: `anthropic.com/research/redesigning-source-control`)는 "Related articles" 영역에 280×105 SVG를 둡니다. 노드 5개, 선 4개이고, 노드는 썸네일을 원으로 자른 모양입니다. SVG는 서버가 렌더링한 HTML에 이미 들어 있어서 브라우저에서 그래프 라이브러리가 돌지 않습니다. 관련 기사를 고르는 방식은 공개되어 있지 않습니다. 기사마다 Topics 태그가 붙어 있어서 태그 기반이거나 편집자가 직접 지정한다고 추정합니다.
 
-## 1단계: 공유 신호 점수 (현재)
+## 1단계: 공유 신호 점수 (코드와 같음)
 
 코드는 `src/content/related.ts`, 화면은 `src/components/RelatedArticles.tsx`에 있습니다.
 
@@ -25,9 +25,9 @@ Anthropic 블로그의 기사 페이지(예: `anthropic.com/research/redesigning
 - 관련 기사가 없으면 섹션을 숨깁니다.
 - 계산은 렌더링할 때 메모리에서 합니다. 기사 n개에 대해 O(n²)이고, 기사가 수백 개가 되어도 빌드 시간에 영향이 없습니다.
 
-### 현재 콘텐츠에서 드러난 점
+### 콘텐츠에서 드러난 점
 
-기사 8개 중 `harrison-chase-agent-harness`와 `karpathy-software-3`은 다른 기사와 겹치는 태그가 없어 관련 기사가 0개입니다. 알고리즘보다 태그 어휘가 결과를 더 크게 좌우합니다. 예를 들어 `agent-ready`와 `agent-ready-docs`, `claude-md`와 `context-files`는 같은 주제를 다른 이름으로 부릅니다. 다음 둘 중 하나가 먼저 필요합니다.
+2026-11-13, 기사가 8개였을 때 `harrison-chase-agent-harness`와 `karpathy-software-3`은 관련 기사가 0개였습니다. 2026-11-21에 `getRelatedGraph`(초안 제외)로 다시 세면 공개 기사는 19개이고, 관련 기사가 없는 기사는 `karpathy-software-3`뿐이었습니다. 그 뒤 `harrison-chase-agent-harness`, `anthropic-source-control-agent-scale`, `postiz-agent-ready-saas`는 삭제했습니다. 알고리즘보다 태그 어휘가 결과를 더 크게 좌우합니다. 예를 들어 `agent-ready`와 `agent-ready-docs`, `claude-md`와 `context-files`는 같은 주제를 다른 이름으로 부릅니다. 다음 둘 중 하나가 먼저 필요합니다.
 
 - 태그 목록을 `content/tags.yaml` 같은 레지스트리로 고정하고, `validate:content`가 목록에 없는 태그를 거부하게 합니다. 인물과 용어집이 이미 이 방식입니다.
 - 아래 2단계로 태그에 의존하지 않는 유사도를 더합니다.

@@ -28,7 +28,7 @@
   --color-accent: var(--accent);
   --color-line: var(--line);
   --color-soft: var(--soft);
-  /* Pretendard glyphs come from content-scanned subsets (pretendard-subset.css).
+  /* Pretendard glyphs come from content-scanned subsets.
      Missing glyphs (UGC, copy added before fonts:subset) use system Korean faces. */
   --font-sans: "Pretendard Variable", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   /* System mono until DeferredMonoFont activates --font-geist-mono near kit/code. */

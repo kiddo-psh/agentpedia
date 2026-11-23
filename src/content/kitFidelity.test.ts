@@ -92,7 +92,7 @@ describe("checkKitFidelity", () => {
   it("rejects sibling kits that take Boris's verify-command job", () => {
     const issues = checkKitFidelity(
       article({
-        slug: "harrison-chase-agent-harness",
+        slug: "sibling-harness-kit",
         persons: [{ id: "h", name: "Harrison Chase", nameKo: "해리슨 체이스", role: "CEO" }],
         keyIdeas: ["하네스와 컨텍스트"],
         apply: {
@@ -124,7 +124,7 @@ Harrison Chase의 하네스 틀로 컨텍스트를 본다.
     expect(
       checkKitFidelity(
         article({
-          slug: "harrison-chase-agent-harness",
+          slug: "sibling-harness-kit",
           persons: [{ id: "h", name: "Harrison Chase", nameKo: "해리슨 체이스", role: "CEO" }],
           keyIdeas: ["하네스와 컨텍스트"],
           apply: {

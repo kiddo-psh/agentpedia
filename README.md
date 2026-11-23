@@ -1,24 +1,15 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Agentpedia is a Korean reference for coding agents and the models they run, plus articles about that work. Agent and model numbers live in `facts.yaml` and need `value`, `sourceUrl`, and `asOf`. The layout of the repo is [docs/architecture.md](docs/architecture.md).
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). UI text uses a Pretendard subset (`npm run fonts:subset`, also run from `prebuild`). Code blocks use Geist Mono, loaded after first paint.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-## View articles without the dev server
+## Preview a production build
 
 ```bash
 npm run preview
@@ -30,8 +21,6 @@ Pass another port with `npm run preview -- 4000`.
 
 Rebuild after you edit content: run `npm run preview` again.
 The preview keeps its comments in `.data/pglite-prod`, separate from the dev server's `.data/pglite`, so both can run at the same time.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Deploy
 
@@ -51,6 +40,7 @@ Production runs on Vercel with Neon Postgres. Pushes to `master` deploy to produ
    | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | Production | From the OAuth app |
    | `EVENT_SALT` | Production | A long random string |
    | `METRICS_TOKEN` | Production | A long random string |
+   | `METRICS_ADMINS` | Production | Comma-separated GitHub numeric user ids (`gh api user --jq .id`). Unset: `/admin/metrics` is dev-only |
    | `SHOW_DRAFTS` | Preview | `1` |
 
 5. Add Upstash for Redis from the Vercel Marketplace and connect it to the project. It sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`, which turn on the rate limit of 60 requests per minute per IP on `/mcp` and `/api/events`. A database created on upstash.com works too: set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` instead. Without either pair, nothing is rate limited.
