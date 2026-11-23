@@ -6,202 +6,189 @@
 # status: idea | picked | dropped
 # primaryVerified: whether the researcher opened a first-hand source.
 #   The writer still re-checks every URL and date (docs/writing-guide.md).
-
-# 2026-11-16 ChatGPT deep research, window 2026-09-15 ~ 2026-11-16
+#
+# Auto-collected rows set primaryVerified: false and confidence: low.
+# Humans shortlist (status: picked), fill kitIdea/tension if needed, then run write-article.
 
 - slug: codex-maintenance-evidence-before-deletion
-  topic: "OpenAI 엔지니어는 Codex에게 '코드를 지워라'가 아니라 사용 흔적을 모아 삭제의 증거부터 만들게 한다"
+  topic: OpenAI 엔지니어는 Codex에게 '코드를 지워라'가 아니라 사용 흔적을 모아 삭제의 증거부터 만들게 한다
   category: people
   people:
-    - "Rodrigo Roim (OpenAI Core Experimentation 엔지니어, 글 저자)"
+    - Rodrigo Roim (OpenAI Core Experimentation 엔지니어, 글 저자)
   sources:
     - https://developers.openai.com/blog/maintaining-software-with-the-gpt-6-family
   publishedAt: 2026-10-14
   sourceKind: blog
-  tension: "dead code 정리는 정적 분석 규칙을 정교하게 만드는 문제라는 통념과 달리, OpenAI는 에이전트가 PR·Slack·feature flag·production profiling까지 뒤져 삭제 근거를 만들도록 하고 사람이 작은 변경부터 검증했다."
-  kitIdea: "자기 레포에서 unused code·stale flag·flaky test 중 하나만 골라 에이전트가 '근거 수집→작은 draft PR→사람 검토' 순서로 수행하게 하고 모델·effort별 비용과 accepted finding 수를 비교한다."
+  tension: dead code 정리는 정적 분석 규칙을 정교하게 만드는 문제라는 통념과 달리, OpenAI는 에이전트가 PR·Slack·feature flag·production profiling까지 뒤져 삭제 근거를 만들도록 하고 사람이 작은 변경부터 검증했다.
+  kitIdea: 자기 레포에서 unused code·stale flag·flaky test 중 하나만 골라 에이전트가 '근거 수집→작은 draft PR→사람 검토' 순서로 수행하게 하고 모델·effort별 비용과 accepted finding 수를 비교한다.
   primaryVerified: true
   confidence: high
   status: idea
-  note: "원문에 AGENTS.md 검증 예시가 나오지만 do-context-files-help와 겹치지 않게 maintenance workflow에 집중한다."
-
+  note: 원문에 AGENTS.md 검증 예시가 나오지만 do-context-files-help와 겹치지 않게 maintenance workflow에 집중한다.
 - slug: cursor-agents-as-versioned-code
-  topic: "Cursor는 반복 업무용 에이전트를 대화 프롬프트가 아니라 버전 관리되는 소프트웨어 프로젝트로 만들기 시작했다"
+  topic: Cursor는 반복 업무용 에이전트를 대화 프롬프트가 아니라 버전 관리되는 소프트웨어 프로젝트로 만들기 시작했다
   category: startup
   people:
-    - "Rustam Lalkaka (Cursor, Agent SDK 소개 글 저자)"
+    - Rustam Lalkaka (Cursor, Agent SDK 소개 글 저자)
   sources:
     - https://cursor.com/blog/agent-sdk
   publishedAt: 2026-10-20
   sourceKind: blog
-  tension: "팀 자동화는 범용 에이전트에게 프롬프트를 잘 쓰는 문제라는 접근과 달리, Cursor는 instructions·tools·connections·evals를 코드와 함께 버전 관리하고 event replay로 검증하는 방식을 제품화했다."
-  kitIdea: "PR review나 incident triage 하나를 골라 Markdown instruction, TypeScript tool, trigger, eval fixture를 한 디렉터리에 두고 과거 이벤트를 replay하는 CI를 붙인다."
+  tension: 팀 자동화는 범용 에이전트에게 프롬프트를 잘 쓰는 문제라는 접근과 달리, Cursor는 instructions·tools·connections·evals를 코드와 함께 버전 관리하고 event replay로 검증하는 방식을 제품화했다.
+  kitIdea: PR review나 incident triage 하나를 골라 Markdown instruction, TypeScript tool, trigger, eval fixture를 한 디렉터리에 두고 과거 이벤트를 replay하는 CI를 붙인다.
   primaryVerified: true
   confidence: high
   status: idea
-
 - slug: cursor-incident-credential-chain-followup
-  topic: "Cursor 11월 후속 보고는 악성 Claude Code 확장 사건의 시작점이 확장 스토어가 아니라 외부 벤더 키와 에이전트 trace였다고 밝혔다"
+  topic: Cursor 11월 후속 보고는 악성 Claude Code 확장 사건의 시작점이 확장 스토어가 아니라 외부 벤더 키와 에이전트 trace였다고 밝혔다
   category: security
   people:
-    - "Cursor Team (2026년 11월 보안 사고 후속 조사 공지 작성 팀)"
+    - Cursor Team (2026년 11월 보안 사고 후속 조사 공지 작성 팀)
   sources:
     - https://cursor.com/blog/security-incident-update
   publishedAt: 2026-11-13
   sourceKind: blog
-  tension: "악성 IDE 확장을 막으려면 extension registry만 보호하면 된다는 시야와 달리, 후속 조사에서는 외부 벤더 access key→에이전트 trace의 미삭제 credential→SaaS 접근→extension cache 변조로 이어지는 연쇄가 드러났다."
-  kitIdea: "에이전트 trace·support ticket·debug log를 secret-scanning 범위에 넣고 외부 벤더별 단기 credential, 회전 주기, extension provenance와 캐시 무결성 검사를 별도 체크리스트로 운영한다."
+  tension: 악성 IDE 확장을 막으려면 extension registry만 보호하면 된다는 시야와 달리, 후속 조사에서는 외부 벤더 access key→에이전트 trace의 미삭제 credential→SaaS 접근→extension cache 변조로 이어지는 연쇄가 드러났다.
+  kitIdea: 에이전트 trace·support ticket·debug log를 secret-scanning 범위에 넣고 외부 벤더별 단기 credential, 회전 주기, extension provenance와 캐시 무결성 검사를 별도 체크리스트로 운영한다.
   primaryVerified: true
   confidence: high
   status: idea
-  note: "agent-tools-trust-boundary가 같은 사건의 10월 공지(Phorion 권고문)를 다룬다. 새 기사 대신 그 기사의 updatedAt 갱신으로 처리할지 먼저 정한다."
-
+  note: agent-tools-trust-boundary가 같은 사건의 10월 공지(Phorion 권고문)를 다룬다. 새 기사 대신 그 기사의 updatedAt 갱신으로 처리할지 먼저 정한다.
 - slug: github-verified-mcp-connectors
-  topic: "GitHub는 MCP를 개발자 로컬 설정 문제에서 조직이 허용 목록을 관리하는 연결 계층 문제로 바꿨다"
+  topic: GitHub는 MCP를 개발자 로컬 설정 문제에서 조직이 허용 목록을 관리하는 연결 계층 문제로 바꿨다
   category: security
   people:
-    - "GitHub Copilot Team (GitHub-verified MCP connectors 공식 공지 팀)"
+    - GitHub Copilot Team (GitHub-verified MCP connectors 공식 공지 팀)
   sources:
     - https://github.blog/changelog/2026-10-28-connect-your-tools-to-copilot-without-all-the-setup/
   publishedAt: 2026-10-28
   sourceKind: blog
-  tension: "MCP는 각 개발자가 서버 URL과 credential을 직접 관리하는 유연한 로컬 확장 방식이라는 관행과 달리, GitHub는 한 번 인증하고 여러 Copilot surface에서 쓰되 enterprise allowlist로 중앙 통제하는 구조를 내놓았다."
-  kitIdea: "현재 .mcp.json·IDE 설정의 서버 목록을 인벤토리화하고 verified connector로 대체 가능한 항목, 반드시 사설로 유지할 항목, 조직 allowlist에 들어갈 항목으로 분류한다."
+  tension: MCP는 각 개발자가 서버 URL과 credential을 직접 관리하는 유연한 로컬 확장 방식이라는 관행과 달리, GitHub는 한 번 인증하고 여러 Copilot surface에서 쓰되 enterprise allowlist로 중앙 통제하는 구조를 내놓았다.
+  kitIdea: 현재 .mcp.json·IDE 설정의 서버 목록을 인벤토리화하고 verified connector로 대체 가능한 항목, 반드시 사설로 유지할 항목, 조직 allowlist에 들어갈 항목으로 분류한다.
   primaryVerified: true
   confidence: high
   status: idea
-
 - slug: copilot-security-review-local-first
-  topic: "GitHub의 새 보안 에이전트는 취약점 수정 권한을 크게 주기보다 로컬 working copy까지만 고치도록 설계됐다"
+  topic: GitHub의 새 보안 에이전트는 취약점 수정 권한을 크게 주기보다 로컬 working copy까지만 고치도록 설계됐다
   category: security
   people:
-    - "GitHub Copilot Team (Copilot Security extension 공식 공지 팀)"
+    - GitHub Copilot Team (Copilot Security extension 공식 공지 팀)
   sources:
     - https://github.blog/changelog/2026-10-28-security-extension-for-the-github-copilot-app/
   publishedAt: 2026-10-28
   sourceKind: blog
-  tension: "보안 자동화의 목표를 finding에서 자동 merge까지 연결하는 것으로 보기 쉽지만, GitHub는 에이전트 수정이 로컬 working copy를 넘지 않게 하고 commit·push 전에 사람이 검토하는 경계를 유지했다."
-  kitIdea: "github-security@awesome-copilot 같은 보안 검토 흐름을 pre-PR 단계에 넣고, 현재 diff가 바뀔 때마다 /security-review를 다시 실행하되 commit·push 권한은 별도 승인으로 남긴다."
+  tension: 보안 자동화의 목표를 finding에서 자동 merge까지 연결하는 것으로 보기 쉽지만, GitHub는 에이전트 수정이 로컬 working copy를 넘지 않게 하고 commit·push 전에 사람이 검토하는 경계를 유지했다.
+  kitIdea: github-security@awesome-copilot 같은 보안 검토 흐름을 pre-PR 단계에 넣고, 현재 diff가 바뀔 때마다 /security-review를 다시 실행하되 commit·push 권한은 별도 승인으로 남긴다.
   primaryVerified: true
   confidence: high
   status: idea
-
 - slug: agentic-workflows-inside-github-actions
-  topic: "GitHub는 에이전트 자동화를 별도 플랫폼이 아니라 기존 Actions 정책 안에 넣는 쪽을 택했다"
+  topic: GitHub는 에이전트 자동화를 별도 플랫폼이 아니라 기존 Actions 정책 안에 넣는 쪽을 택했다
   category: trends
   people:
-    - "Ben Alton (Accenture Strategy, Architecture & Innovation 팀 Senior Manager; GitHub Agentic Workflows 사용 사례 제공)"
+    - Ben Alton (Accenture Strategy, Architecture & Innovation 팀 Senior Manager; GitHub Agentic Workflows 사용 사례 제공)
   sources:
     - https://github.blog/changelog/2026-10-28-github-agentic-workflows-generally-available/
   publishedAt: 2026-10-28
   sourceKind: blog
-  tension: "agentic CI는 별도 오케스트레이터와 새 권한 모델이 필요하다는 접근과 달리, GitHub는 자연어 Markdown을 Actions YAML로 컴파일해 기존 runner·policy·sandbox를 재사용한다."
-  kitIdea: "CI failure 분석이나 issue triage 하나를 Markdown agent workflow로 만들고 처음에는 read-only, sandbox, safe-output 검증과 월간 credit forecast를 강제한 뒤 쓰기 권한을 단계적으로 연다."
+  tension: agentic CI는 별도 오케스트레이터와 새 권한 모델이 필요하다는 접근과 달리, GitHub는 자연어 Markdown을 Actions YAML로 컴파일해 기존 runner·policy·sandbox를 재사용한다.
+  kitIdea: CI failure 분석이나 issue triage 하나를 Markdown agent workflow로 만들고 처음에는 read-only, sandbox, safe-output 검증과 월간 credit forecast를 강제한 뒤 쓰기 권한을 단계적으로 연다.
   primaryVerified: true
   confidence: high
   status: idea
-
 - slug: copilot-cloud-sandbox-as-default
-  topic: "GitHub는 코딩 에이전트 세션의 기본 실행 장소를 개발자 노트북이 아니라 격리된 resumable cloud sandbox로 옮겼다"
+  topic: GitHub는 코딩 에이전트 세션의 기본 실행 장소를 개발자 노트북이 아니라 격리된 resumable cloud sandbox로 옮겼다
   category: trends
   people:
-    - "GitHub Copilot Team (Copilot cloud experience 공식 공지 팀)"
+    - GitHub Copilot Team (Copilot cloud experience 공식 공지 팀)
   sources:
     - https://github.blog/changelog/2026-10-28-work-from-anywhere-with-a-new-connected-copilot-cloud-experience/
   publishedAt: 2026-10-28
   sourceKind: blog
-  tension: "IDE 에이전트는 로컬 머신의 연장이라는 전제와 달리, GitHub는 세션을 여러 클라이언트에서 이어 가면서 실행 자체는 기본적으로 격리된 클라우드 샌드박스에 두는 구조를 일반화했다."
-  kitIdea: "로컬에서만 돌려야 하는 작업과 cloud sandbox로 넘길 작업을 레포 정책으로 나누고, cloud 쪽에는 조직 SSO·MCP allowlist·tool approval·repo exclusion을 기본값으로 설정한다."
+  tension: IDE 에이전트는 로컬 머신의 연장이라는 전제와 달리, GitHub는 세션을 여러 클라이언트에서 이어 가면서 실행 자체는 기본적으로 격리된 클라우드 샌드박스에 두는 구조를 일반화했다.
+  kitIdea: 로컬에서만 돌려야 하는 작업과 cloud sandbox로 넘길 작업을 레포 정책으로 나누고, cloud 쪽에는 조직 SSO·MCP allowlist·tool approval·repo exclusion을 기본값으로 설정한다.
   primaryVerified: true
   confidence: high
   status: idea
-
 - slug: ship-show-ask-agent-review
-  topic: "Sourcegraph는 모든 PR에 사람 승인을 요구하는 대신 에이전트가 Ship·Show·Ask로 리뷰 필요성을 분류하게 했다"
+  topic: Sourcegraph는 모든 PR에 사람 승인을 요구하는 대신 에이전트가 Ship·Show·Ask로 리뷰 필요성을 분류하게 했다
   category: people
   people:
-    - "Constantin Nicolae (Sourcegraph, PR approval bot 실험 글 저자)"
+    - Constantin Nicolae (Sourcegraph, PR approval bot 실험 글 저자)
   sources:
     - https://sourcegraph.com/blog/what-we-learned-building-a-pr-approval-bot
   publishedAt: 2026-11-10
   sourceKind: blog
-  tension: "AI 코드가 늘수록 모든 변경에 사람 리뷰를 더 강하게 걸어야 한다는 반응과 달리, Sourcegraph는 위험도와 작성자의 해당 컴포넌트 친숙도를 근거로 일부 리뷰를 사후로 보내거나 생략하는 실험을 했다."
-  kitIdea: "한 레포에서 Ship·Show·Ask 정책을 shadow mode로 먼저 돌리고, 최근 30일 관련 기여와 리뷰된 PR 수를 familiarity 신호로 쓰되 auth·sensitive-data 변경은 항상 Ask로 고정한다."
+  tension: AI 코드가 늘수록 모든 변경에 사람 리뷰를 더 강하게 걸어야 한다는 반응과 달리, Sourcegraph는 위험도와 작성자의 해당 컴포넌트 친숙도를 근거로 일부 리뷰를 사후로 보내거나 생략하는 실험을 했다.
+  kitIdea: 한 레포에서 Ship·Show·Ask 정책을 shadow mode로 먼저 돌리고, 최근 30일 관련 기여와 리뷰된 PR 수를 familiarity 신호로 쓰되 auth·sensitive-data 변경은 항상 Ask로 고정한다.
   primaryVerified: true
   confidence: high
   status: idea
-
 - slug: factory-programmatic-tool-calling
-  topic: "Factory는 긴 코딩 세션의 핵심 최적화를 모델 교체가 아니라 '프로그램 안에서 여러 도구를 호출하게 하는 harness'로 잡았다"
+  topic: Factory는 긴 코딩 세션의 핵심 최적화를 모델 교체가 아니라 '프로그램 안에서 여러 도구를 호출하게 하는 harness'로 잡았다
   category: startup
   people:
-    - "Factory Research (Droid 1.0 harness 연구·제품 팀)"
+    - Factory Research (Droid 1.0 harness 연구·제품 팀)
   sources:
     - https://factory.com/news/frontier-harness
   publishedAt: 2026-10-29
   sourceKind: blog
-  tension: "좋은 코딩 에이전트는 결국 가장 강한 단일 모델을 고르는 문제라는 관점과 달리, Factory는 동일 모델에서도 harness·tool-calling 방식·model-specific tuning이 성능과 비용을 크게 바꾼다고 주장한다."
-  kitIdea: "대표 작업 10개를 고정해 모델을 바꾸지 않은 채 현재 harness와 tool 정의 변경 버전을 A/B하고, 성공률·turn 수·비용·tool call 수를 함께 기록한 뒤에만 model routing을 추가한다."
+  tension: 좋은 코딩 에이전트는 결국 가장 강한 단일 모델을 고르는 문제라는 관점과 달리, Factory는 동일 모델에서도 harness·tool-calling 방식·model-specific tuning이 성능과 비용을 크게 바꾼다고 주장한다.
+  kitIdea: 대표 작업 10개를 고정해 모델을 바꾸지 않은 채 현재 harness와 tool 정의 변경 버전을 A/B하고, 성공률·turn 수·비용·tool call 수를 함께 기록한 뒤에만 model routing을 추가한다.
   primaryVerified: true
   confidence: high
   status: idea
-  note: "같은 모델에서 harness만 바꾼 수치에 집중한다."
-
+  note: 같은 모델에서 harness만 바꾼 수치에 집중한다.
 - slug: frontiercode-more-reasoning-can-hurt
-  topic: "Cognition의 새 벤치마크에서는 reasoning effort를 올릴수록 코드를 더 건드려 오히려 실패하는 경우가 나타났다"
+  topic: Cognition의 새 벤치마크에서는 reasoning effort를 올릴수록 코드를 더 건드려 오히려 실패하는 경우가 나타났다
   category: trends
   people:
-    - "The Cognition Team (FrontierCode 2.0 연구·평가 팀)"
+    - The Cognition Team (FrontierCode 2.0 연구·평가 팀)
   sources:
     - https://cognition.com/blog/frontier-code-2.0
   publishedAt: 2026-10-27
   sourceKind: blog
-  tension: "코딩 에이전트는 reasoning effort가 높을수록 최소한 나빠지지는 않을 것이라는 직관과 달리, FrontierCode 2.0은 높은 effort에서 scope를 과도하게 넓혀 점수가 떨어지는 실제 사례를 보여 준다."
-  kitIdea: "사내 에이전트 eval에 correctness뿐 아니라 '건드리면 안 되는 파일', backward compatibility, regression, inferred thoroughness를 blocker로 넣고 low·high effort를 같은 태스크에서 모두 돌려 본다."
+  tension: 코딩 에이전트는 reasoning effort가 높을수록 최소한 나빠지지는 않을 것이라는 직관과 달리, FrontierCode 2.0은 높은 effort에서 scope를 과도하게 넓혀 점수가 떨어지는 실제 사례를 보여 준다.
+  kitIdea: 사내 에이전트 eval에 correctness뿐 아니라 '건드리면 안 되는 파일', backward compatibility, regression, inferred thoroughness를 blocker로 넣고 low·high effort를 같은 태스크에서 모두 돌려 본다.
   primaryVerified: true
   confidence: high
   status: idea
-
 - slug: devin-security-living-threat-model
-  topic: "Cognition은 취약점 우선순위를 CVSS가 아니라 에이전트와 사람이 함께 유지하는 '살아 있는 threat model'로 재평가한다"
+  topic: Cognition은 취약점 우선순위를 CVSS가 아니라 에이전트와 사람이 함께 유지하는 '살아 있는 threat model'로 재평가한다
   category: startup
   people:
-    - "The Cognition Team (Devin Security 제품·보안 팀)"
+    - The Cognition Team (Devin Security 제품·보안 팀)
   sources:
     - https://cognition.com/blog/devin-security
   publishedAt: 2026-10-26
   sourceKind: blog
-  tension: "보안 backlog는 scanner severity 순으로 고치면 된다는 전통적 흐름과 달리, Devin Security는 실제 배포 구조·네트워크 방어·business impact를 별도 threat model에 넣어 exploitability를 다시 판단한다."
-  kitIdea: "레포 옆에 서비스·호스트·통신 경로·network policy·배포 방식·unused code·business impact를 담은 threat-model 문서를 만들고 scanner finding을 이 문서 기준으로 재분류하되 위험도 하향은 사람 승인을 의무화한다."
+  tension: 보안 backlog는 scanner severity 순으로 고치면 된다는 전통적 흐름과 달리, Devin Security는 실제 배포 구조·네트워크 방어·business impact를 별도 threat model에 넣어 exploitability를 다시 판단한다.
+  kitIdea: 레포 옆에 서비스·호스트·통신 경로·network policy·배포 방식·unused code·business impact를 담은 threat-model 문서를 만들고 scanner finding을 이 문서 기준으로 재분류하되 위험도 하향은 사람 승인을 의무화한다.
   primaryVerified: true
   confidence: high
   status: idea
-
 - slug: e2e-swe-empty-repo-evals
-  topic: "E2E-SWE는 코딩 에이전트를 기존 레포의 버그 수정이 아니라 빈 디렉터리에서 설치 가능한 전체 제품을 만드는 능력으로 평가한다"
+  topic: E2E-SWE는 코딩 에이전트를 기존 레포의 버그 수정이 아니라 빈 디렉터리에서 설치 가능한 전체 제품을 만드는 능력으로 평가한다
   category: trends
   people:
-    - "Hantian Ding (E2E-SWE 제1저자)"
+    - Hantian Ding (E2E-SWE 제1저자)
   sources:
     - https://arxiv.org/abs/2609.38335
   publishedAt: 2026-09-29
   sourceKind: paper
-  tension: "SWE-bench류 issue 해결률이 높으면 장기 소프트웨어 개발도 잘할 것이라는 암묵적 가정과 달리, E2E-SWE는 빈 workspace·전체 repo·fresh container·hidden tests 조건에서 모델 간 큰 격차와 긴 초기 계획 구간을 확인했다."
-  kitIdea: "자기 팀의 작은 내부 서비스를 대상으로 '빈 repo + 한 장짜리 spec + hidden acceptance tests + fresh-container install' eval을 만들어 평소 쓰는 Claude Code·Codex·Cursor 설정을 동일 조건에서 비교한다."
+  tension: SWE-bench류 issue 해결률이 높으면 장기 소프트웨어 개발도 잘할 것이라는 암묵적 가정과 달리, E2E-SWE는 빈 workspace·전체 repo·fresh container·hidden tests 조건에서 모델 간 큰 격차와 긴 초기 계획 구간을 확인했다.
+  kitIdea: 자기 팀의 작은 내부 서비스를 대상으로 '빈 repo + 한 장짜리 spec + hidden acceptance tests + fresh-container install' eval을 만들어 평소 쓰는 Claude Code·Codex·Cursor 설정을 동일 조건에서 비교한다.
   primaryVerified: true
   confidence: high
   status: idea
-  note: "arXiv 최초 제출일 2026-09-29, 논문 본문 표기일 2026-10-02."
-
-# 2026-11-18 Grok X scout shortlist (items 3–4)
-
+  note: arXiv 최초 제출일 2026-09-29, 논문 본문 표기일 2026-10-02.
 - slug: claude-code-mode-scripted-tools
-  topic: "Claude Code 실험적 Code Mode, 도구를 하나씩 호출하는 대신 JavaScript로 묶는다"
+  topic: Claude Code 실험적 Code Mode, 도구를 하나씩 호출하는 대신 JavaScript로 묶는다
   category: trends
   people:
-    - "Pedro G (@pggalaviz)"
-    - "Rhys Sullivan (@RhysSullivan)"
-    - "Daniel San (@dani_avila7)"
+    - Pedro G (@pggalaviz)
+    - Rhys Sullivan (@RhysSullivan)
+    - Daniel San (@dani_avila7)
   sources:
     - https://code.claude.com/docs/en/code-mode
     - https://x.com/ClaudeDevs/status/2122801681939234950
@@ -210,21 +197,20 @@
     - https://x.com/dani_avila7/status/2121789088499933223
   publishedAt: 2026-11-18
   sourceKind: blog
-  tension: "통념은 에이전트 도구 호출을 한 번씩 검토하는 것이 더 안전하다는 것이지만, 공식 문서는 auto mode classifier가 개별 호출이 아니라 스크립트만 보며 런타임에 계산된 값(검색으로 얻은 경로 등)은 보지 못한다고 적는다. X에서는 Rhys Sullivan이 Claude Code는 in-process node:vm(Bun), Codex는 v8 등 구현 편차가 크다고 비교했으나, 이 구현 세부는 문서에서 확인하지 못했다."
-  kitIdea: "Claude Code v2.1.323+에서 CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1을 켠 뒤, 검색 결과 경로로 파일을 편집하는 작업을 auto mode로 돌려 classifier와 PreToolUse 훅이 런타임 경로를 실제로 막는지 비교하라."
+  tension: 통념은 에이전트 도구 호출을 한 번씩 검토하는 것이 더 안전하다는 것이지만, 공식 문서는 auto mode classifier가 개별 호출이 아니라 스크립트만 보며 런타임에 계산된 값(검색으로 얻은 경로 등)은 보지 못한다고 적는다. X에서는 Rhys Sullivan이 Claude Code는 in-process node:vm(Bun), Codex는 v8 등 구현 편차가 크다고 비교했으나, 이 구현 세부는 문서에서 확인하지 못했다.
+  kitIdea: Claude Code v2.1.323+에서 CLAUDE_CODE_EXPERIMENTAL_CODE_MODE=1을 켠 뒤, 검색 결과 경로로 파일을 편집하는 작업을 auto mode로 돌려 classifier와 PreToolUse 훅이 런타임 경로를 실제로 막는지 비교하라.
   primaryVerified: true
   confidence: high
   status: picked
   note: "공식 계정 공지는 2026-11-18 06:18 KST. 문서상 제약은 터미널 세션 전용, Remote Control/Chrome/클라우드 세션 불가, HIPAA·ZDR·게이트웨이 계정 제외. node:vm 주장은 스크린샷 기반이므로 소스 검증 필요. 기존 claude-code-auto-mode(권한 분류기)와 겹치지 않게 스크립트 묶음·classifier 사각지대에 집중. 초안 작성됨(draft: true)."
   score: 85
   collectedAt: 2026-11-18
-
 - slug: claude-code-agent-self-verification
-  topic: "Claude Code 팀, 코드의 약 90%를 에이전트가 작성·검증한다는 주장과 반박"
+  topic: Claude Code 팀, 코드의 약 90%를 에이전트가 작성·검증한다는 주장과 반박
   category: trends
   people:
-    - "Addy Osmani (@addyosmani)"
-    - "yoavgo (@yoavgo)"
+    - Addy Osmani (@addyosmani)
+    - yoavgo (@yoavgo)
   sources:
     - https://claude.dev/blog/how-the-claude-code-team-thinks-about-verification/
     - https://x.com/ClaudeDevs/status/2122457608963395586
@@ -232,11 +218,524 @@
     - https://x.com/yoavgo/status/2122791221026234724
   publishedAt: 2026-11-16
   sourceKind: blog
-  tension: "통념은 사람이 모든 diff를 읽어야 품질이 나온다는 것이지만, Addy Osmani는 검증 루프가 있으면 에이전트를 수십·수백 개 병렬로 돌릴 수 있고 팀 코드의 약 90%를 Claude가 작성·검토한다고 썼다. yoavgo는 그게 테스트 기법 때문이 아니라 Claude Code 자체가 비교적 단순하고 해로운 버그 면적이 작기 때문이라고 반박했다."
-  kitIdea: "REVIEW.md와 검증 게이트를 기본 브랜치에서만 읽히게 한 뒤, 에이전트에게 자기 검사 규칙을 PR에서 완화해 보라고 시켜 게이트가 실제로 막는지 확인하라."
+  tension: 통념은 사람이 모든 diff를 읽어야 품질이 나온다는 것이지만, Addy Osmani는 검증 루프가 있으면 에이전트를 수십·수백 개 병렬로 돌릴 수 있고 팀 코드의 약 90%를 Claude가 작성·검토한다고 썼다. yoavgo는 그게 테스트 기법 때문이 아니라 Claude Code 자체가 비교적 단순하고 해로운 버그 면적이 작기 때문이라고 반박했다.
+  kitIdea: REVIEW.md와 검증 게이트를 기본 브랜치에서만 읽히게 한 뒤, 에이전트에게 자기 검사 규칙을 PR에서 완화해 보라고 시켜 게이트가 실제로 막는지 확인하라.
   primaryVerified: true
   confidence: high
   status: idea
   note: "블로그 2026-11-16, 공식 스레드 2026-11-17 07:31 KST. 핵심 장치: 자기 검사 규칙 자가수정 금지, observe/enforce 커밋 게이트, 실패 3회 후 사람 개입. 90% 수치 재현 가능성과 yoavgo의 '단순 소프트웨어' 전제는 작성 시 재검증. Addy X 아티클은 로그인 벽으로 블로그로 대체 확인."
   score: 83
   collectedAt: 2026-11-18
+- slug: launch-hn-intuned-yc-s22-build-and-run-reliable-7a82
+  topic: "Launch HN: Intuned (YC S22) – Build and run reliable browser automations as code"
+  category: trends
+  people:
+    - fkilaiwi
+  sources:
+    - https://intunedhq.com
+    - https://news.ycombinator.com/item?id=48445171
+  publishedAt: 2026-06-08
+  sourceKind: blog
+  tension: HN에서 117점·댓글 58개로 눈에 띈 글입니다. trends 쿼리와 맞습니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=hn; query category=trends
+  score: 88
+  collectedAt: 2026-11-23
+- slug: launch-hn-kino-ai-yc-s23-ai-media-manager-and-vi-44cd
+  topic: "Launch HN: Kino AI (YC S23) – AI media manager and video editor"
+  category: trends
+  people:
+    - lukeigel
+  sources:
+    - https://news.ycombinator.com/item?id=50368804
+  publishedAt: 2026-11-04
+  sourceKind: thread
+  tension: HN에서 112점·댓글 37개로 눈에 띈 글입니다. trends 쿼리와 맞습니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=hn; query category=trends
+  score: 87
+  collectedAt: 2026-11-23
+- slug: show-hn-smooth-cli-token-efficient-browser-for-a-a734
+  topic: "Show HN: Smooth CLI – Token-efficient browser for AI agents"
+  category: security
+  people:
+    - antves
+  sources:
+    - https://docs.smooth.sh/cli/overview
+    - https://news.ycombinator.com/item?id=46901233
+  publishedAt: 2026-02-05
+  sourceKind: blog
+  tension: HN에서 109점·댓글 74개로 눈에 띈 글입니다. security 쿼리와 맞습니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=hn; query category=security
+  score: 87
+  collectedAt: 2026-11-23
+- slug: how-openai-s-performance-factory-keeps-chatgpt-f-9342
+  topic: How OpenAI’s Performance Factory keeps ChatGPT fast
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/how-openai-performance-factory-keeps-chatgpt-fast
+  publishedAt: 2026-11-19
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: deploying-daybreak-red-a890
+  topic: Deploying Daybreak Red
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/business/learn/deploying-daybreak-red
+  publishedAt: 2026-11-19
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: explore-the-codex-security-plugin-82fe
+  topic: Explore the Codex Security Plugin
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/business/learn/codex-security-plugin-demo
+  publishedAt: 2026-11-19
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: research-acceleration-the-jagged-frontier-58da
+  topic: "Research acceleration: The jagged frontier"
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/research-acceleration-jagged-frontier
+  publishedAt: 2026-11-18
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: inside-the-codex-sandbox-6795
+  topic: Inside the Codex sandbox
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/inside-the-codex-sandbox
+  publishedAt: 2026-11-18
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: managing-frontier-ai-risk-from-training-to-deplo-99be
+  topic: "Managing frontier AI risk: From training to deployment"
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/managing-frontier-ai-risk
+  publishedAt: 2026-11-18
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: introducing-gpt-6-2-astra-and-sol-8f6a
+  topic: Introducing GPT-6.2 Astra and Sol
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/introducing-gpt-6-2-astra-sol
+  publishedAt: 2026-11-17
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: strengthening-the-fight-against-online-child-sex-dd65
+  topic: Strengthening the fight against online child sexual abuse with new tools and support
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/strengthening-online-child-safety
+  publishedAt: 2026-11-16
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: how-revolut-raises-ambition-without-lowering-the-b82b
+  topic: How Revolut raises ambition without lowering the bar
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/business/customer-stories/revolut
+  publishedAt: 2026-11-16
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: more-ways-to-move-care-forward-with-chatgpt-for-21e8
+  topic: More ways to move care forward with ChatGPT for Healthcare
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/more-ways-to-move-care-forward-with-chatgpt-for-healthcare
+  publishedAt: 2026-11-16
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: advancing-computer-use-agents-for-healthcare-tea-21b4
+  topic: Advancing computer-use agents for healthcare teams
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/advancing-computer-use-for-healthcare-teams
+  publishedAt: 2026-11-16
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: introducing-chatgpt-wallet-7d4d
+  topic: Introducing ChatGPT Wallet
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/introducing-chatgpt-wallet
+  publishedAt: 2026-11-13
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: shield-helps-technicians-hand-off-legacy-portal-a99d
+  topic: Shield helps technicians hand off legacy portal work with OpenAI
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/business/customer-stories/shield
+  publishedAt: 2026-11-13
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: how-amplitude-ships-product-improvements-in-1-2-6767
+  topic: How Amplitude ships product improvements in 1–2 days with OpenAI
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/business/customer-stories/amplitude
+  publishedAt: 2026-11-12
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: gondola-doubles-revenue-as-its-team-builds-more-b984
+  topic: Gondola doubles revenue as its team builds more with Codex
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/business/customer-stories/gondola
+  publishedAt: 2026-11-12
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: holiday-extras-is-rethinking-what-it-can-build-w-4922
+  topic: Holiday Extras is rethinking what it can build with Codex
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/business/customer-stories/holidays-extras-codex
+  publishedAt: 2026-11-12
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: supporting-research-on-ai-and-children-s-safety-d7c1
+  topic: Supporting research on AI and children’s safety
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/children-first-declaration
+  publishedAt: 2026-11-12
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: cogent-and-openai-build-cyber-defense-factories-37e4
+  topic: Cogent and OpenAI build cyber defense factories for enterprises
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/cogent-security
+  publishedAt: 2026-11-10
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: control-room-a-central-system-to-track-and-stop-952d
+  topic: "Control Room: A central system to track and stop model workloads across our research infrastructure"
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/control-room
+  publishedAt: 2026-11-09
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: coderabbit-scales-agentic-software-development-a-02e9
+  topic: CodeRabbit scales agentic software development and ships 20x more
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/coderabbit-codex-daybreak
+  publishedAt: 2026-11-09
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 85
+  collectedAt: 2026-11-23
+- slug: launch-hn-skillsync-yc-w26-ai-chat-sessions-made-98a6
+  topic: "Launch HN: Skillsync (YC W26) – AI chat sessions made portable across agents"
+  category: trends
+  people:
+    - cat-whisperer
+  sources:
+    - https://news.ycombinator.com/item?id=49743049
+  publishedAt: 2026-09-17
+  sourceKind: thread
+  tension: HN에서 68점·댓글 62개로 눈에 띈 글입니다. trends 쿼리와 맞습니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=hn; query category=trends
+  score: 81
+  collectedAt: 2026-11-23
+- slug: show-hn-web-eval-agent-let-the-coding-agent-debu-96e6
+  topic: "Show HN: Web-eval-agent – Let the coding agent debug itself"
+  category: trends
+  people:
+    - neversettles
+  sources:
+    - https://github.com/Operative-Sh/web-eval-agent
+    - https://news.ycombinator.com/item?id=43822659
+  publishedAt: 2025-04-28
+  sourceKind: blog
+  tension: HN에서 84점·댓글 12개로 눈에 띈 글입니다. trends 쿼리와 맞습니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=hn; query category=trends
+  score: 81
+  collectedAt: 2026-11-23
+- slug: measuring-how-ai-agents-handle-everyday-wet-lab-5f72
+  topic: Measuring how AI agents handle everyday wet-lab science
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/measuring-how-ai-agents-handle-wet-lab-science
+  publishedAt: 2026-11-06
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 78
+  collectedAt: 2026-11-23
+- slug: cult-fit-builds-operational-muscle-with-codex-bbd4
+  topic: Cult.fit builds operational muscle with Codex
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/cultfit-builds-with-codex
+  publishedAt: 2026-11-05
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 78
+  collectedAt: 2026-11-23
+- slug: gpt-6-cyber-advancing-the-frontier-of-aligned-cy-14e9
+  topic: "GPT‑6 Cyber: Advancing the frontier of aligned cybersecurity agents"
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/introducing-gpt-6-cyber
+  publishedAt: 2026-11-05
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 78
+  collectedAt: 2026-11-23
+- slug: merge-builds-product-and-business-tools-with-ope-db97
+  topic: Merge builds product and business tools with OpenAI technology
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/merge-builds-with-openai
+  publishedAt: 2026-11-05
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 78
+  collectedAt: 2026-11-23
+- slug: openai-to-acquire-pierre-computer-company-inc-1be4
+  topic: OpenAI to acquire Pierre Computer Company, Inc.
+  category: trends
+  people:
+    - OpenAI News
+  sources:
+    - https://openai.com/index/openai-to-acquire-pierre
+  publishedAt: 2026-11-04
+  sourceKind: blog
+  tension: OpenAI News 공식 피드에서 에이전트·보안·제품 운영과 맞물릴 수 있는 글입니다.
+  kitIdea: 사람이 shortlist할 때 키트 아이디어를 채웁니다.
+  primaryVerified: false
+  confidence: low
+  status: idea
+  note: collector=blog:openai; metadata only
+  score: 78
+  collectedAt: 2026-11-23
