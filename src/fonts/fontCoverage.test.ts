@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { cmapCodepoints, contentCodepoints, inRanges, parseFontFaces } from "./fontCoverage";
+import { cmapCodepoints, codepointsIn, contentCodepoints, inRanges, parseFontFaces } from "./fontCoverage";
 
 const root = process.cwd();
 const cssPaths = [
@@ -28,9 +28,43 @@ describe("served Pretendard faces", () => {
     );
     const missing: string[] = [];
     for (const [code, file] of contentCodepoints()) {
-      if (!source.has(code)) continue;
-      const face = loaded.find((item) => inRanges(code, item.ranges) && item.cmap.has(code));
-      if (!face) missing.push(`U+${code.toString(16)} ${String.fromCodePoint(code)} (${file})`);
+      const first = loaded.find((item) => inRanges(code, item.ranges));
+      if (!source.has(code)) {
+        if (first) {
+          missing.push(
+            `U+${code.toString(16)} ${String.fromCodePoint(code)} is outside Pretendard but ${first.url} claims it (${file})`,
+          );
+        }
+        continue;
+      }
+      if (!first || !first.cmap.has(code)) {
+        missing.push(`U+${code.toString(16)} ${String.fromCodePoint(code)} (${file})`);
+      }
+    }
+    expect(missing, missing.slice(0, 12).join("\n")).toEqual([]);
+  });
+
+  it("covers survey, community, and component copy in the shell or ui face", async () => {
+    const css = cssPaths.map((file) => fs.readFileSync(file, "utf8")).join("\n");
+    const faces = parseFontFaces(css).filter(
+      (face) => face.url.includes("pretendard-shell.woff2") || face.url.includes("pretendard-ui.woff2"),
+    );
+    const loaded = [];
+    for (const face of faces) {
+      const cmap = await cmapCodepoints(fs.readFileSync(path.join(root, "public", face.url.slice(1))));
+      loaded.push({ ...face, cmap });
+    }
+    const source = await cmapCodepoints(
+      fs.readFileSync(path.join(root, "node_modules/pretendard/dist/public/variable/PretendardVariable.ttf")),
+    );
+    const samples = ["src/survey", "src/components", "src/app/community", "src/components/survey"];
+    const missing: string[] = [];
+    for (const sample of samples) {
+      for (const [code, file] of codepointsIn(sample)) {
+        if (!source.has(code)) continue;
+        const face = loaded.find((item) => inRanges(code, item.ranges) && item.cmap.has(code));
+        if (!face) missing.push(`U+${code.toString(16)} ${String.fromCodePoint(code)} (${file})`);
+      }
     }
     expect(missing, missing.slice(0, 12).join("\n")).toEqual([]);
   });
