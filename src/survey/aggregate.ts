@@ -20,6 +20,17 @@ export type SurveyCatalog = {
   tenures: readonly SurveyOption[];
 };
 
+/** Highest count first. Ties keep a stable label order so a render does not shuffle. */
+export function sortedByCount<T extends { count: number; label: string }>(items: readonly T[]): T[] {
+  return [...items].sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, "ko"));
+}
+
+/** The leading row, or null when every count is zero. */
+export function leadingBucket<T extends { count: number; label: string }>(items: readonly T[]): T | null {
+  const [top] = sortedByCount(items);
+  return top && top.count > 0 ? top : null;
+}
+
 /** Integer percent of respondents. Multi-select buckets can sum past 100. */
 export function percentOf(count: number, n: number): number {
   if (n <= 0) return 0;

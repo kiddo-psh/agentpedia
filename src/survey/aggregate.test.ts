@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { aggregateSurvey, percentOf } from "./aggregate";
+import { aggregateSurvey, leadingBucket, percentOf, sortedByCount } from "./aggregate";
 import { AGENT_GROUPS } from "./choices";
 import type { SurveyAnswer } from "./validate";
 import { surveyCatalog } from "./options";
@@ -21,6 +21,19 @@ function answer(partial: Partial<SurveyAnswer> = {}): SurveyAnswer {
     ...partial,
   };
 }
+
+describe("sortedByCount", () => {
+  it("orders by count and keeps a stable label order on ties", () => {
+    const ranked = sortedByCount([
+      { count: 1, label: "나" },
+      { count: 3, label: "가" },
+      { count: 1, label: "다" },
+    ]);
+    expect(ranked.map((item) => item.label)).toEqual(["가", "나", "다"]);
+    expect(leadingBucket(ranked)?.label).toBe("가");
+    expect(leadingBucket([{ count: 0, label: "가" }])).toBeNull();
+  });
+});
 
 describe("aggregateSurvey", () => {
   it("draws every bucket at zero when nobody has answered", () => {
