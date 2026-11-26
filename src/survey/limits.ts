@@ -1,6 +1,3 @@
-/** Responses required before option breakdowns are public. */
-export const PUBLISH_AT = 30;
-
 export const OTHER_ID = "other";
 
 /** Free-text "기타" on the survey. Shared by the form and the validator. */

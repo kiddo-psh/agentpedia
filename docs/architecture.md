@@ -53,7 +53,7 @@ content/ideas-sources.yaml
 
 앱 테이블: `comments`(`citation_quote` 포함), `community_posts`, `community_comments`, `likes`, `suggestions`, `events`, `survey_responses`, `survey_comments`, `survey_comment_reports`.
 
-`survey_responses`는 방문자 쿠키(`ap_vid`)당 한 줄이다. 세션이 있으면 `user_id`를 같이 남긴다. `survey_comments`는 설문 글의 익명 댓글이다. 서로 다른 방문자 3명이 신고하면 숨기고, `METRICS_ADMINS` 관리자는 숨기거나 지울 수 있다. 댓글 본문은 평문으로만 그린다. 응답이 30명 미만이면 공개 페이지는 인원만 보여 주고 항목별 수는 내보내지 않는다.
+`survey_responses`는 방문자 쿠키(`ap_vid`)당 한 줄이다. 세션이 있으면 `user_id`를 같이 남긴다. `model`은 모델 id의 JSON 배열 문자열이고 `agent_other`는 기타 문장의 JSON이다. 응답 수와 항목·형태별 막대는 항상 공개한다. `survey_comments`는 설문 글의 익명 댓글이다. 서로 다른 방문자 3명이 신고하면 숨기고, `METRICS_ADMINS` 관리자는 숨기거나 지울 수 있다. 댓글 본문은 평문으로만 그린다.
 
 Better Auth 테이블: `user`, `session`, `account`, `verification`.
 

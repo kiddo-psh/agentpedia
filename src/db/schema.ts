@@ -158,7 +158,9 @@ export const surveyResponses = pgTable(
     visitorId: uuid("visitor_id").notNull(),
     userId: text("user_id").references(() => user.id, { onDelete: "set null" }),
     agents: text("agents").array().notNull(),
+    /** JSON {"orchestrator","other"} or null. The chart counts the buckets and does not show the text. */
     agentOther: text("agent_other"),
+    /** JSON array of model ids, including "other". Text so multi-select did not add a column. */
     model: text("model").notNull(),
     modelOther: text("model_other"),
     uses: text("uses").array().notNull(),

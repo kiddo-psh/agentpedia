@@ -1,14 +1,20 @@
 import { getDb } from "@/db/client";
 import { visitorId } from "@/events/record";
 import { getSession } from "@/lib/auth";
-import { agentAppOptions, modelOptions, TENURE_OPTIONS, USE_OPTIONS } from "@/survey/options";
-import { saveSurveyResponse } from "@/survey/service";
+import { agentAppOptions, modelOptions, surveyCatalog, TENURE_OPTIONS, USE_OPTIONS } from "@/survey/options";
+import { loadSurveyResults, saveSurveyResponse } from "@/survey/service";
 import { rejectsCrossSite, surveyJson, surveyRedirect } from "@/survey/http";
 import { fieldsFromForm, fieldsFromJson, honeypotFilled, parseSurveyFields } from "@/survey/validate";
 
+function wantsJson(request: Request): boolean {
+  const type = request.headers.get("content-type") ?? "";
+  const accept = request.headers.get("accept") ?? "";
+  return type.includes("application/json") || accept.includes("application/json");
+}
+
 async function readFields(request: Request) {
-  const json = (request.headers.get("content-type") ?? "").includes("application/json");
-  if (json) {
+  const json = wantsJson(request);
+  if ((request.headers.get("content-type") ?? "").includes("application/json")) {
     const body = await request.json().catch(() => null);
     return { json, fields: fieldsFromJson(body) };
   }
@@ -46,13 +52,21 @@ export async function POST(request: Request) {
   }
 
   try {
-    const saved = await saveSurveyResponse(await getDb(), {
+    const db = await getDb();
+    const saved = await saveSurveyResponse(db, {
       ...parsed.value,
       visitorId: visitor.id,
       userId,
     });
+    const results = await loadSurveyResults(db, surveyCatalog());
     if (json) {
-      return surveyJson(request, { ok: true, already: saved.already }, saved.already ? 200 : 201, visitor, true);
+      return surveyJson(
+        request,
+        { ok: true, already: saved.already, results },
+        saved.already ? 200 : 201,
+        visitor,
+        true,
+      );
     }
     return surveyRedirect(request, saved.already ? "survey=already" : "thanks=1", visitor, true);
   } catch (err) {

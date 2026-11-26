@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { SurveyCommentForm, SurveyComments, SurveyCommentsFallback } from "@/components/survey/SurveyComments";
-import { SurveyForm } from "@/components/survey/SurveyForm";
 import { SurveyResults, SurveyResultsFallback } from "@/components/survey/SurveyResults";
-import { MAX_COMMENT_LENGTH, MAX_NICKNAME_LENGTH, PUBLISH_AT } from "@/survey/limits";
+import { MAX_COMMENT_LENGTH, MAX_NICKNAME_LENGTH } from "@/survey/limits";
 import { SURVEY_POST, SURVEY_POST_PUBLISHED_AT } from "@/survey/post";
 
 export const metadata: Metadata = {
@@ -29,7 +28,7 @@ async function SurveyStatus({
   const query = await searchParams;
   const thanks = first(query.thanks);
   const survey = first(query.survey);
-  if (thanks === "1") return <p>응답을 기록했습니다. {PUBLISH_AT}명이 모이면 이 글에 비율이 공개됩니다.</p>;
+  if (thanks === "1") return <p>응답을 기록했습니다.</p>;
   if (survey === "already") return <p>이미 이 브라우저에서 응답했습니다.</p>;
   if (survey === "invalid") return <p>답을 다시 확인해 주세요. 기타를 골랐다면 내용을 적어 주세요.</p>;
   return <p>로그인 없이, 이 브라우저에서 한 번만 답합니다.</p>;
@@ -83,8 +82,8 @@ export default function SurveyPostPage({
             로그인은 필요 없습니다. 이 브라우저에서 한 번만 답할 수 있습니다.
           </p>
           <p className="mt-3">
-            {PUBLISH_AT}명이 모이면 비율을 이 글에 공개합니다. 그 전에는 응답한 사람 수만 보여 줍니다. 고른 이유는
-            댓글로 남겨 주세요.
+            응답 비율은 이 글에 바로 나옵니다. 에이전트와 모델은 여러 개 고를 수 있고, 그때 비율의 합은 100을 넘을 수
+            있습니다. 고른 이유는 댓글로 남겨 주세요.
           </p>
         </div>
 
@@ -93,7 +92,6 @@ export default function SurveyPostPage({
             <SurveyStatus searchParams={searchParams} />
           </Suspense>
         </div>
-        <SurveyForm />
       </article>
 
       <Suspense fallback={<SurveyResultsFallback />}>

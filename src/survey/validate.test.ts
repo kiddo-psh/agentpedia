@@ -4,20 +4,20 @@ import { SURVEY_BOOT_JS } from "./boot";
 import { containsLink } from "./links";
 import { publicOrigin, rejectsCrossSite } from "./http";
 import { MAX_OTHER_LENGTH } from "./limits";
-import { agentAppOptions, modelOptions, TENURE_OPTIONS, USE_OPTIONS } from "./options";
+import { listAgents } from "@/content/agents";
+import { AGENT_GROUPS, agentAppOptions } from "./choices";
+import { modelOptions, TENURE_OPTIONS, USE_OPTIONS } from "./options";
 import { parseSurveyFields, type SurveyFields } from "./validate";
 
-const agents = [
-  { id: "claude-code", label: "Claude Code" },
-  { id: "cursor", label: "Cursor" },
-];
-const models = [{ id: "opus-5-5", label: "Claude Opus 5.5" }];
+const agents = agentAppOptions();
+const models = [{ id: "opus-5-5", label: "Claude Opus 5.5" }, { id: "grok-4-7", label: "Grok 4.7" }];
 
 function fields(partial: Partial<SurveyFields> = {}): SurveyFields {
   return {
-    agents: ["claude-code"],
+    agents: ["claude-code-cli"],
+    orchestratorOther: "",
     agentOther: "",
-    model: "opus-5-5",
+    models: ["opus-5-5"],
     modelOther: "",
     uses: ["web"],
     useOther: "",
@@ -28,28 +28,18 @@ function fields(partial: Partial<SurveyFields> = {}): SurveyFields {
 }
 
 describe("survey options", () => {
-  it("starts from catalog agents, then adds apps that are not in content", () => {
-    const options = agentAppOptions();
-    expect(options.map((option) => option.id).slice(0, 6)).toEqual([
-      "claude-code",
-      "codex",
-      "cursor",
-      "orca",
-      "gemini-cli",
-      "github-copilot",
+  it("groups apps by form factor", () => {
+    expect(AGENT_GROUPS.map((group) => [group.label, group.options.map((option) => option.label)])).toEqual([
+      ["터미널 CLI", ["Claude Code CLI", "Codex CLI", "Gemini CLI"]],
+      ["데스크톱·웹 에이전트 앱", ["Claude Code 앱", "Codex 앱"]],
+      ["IDE·에디터", ["Cursor", "GitHub Copilot"]],
+      ["오케스트레이터", ["Orca", "기타 오케스트레이터"]],
+      ["개인 비서형 에이전트", ["Grok Bot"]],
+      ["기타", ["기타"]],
     ]);
-    expect(options.find((option) => option.id === "claude-code")?.label).toBe("Claude Code");
-    expect(options.find((option) => option.id === "cursor")?.label).toBe("Cursor");
-    expect(options.find((option) => option.id === "codex")?.label).toBe("Codex CLI");
-  });
-
-  it("does not duplicate an extra app that content already lists", () => {
-    const options = agentAppOptions([
-      { slug: "orca", name: "Orca" },
-      { slug: "claude-code", name: "Claude Code" },
-    ]);
-    expect(options.filter((option) => option.id === "orca")).toHaveLength(1);
-    expect(options[0]?.id).toBe("claude-code");
+    expect(agentAppOptions().find((option) => option.id === "cursor")?.label).toBe(
+      listAgents().find((agent) => agent.slug === "cursor")?.name,
+    );
   });
 
   it("uses model names from content", () => {
@@ -75,44 +65,38 @@ describe("parseSurveyFields", () => {
   const parse = (partial: Partial<SurveyFields> = {}) =>
     parseSurveyFields(fields(partial), agents, models, USE_OPTIONS, TENURE_OPTIONS);
 
-  it("accepts a complete answer, and filled other text counts as 기타", () => {
+  it("accepts several agents and models, and stores both free-text boxes", () => {
     expect(parse()).toMatchObject({
       ok: true,
-      value: { agents: ["claude-code"], agentOther: null, model: "opus-5-5", tenure: "lt-1m" },
+      value: { agents: ["claude-code-cli"], agentOther: null, models: ["opus-5-5"], tenure: "lt-1m" },
     });
-    expect(parse({ agentOther: "  직접 입력  " })).toMatchObject({
-      ok: true,
-      value: { agents: ["claude-code", "other"], agentOther: "직접 입력" },
-    });
-  });
-
-  it("dedupes agents and keeps other text when the box is filled", () => {
-    const result = parse({
-      agents: ["cursor", "claude-code", "cursor", "nope"],
-      agentOther: "",
-    });
-    expect(result).toMatchObject({ ok: false, error: "고를 수 없는 에이전트입니다." });
-
     expect(
-      parse({ agents: ["cursor", "claude-code", "cursor"], agentOther: "  Orca  " }),
+      parse({
+        agents: ["orca", "orchestrator-other"],
+        orchestratorOther: "  내 오케스트레이터  ",
+        agentOther: "직접 입력",
+        models: ["grok-4-7", "opus-5-5", "opus-5-5"],
+      }),
     ).toMatchObject({
       ok: true,
-      value: { agents: ["claude-code", "cursor", "other"], agentOther: "Orca" },
+      value: {
+        agents: ["orca", "orchestrator-other", "other"],
+        agentOther: JSON.stringify({ orchestrator: "내 오케스트레이터", other: "직접 입력" }),
+        models: ["grok-4-7", "opus-5-5"],
+      },
     });
   });
 
-  it("requires a choice, a period, and other text without a link", () => {
+  it("rejects an unknown app and an empty or linked other box", () => {
+    expect(parse({ agents: ["nope"] })).toMatchObject({ ok: false, error: "고를 수 없는 에이전트입니다." });
     expect(parse({ agents: [] })).toMatchObject({ ok: false, error: "에이전트를 하나 이상 골라 주세요." });
-    expect(parse({ agents: ["other"], agentOther: "  " })).toMatchObject({
-      ok: false,
-      error: "기타 에이전트를 적어 주세요.",
-    });
+    expect(parse({ agents: ["other"], agentOther: "  " })).toMatchObject({ ok: false });
     expect(parse({ agentOther: "https://x.test" })).toMatchObject({ ok: false, error: "링크는 적을 수 없습니다." });
-    expect(parse({ agentOther: "가".repeat(MAX_OTHER_LENGTH + 1) })).toMatchObject({ ok: false });
-    expect(parse({ model: "", modelOther: "" })).toMatchObject({ ok: false, error: "모델을 골라 주세요." });
-    expect(parse({ model: "other", modelOther: "로컬 모델" })).toMatchObject({
+    expect(parse({ orchestratorOther: "가".repeat(MAX_OTHER_LENGTH + 1) })).toMatchObject({ ok: false });
+    expect(parse({ models: [], modelOther: "" })).toMatchObject({ ok: false, error: "모델을 하나 이상 골라 주세요." });
+    expect(parse({ models: ["opus-5-5", "grok-4-7"], modelOther: "로컬 모델" })).toMatchObject({
       ok: true,
-      value: { model: "other", modelOther: "로컬 모델" },
+      value: { models: ["grok-4-7", "opus-5-5", "other"], modelOther: "로컬 모델" },
     });
     expect(parse({ uses: [], useOther: "" })).toMatchObject({ ok: false, error: "용도를 하나 이상 골라 주세요." });
     expect(parse({ tenure: "forever" })).toMatchObject({ ok: false, error: "사용 기간을 골라 주세요." });

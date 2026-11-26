@@ -126,6 +126,25 @@ function walkTextFiles(dir: string, out: string[]) {
   }
 }
 
+/** Non-ascii characters under a file or directory. */
+export function codepointsIn(target: string, root = process.cwd()): Map<number, string> {
+  const files: string[] = [];
+  const abs = path.isAbsolute(target) ? target : path.join(root, target);
+  if (!fs.existsSync(abs)) return new Map();
+  if (fs.statSync(abs).isDirectory()) walkTextFiles(abs, files);
+  else if (TEXT_EXT.test(abs)) files.push(abs);
+  const found = new Map<number, string>();
+  for (const file of files) {
+    const text = fs.readFileSync(file, "utf8");
+    for (const ch of text) {
+      const code = ch.codePointAt(0)!;
+      if (code < 0x80 || isSystemEmoji(code) || found.has(code)) continue;
+      found.set(code, path.relative(root, file));
+    }
+  }
+  return found;
+}
+
 /** Non-ascii characters in articles, chrome, and UI source. */
 export function contentCodepoints(root = process.cwd()): Map<number, string> {
   const files: string[] = [];
