@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { SurveyCharts } from "@/components/survey/SurveyCharts";
 import { Honeypot } from "@/components/survey/Honeypot";
 import type { SurveyResults } from "@/survey/aggregate";
@@ -22,10 +22,27 @@ function OptionBox({ name, option }: { name: string; option: SurveyOption }) {
   );
 }
 
-export function SurveyLive({ initial, models }: { initial: SurveyResults; models: readonly SurveyOption[] }) {
-  const [results, setResults] = useState(initial);
+export function SurveyLive({
+  answered,
+  results: initialResults,
+  models,
+}: {
+  answered: boolean;
+  results: SurveyResults | null;
+  models: readonly SurveyOption[];
+}) {
+  const slot = useRef<HTMLDivElement>(null);
+  const [results, setResults] = useState(initialResults);
+  const [view, setView] = useState<"form" | "results">(answered ? "results" : "form");
+  const [locked, setLocked] = useState(answered);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+
+  function holdHeight() {
+    const el = slot.current;
+    if (!el) return;
+    el.style.minHeight = `${el.offsetHeight}px`;
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,7 +59,10 @@ export function SurveyLive({ initial, models }: { initial: SurveyResults; models
         setError(data?.error ?? "답을 다시 확인해 주세요.");
         return;
       }
+      holdHeight();
       setResults(data.results);
+      setLocked(true);
+      setView("results");
       try {
         localStorage.setItem(SURVEY_STORAGE_KEY, "answered");
       } catch {
@@ -58,10 +78,51 @@ export function SurveyLive({ initial, models }: { initial: SurveyResults; models
     }
   }
 
+  async function showResults() {
+    if (results) {
+      holdHeight();
+      setView("results");
+      return;
+    }
+    setPending(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/survey", { headers: { accept: "application/json" } });
+      const data = (await response.json().catch(() => null)) as { results?: SurveyResults } | null;
+      if (!response.ok || !data?.results) {
+        setError("집계를 불러오지 못했습니다.");
+        return;
+      }
+      holdHeight();
+      setResults(data.results);
+      setView("results");
+    } catch {
+      setError("집계를 불러오지 못했습니다.");
+    } finally {
+      setPending(false);
+    }
+  }
+
   return (
-    <>
-      <SurveyCharts results={results} />
-      <form action="/api/survey" method="post" className="survey-form mt-10" onSubmit={onSubmit}>
+    <div ref={slot} className={view === "form" ? "survey-slot survey-unanswered" : "survey-slot"}>
+      {view === "results" && results ? (
+        <>
+          <SurveyCharts results={results} />
+          {!locked && (
+            <button
+              type="button"
+              className="mt-8 inline-flex h-10 items-center rounded-full px-5 text-sm ring-1 ring-line ring-inset hover:bg-soft"
+              onClick={() => {
+                holdHeight();
+                setView("form");
+              }}
+            >
+              설문하러 가기
+            </button>
+          )}
+        </>
+      ) : (
+        <form action="/api/survey" method="post" className="survey-form mt-8" onSubmit={onSubmit}>
         <Honeypot />
         <fieldset>
           <legend className="text-base font-semibold tracking-tight">주로 쓰는 에이전트 앱</legend>
@@ -175,14 +236,25 @@ export function SurveyLive({ initial, models }: { initial: SurveyResults; models
             {error}
           </p>
         )}
-        <button
-          type="submit"
-          disabled={pending}
-          className="mt-8 inline-flex h-10 items-center rounded-full bg-foreground px-5 text-sm font-medium text-background hover:opacity-85 disabled:opacity-50"
-        >
-          {pending ? "보내는 중…" : "응답 보내기"}
-        </button>
+        <div className="mt-8 flex flex-wrap gap-2">
+          <button
+            type="submit"
+            disabled={pending}
+            className="inline-flex h-10 items-center rounded-full bg-foreground px-5 text-sm font-medium text-background hover:opacity-85 disabled:opacity-50"
+          >
+            {pending ? "보내는 중…" : "응답 보내기"}
+          </button>
+          <button
+            type="button"
+            disabled={pending}
+            className="inline-flex h-10 items-center rounded-full px-5 text-sm ring-1 ring-line ring-inset hover:bg-soft disabled:opacity-50"
+            onClick={showResults}
+          >
+            응답 보기
+          </button>
+        </div>
       </form>
-    </>
+      )}
+    </div>
   );
 }

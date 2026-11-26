@@ -1,28 +1,31 @@
 import { connection } from "next/server";
 import { unstable_rethrow } from "next/navigation";
+import { headers } from "next/headers";
 import { SurveyLive } from "@/components/survey/SurveyLive";
-import { aggregateSurvey } from "@/survey/aggregate";
-import { modelOptions, surveyCatalog } from "@/survey/options";
-import { loadSurveyResults } from "@/survey/service";
 import { getDb } from "@/db/client";
+import { existingVisitorId } from "@/events/record";
+import { modelOptions, surveyCatalog } from "@/survey/options";
+import type { SurveyResults } from "@/survey/aggregate";
+import { hasSurveyResponse, loadSurveyResults } from "@/survey/service";
 
-function emptyBoard() {
-  const models = modelOptions();
-  return <SurveyLive initial={aggregateSurvey([], surveyCatalog(models))} models={models} />;
-}
-
-/** Same bars and form as the loaded board, at zero, so streamed counts do not change the page height. */
+/** Form only. Counts stay out of the shell so an unanswered visitor never receives them. */
 export function SurveyResultsFallback() {
-  return emptyBoard();
+  return <SurveyLive answered={false} results={null} models={modelOptions()} />;
 }
 
 export async function SurveyResults() {
   await connection();
   const models = modelOptions();
+  const visitor = existingVisitorId((await headers()).get("cookie"));
+  let answered = false;
+  let results: SurveyResults | null = null;
   let failed = false;
-  let results = aggregateSurvey([], surveyCatalog(models));
   try {
-    results = await loadSurveyResults(await getDb(), surveyCatalog(models));
+    if (visitor) {
+      const db = await getDb();
+      answered = await hasSurveyResponse(db, visitor);
+      if (answered) results = await loadSurveyResults(db, surveyCatalog(models));
+    }
   } catch (err) {
     unstable_rethrow(err);
     console.error("[survey] failed to load results", err);
@@ -30,11 +33,10 @@ export async function SurveyResults() {
   }
   if (failed) {
     return (
-      <section className="mt-8">
-        <h2 className="text-xl font-semibold tracking-tight">응답</h2>
-        <p className="mt-2 text-sm text-muted">지금은 응답을 불러올 수 없습니다.</p>
+      <section className="survey-slot mt-8">
+        <p className="text-sm text-muted">지금은 응답을 불러올 수 없습니다.</p>
       </section>
     );
   }
-  return <SurveyLive initial={results} models={models} />;
+  return <SurveyLive answered={answered} results={results} models={models} />;
 }

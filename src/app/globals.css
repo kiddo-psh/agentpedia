@@ -186,8 +186,12 @@ body {
 html[data-survey-banner="off"] .survey-banner {
   display: none;
 }
-html[data-survey="answered"] .survey-form {
+html[data-survey="answered"] .survey-unanswered {
   display: none;
+}
+/* Returning visitors: the form fallback is hidden before paint, so keep the slot open for the bars. */
+html[data-survey="answered"] .survey-slot {
+  min-height: 40rem;
 }
 
 /* Honeypot: submitted, not shown, not in the tab order. */

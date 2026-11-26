@@ -5,7 +5,7 @@ import { createTestDb, insertUser } from "@/db/testing";
 import { aggregateSurvey } from "./aggregate";
 import { encodeModelIds } from "./codec";
 import { surveyCatalog } from "./options";
-import { listSurveyAnswers, saveSurveyResponse, type SaveSurveyInput } from "./service";
+import { hasSurveyResponse, listSurveyAnswers, saveSurveyResponse, type SaveSurveyInput } from "./service";
 
 let db: Db;
 const visitorA = "3f2c8a1e-4b5d-4c6e-9f70-123456789abc";
@@ -54,6 +54,13 @@ describe("survey responses", () => {
     await saveSurveyResponse(db, input({ userId: "alice" }));
     const [row] = await db.select().from(surveyResponses);
     expect(row?.userId).toBe("alice");
+  });
+
+  it("knows whether this visitor cookie already answered", async () => {
+    expect(await hasSurveyResponse(db, visitorA)).toBe(false);
+    await saveSurveyResponse(db, input());
+    expect(await hasSurveyResponse(db, visitorA)).toBe(true);
+    expect(await hasSurveyResponse(db, visitorB)).toBe(false);
   });
 
   it("aggregates stored rows into groups without hiding the counts", async () => {

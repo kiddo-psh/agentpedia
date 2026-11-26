@@ -32,6 +32,16 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
  * The anonymous visitor ID from the request's cookie, or a fresh one with the `Set-Cookie`
  * value that stores it. The ID is random and carries no personal data.
  */
+/** The visitor cookie if this request already has one. Does not mint a new id. */
+export function existingVisitorId(cookieHeader: string | null): string | null {
+  const sent = cookieHeader
+    ?.split(";")
+    .map((c) => c.trim().split("="))
+    .find(([name]) => name === VISITOR_COOKIE)?.[1];
+  if (sent && UUID.test(sent)) return sent.toLowerCase();
+  return null;
+}
+
 export function visitorId(request: Request): { id: string; setCookie: string | null } {
   const sent = request.headers
     .get("cookie")
