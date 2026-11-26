@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { DeferredMonoFont } from "@/components/DeferredMonoFont";
+import { SURVEY_BOOT_JS } from "@/survey/boot";
 import { LogoLink } from "@/components/LogoLink";
 import { UserMenu } from "@/components/UserMenu";
 import logo from "@/assets/logo.png";
@@ -33,8 +34,9 @@ const brand = (
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ko" className="h-full antialiased">
+    <html lang="ko" className="h-full antialiased" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: SURVEY_BOOT_JS }} />
         <script dangerouslySetInnerHTML={{ __html: shellFontLoader }} />
       </head>
       <body className="flex min-h-full flex-col">
