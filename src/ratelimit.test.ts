@@ -75,11 +75,14 @@ describe("upstashHit", () => {
 });
 
 describe("proxy", () => {
-  it.each(["/mcp", "/api/events"])("runs on %s", (url) => {
-    expect(unstable_doesMiddlewareMatch({ config, url })).toBe(true);
-  });
+  it.each(["/mcp", "/api/events", "/api/survey", "/api/survey/comments", "/api/survey/comments/report", "/api/survey/comments/moderate"])(
+    "runs on %s",
+    (url) => {
+      expect(unstable_doesMiddlewareMatch({ config, url })).toBe(true);
+    },
+  );
 
-  it.each(["/", "/a/some-article", "/api/auth/callback/github", "/api/metrics", "/mcp-guide"])(
+  it.each(["/", "/a/some-article", "/api/auth/callback/github", "/api/metrics", "/mcp-guide", "/api/survey-notes"])(
     "skips %s",
     (url) => {
       expect(unstable_doesMiddlewareMatch({ config, url })).toBe(false);

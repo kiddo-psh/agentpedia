@@ -15,5 +15,5 @@ export async function proxy(request: NextRequest) {
 // Only the public endpoints that run code per request, plus the admin gate.
 // Auth, metrics API, and other pages are not limited.
 export const config = {
-  matcher: ["/mcp", "/api/events", "/admin/:path*"],
+  matcher: ["/mcp", "/api/events", "/api/survey", "/api/survey/:path*", "/admin/:path*"],
 };

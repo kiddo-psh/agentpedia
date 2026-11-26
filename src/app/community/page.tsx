@@ -5,6 +5,7 @@ import { unstable_rethrow } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { listPostPreviews } from "@/community/service";
+import { SURVEY_POST, SURVEY_POST_PATH, SURVEY_POST_PUBLISHED_AT } from "@/survey/post";
 import { listArticleOptions } from "@/content/loader";
 import { getDb } from "@/db/client";
 import { getRenderSession } from "@/lib/auth";
@@ -33,6 +34,18 @@ export default function CommunityPage() {
           <NewPostLink />
         </Suspense>
       </header>
+      <ul className="border-y border-line">
+        <li>
+          <Link href={SURVEY_POST_PATH} prefetch={true} className="block py-5 hover:bg-soft/60">
+            <h2 className="text-lg font-medium tracking-tight">{SURVEY_POST.title}</h2>
+            <p className="mt-1 line-clamp-2 text-sm text-muted">{SURVEY_POST.summary}</p>
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 text-xs text-muted">
+              <span className="font-medium text-foreground">{SURVEY_POST.authorName}</span>
+              <time dateTime={SURVEY_POST_PUBLISHED_AT.toISOString()}>{timeFormat.format(SURVEY_POST_PUBLISHED_AT)}</time>
+            </div>
+          </Link>
+        </li>
+      </ul>
       <Suspense fallback={<p className="text-sm text-muted">불러오는 중…</p>}>
         <PostList />
       </Suspense>
@@ -97,16 +110,10 @@ async function PostList() {
     );
   }
 
-  if (posts.length === 0) {
-    return (
-      <p className="py-16 text-center text-muted">
-        아직 글이 없습니다. 첫 이야기를 남겨 보세요.
-      </p>
-    );
-  }
+  if (posts.length === 0) return null;
 
   return (
-    <ul className="divide-y divide-line border-t border-line">
+    <ul className="divide-y divide-line border-b border-line">
       {posts.map((p) => (
         <li key={p.id}>
           <Link href={`/community/${p.id}`} prefetch={true} className="block py-5 hover:bg-soft/60">

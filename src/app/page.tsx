@@ -12,6 +12,7 @@ import type { ArticleMeta, Category } from "@/content/schema";
 import { getDb } from "@/db/client";
 import { listArticleLikeCounts } from "@/likes/service";
 import { HOME_HERO_LEDE, HOME_HERO_TITLE } from "@/fonts/lcpCopy";
+import { SurveyBanner } from "@/components/survey/SurveyBanner";
 import { ArticleList } from "./ArticleList";
 import "./home.css";
 
@@ -65,6 +66,8 @@ export default function Home({ searchParams }: PageProps<"/">) {
           </Suspense>
         </section>
       )}
+
+      <SurveyBanner />
 
       <section id="articles" className="home-articles mt-20 scroll-mt-24" aria-labelledby="articles-title">
         <h2 id="articles-title" className="text-2xl font-semibold tracking-tight">

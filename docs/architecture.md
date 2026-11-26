@@ -12,12 +12,14 @@
 | `/a/[slug]/kit` | 키트 zip |
 | `/agents`, `/agents/[slug]` | 에이전트. `content/agents/<slug>/facts.yaml`과 `index.mdx` |
 | `/models`, `/models/[slug]` | 모델 비교. `content/models/<slug>/facts.yaml`과 `index.mdx` |
-| `/community`, `/community/new`, `/community/[id]` | 커뮤니티 글 |
+| `/community`, `/community/new`, `/community/[id]` | 커뮤니티 글. 글쓰기는 로그인 |
+| `/community/agent-survey` | 에이전트 사용 설문. 익명 응답, 집계, 익명 댓글 |
 | `/connect` | MCP 연결 안내 |
 | `/login`, `/likes` | GitHub 로그인(로컬은 개발용 이메일 로그인), 좋아요한 글 |
 | `/admin/metrics` | 운영 지표. `METRICS_ADMINS`에 없는 사용자는 `src/proxy.ts`가 404 |
 | `/mcp` | MCP (Streamable HTTP) |
 | `/api/auth/[...all]`, `/api/events`, `/api/metrics`, `/api/suggestions` | 인증, 이벤트, 지표 JSON, 건의 |
+| `/api/survey`, `/api/survey/comments` | 설문 응답, 익명 댓글·신고·관리자 숨김 |
 
 기사 작성 기준은 [writing-guide.md](writing-guide.md)와 [review-rubric.md](review-rubric.md)다. 페이지가 그리는 기사 골격은 30초 요약(`brief`), 본문, 적용 키트다.
 
@@ -49,7 +51,9 @@ content/ideas-sources.yaml
 
 테이블 정의는 `src/db/schema.ts`와 `src/db/auth-schema.ts`, 마이그레이션은 `drizzle/`. 콘텐츠 slug에는 외래 키를 걸지 않는다.
 
-앱 테이블: `comments`(`citation_quote` 포함), `community_posts`, `community_comments`, `likes`, `suggestions`, `events`.
+앱 테이블: `comments`(`citation_quote` 포함), `community_posts`, `community_comments`, `likes`, `suggestions`, `events`, `survey_responses`, `survey_comments`, `survey_comment_reports`.
+
+`survey_responses`는 방문자 쿠키(`ap_vid`)당 한 줄이다. 세션이 있으면 `user_id`를 같이 남긴다. `survey_comments`는 설문 글의 익명 댓글이다. 서로 다른 방문자 3명이 신고하면 숨기고, `METRICS_ADMINS` 관리자는 숨기거나 지울 수 있다. 댓글 본문은 평문으로만 그린다. 응답이 30명 미만이면 공개 페이지는 인원만 보여 주고 항목별 수는 내보내지 않는다.
 
 Better Auth 테이블: `user`, `session`, `account`, `verification`.
 
@@ -66,7 +70,7 @@ Better Auth 테이블: `user`, `session`, `account`, `verification`.
 | tool | `search_articles`, `get_article`, `get_apply_kit` |
 | prompt | `apply_article` |
 
-에이전트·모델 페이지는 이 서버에 없다. `/mcp`와 `/api/events`는 IP당 분당 60회다 (`src/ratelimit.ts`). Upstash 환경 변수가 없으면 제한하지 않는다.
+에이전트·모델 페이지는 이 서버에 없다. `/mcp`, `/api/events`, `/api/survey`는 IP당 분당 60회다 (`src/ratelimit.ts`). Upstash 환경 변수가 없으면 제한하지 않는다.
 
 ## 환경 변수
 

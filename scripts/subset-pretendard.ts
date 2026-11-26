@@ -252,6 +252,7 @@ async function main() {
   scanUiSourceGlyphs(path.join(ROOT, "src/app"), critical);
   scanUiSourceGlyphs(path.join(ROOT, "src/components"), critical);
   scanUiSourceGlyphs(path.join(ROOT, "src/content"), critical);
+  scanUiSourceGlyphs(path.join(ROOT, "src/survey"), critical);
 
   // Content starts as a copy of critical, then gains body/glossary glyphs.
   for (const ch of critical) content.add(ch);

@@ -43,7 +43,7 @@ Production runs on Vercel with Neon Postgres. Pushes to `master` deploy to produ
    | `METRICS_ADMINS` | Production | Comma-separated GitHub numeric user ids (`gh api user --jq .id`). Unset: `/admin/metrics` is dev-only |
    | `SHOW_DRAFTS` | Preview | `1` |
 
-5. Add Upstash for Redis from the Vercel Marketplace and connect it to the project. It sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`, which turn on the rate limit of 60 requests per minute per IP on `/mcp` and `/api/events`. A database created on upstash.com works too: set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` instead. Without either pair, nothing is rate limited.
+5. Add Upstash for Redis from the Vercel Marketplace and connect it to the project. It sets `KV_REST_API_URL` and `KV_REST_API_TOKEN`, which turn on the rate limit of 60 requests per minute per IP on `/mcp`, `/api/events`, and `/api/survey`. A database created on upstash.com works too: set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` instead. Without either pair, nothing is rate limited.
 6. Save the production database URL in `.env.migrate` at the repo root. Copy `DATABASE_URL_UNPOOLED` from Vercel → Storage → `agentpedia-db`:
 
    ```

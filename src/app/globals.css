@@ -181,3 +181,24 @@ body {
     overflow-wrap: anywhere;
   }
 }
+
+/* Home survey banner and the answered form. The head script sets the attributes before paint. */
+html[data-survey-banner="off"] .survey-banner {
+  display: none;
+}
+html[data-survey="answered"] .survey-form {
+  display: none;
+}
+
+/* Honeypot: submitted, not shown, not in the tab order. */
+.survey-hp {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
