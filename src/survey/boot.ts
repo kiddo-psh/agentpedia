@@ -8,7 +8,10 @@ export const SURVEY_STORAGE_KEY = "ap_survey";
  */
 export const SURVEY_DONE_COOKIE = "ap_survey_done";
 
-/** Runs in <head>. Sets html attributes from localStorage and the done cookie. No fetch. */
+/**
+ * Runs in <head> on a full load. Hides the banner before paint, and delegates 닫기
+ * on document so the listener still works after a client-side navigation mounts the card.
+ */
 export const SURVEY_BOOT_JS = `(function () {
   try {
     var key = ${JSON.stringify(SURVEY_STORAGE_KEY)};
@@ -21,19 +24,14 @@ export const SURVEY_BOOT_JS = `(function () {
       document.documentElement.setAttribute("data-survey", "answered");
       try { localStorage.setItem(key, "answered"); } catch (e) {}
     }
+    document.addEventListener("click", function (event) {
+      var node = event.target;
+      if (node && node.nodeType === 3) node = node.parentElement;
+      if (!node || !node.closest || !node.closest("[data-survey-dismiss]")) return;
+      try {
+        if (localStorage.getItem(key) !== "answered") localStorage.setItem(key, "dismissed");
+      } catch (e) {}
+      document.documentElement.setAttribute("data-survey-banner", "off");
+    });
   } catch (e) {}
-})();`;
-
-/** Binds the dismiss control that sits immediately before this script. */
-export const SURVEY_DISMISS_JS = `(function () {
-  var root = document.currentScript && document.currentScript.previousElementSibling;
-  var btn = root && root.querySelector("[data-survey-dismiss]");
-  if (!btn) return;
-  btn.addEventListener("click", function () {
-    try {
-      var key = ${JSON.stringify(SURVEY_STORAGE_KEY)};
-      if (localStorage.getItem(key) !== "answered") localStorage.setItem(key, "dismissed");
-    } catch (e) {}
-    document.documentElement.setAttribute("data-survey-banner", "off");
-  });
 })();`;

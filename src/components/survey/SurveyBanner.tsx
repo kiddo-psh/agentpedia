@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { SURVEY_DISMISS_JS } from "@/survey/boot";
 import { SURVEY_POST_PATH } from "@/survey/post";
 
 /** Static home card. A head script hides it before paint when the visitor dismissed or answered. */
@@ -30,7 +29,6 @@ export function SurveyBanner() {
           </button>
         </div>
       </div>
-      <script dangerouslySetInnerHTML={{ __html: SURVEY_DISMISS_JS }} />
     </section>
   );
 }

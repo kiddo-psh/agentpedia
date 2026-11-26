@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { listModels } from "@/content/models";
-import { SURVEY_BOOT_JS, SURVEY_DISMISS_JS } from "./boot";
+import { SURVEY_BOOT_JS } from "./boot";
 import { containsLink } from "./links";
 import { publicOrigin, rejectsCrossSite } from "./http";
 import { MAX_OTHER_LENGTH } from "./limits";
@@ -120,9 +120,9 @@ describe("parseSurveyFields", () => {
 });
 
 describe("survey boot script", () => {
-  it("parses as a script", () => {
+  it("parses as a script and keeps the dismiss listener on document", () => {
     expect(() => new Function(SURVEY_BOOT_JS)).not.toThrow();
-    expect(() => new Function(SURVEY_DISMISS_JS)).not.toThrow();
+    expect(SURVEY_BOOT_JS).toContain('closest("[data-survey-dismiss]")');
   });
 });
 
