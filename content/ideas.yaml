@@ -110,20 +110,6 @@
   primaryVerified: true
   confidence: high
   status: idea
-- slug: ship-show-ask-agent-review
-  topic: Sourcegraph는 모든 PR에 사람 승인을 요구하는 대신 에이전트가 Ship·Show·Ask로 리뷰 필요성을 분류하게 했다
-  category: people
-  people:
-    - Constantin Nicolae (Sourcegraph, PR approval bot 실험 글 저자)
-  sources:
-    - https://sourcegraph.com/blog/what-we-learned-building-a-pr-approval-bot
-  publishedAt: 2026-11-10
-  sourceKind: blog
-  tension: AI 코드가 늘수록 모든 변경에 사람 리뷰를 더 강하게 걸어야 한다는 반응과 달리, Sourcegraph는 위험도와 작성자의 해당 컴포넌트 친숙도를 근거로 일부 리뷰를 사후로 보내거나 생략하는 실험을 했다.
-  kitIdea: 한 레포에서 Ship·Show·Ask 정책을 shadow mode로 먼저 돌리고, 최근 30일 관련 기여와 리뷰된 PR 수를 familiarity 신호로 쓰되 auth·sensitive-data 변경은 항상 Ask로 고정한다.
-  primaryVerified: true
-  confidence: high
-  status: idea
 - slug: factory-programmatic-tool-calling
   topic: Factory는 긴 코딩 세션의 핵심 최적화를 모델 교체가 아니라 '프로그램 안에서 여러 도구를 호출하게 하는 harness'로 잡았다
   category: startup

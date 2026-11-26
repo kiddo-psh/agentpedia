@@ -1,0 +1,146 @@
+---
+slug: ship-show-ask-agent-review
+title: "Constantin Nicolae가 Sourcegraph PR 리뷰를 Ship, Show, Ask로 나눈 실험"
+summary: "2026년 11월 10일 Constantin Nicolae는 Sourcegraph의 작은 PR 도장 요청을 적었습니다. 합치기 전 승인 한 칸을 Ship, Show, Ask로 나누고, 승인보다 추천과 근거를 먼저 다듬은 실험과 그 한계를 정리합니다."
+category: people
+people: [constantin-nicolae, rouan-wilsenach]
+tags: ["code-review", "pull-request", "github-actions", "agents"]
+difficulty: practical
+brief:
+  what: "2026년 11월 10일 Constantin Nicolae는 Sourcegraph의 작은 PR 도장 요청을 Ship, Show, Ask로 나누는 실험을 적었습니다."
+  why: "에이전트가 변경을 늘리면 리뷰가 병목이 됩니다. 기대가 다른 변경이 같은 사전 승인을 지나면 일상 수정도 그 줄을 섭니다."
+  action: "키트가 최근 PR을 Ship, Show, Ask로 나눠 근거와 함께 보여 줍니다. 승인 설정은 바꾸지 않습니다."
+apply:
+  goal: "최근 PR을 Ship·Show·Ask로 나눠 근거와 함께 보고서로 남기고, 승인 설정은 바꾸지 않습니다."
+  changes:
+    - "승인하면 `docs/review-routing.md`에 최근 PR의 경로, 확인한 근거, 확인하지 못한 항목, 항상 Ask로 둘 경로를 적습니다. 같은 파일이 있으면 덮어쓰지 않고 `docs/review-routing-2.md`를 씁니다."
+    - "보고서는 읽기 명령으로 확인한 내용만 담습니다. Ship은 diff를 읽어 인증 검사나 민감 데이터 노출이 아닌 경우에만 적고, 확인하지 못하면 Ask입니다. 분류가 Ship이어도 GitHub 승인, 댓글, 머지는 하지 않습니다."
+  doesNotDo:
+    - "브랜치 보호, 필수 리뷰, 자동 머지, CODEOWNERS, 애플리케이션 코드, 워크플로를 수정하지 않습니다."
+    - "PR에 댓글을 달거나 승인하거나 머지하지 않습니다. 토큰 값은 읽거나 적지 않습니다."
+    - "설치, 빌드, 배포, 포맷, 스냅샷 갱신, git commit을 하지 않습니다."
+  fitsWhen: "최근 머지된 PR이나 커밋 이력을 읽을 수 있는 Git 저장소"
+  time: "20~40분"
+tryIt: "이 레포가 git인지 봐 줘. gh가 되면 최근 머지 PR 10개의 번호, 제목, 작성자, 바꾼 경로만 읽고, 안 되면 git log --oneline -10만 써. 경로에 auth, secret, credential, token, password, pii가 있으면 표시만 해. Ship, Show, Ask로 나누지 마. 표로 정리해. 읽기 명령만 쓰고 아무 파일도 바꾸지 마."
+draft: false
+publishedAt: 2026-11-27
+keyIdeas:
+  - "Sourcegraph는 작은 PR마다 사람을 찾아 도장을 받던 절차를 Ship, Show, Ask로 나누는 실험을 시작했습니다."
+  - "2021년 Rouan Wilsenach 글에서 경로를 고르는 사람은 작성자입니다. Nicolae의 실험은 에이전트의 근거와 애플리케이션 코드의 규칙이 경로를 고르게 합니다."
+  - "처음에는 추천만 올렸고 사람 리뷰는 그대로 두었습니다. 그 단계는 조건에 맞는 변경의 승인을 켜기 전에 결정을 반박할 자리였습니다."
+  - "컴포넌트 친숙함의 현재 기준은 다른 사람이 리뷰한 뒤 합쳐진 PR 두 개와, 최근 30일의 코드·테스트·기술 문서 기여입니다."
+  - "인증 검사나 민감 데이터가 드러나는 방식의 변경은 경험과 상관없이 리뷰가 필요합니다."
+  - "빠른 도장 요청이 줄었다고 해서 리뷰 품질이 좋아진 것은 아닙니다. Nicolae는 이 시도를 사내 실험으로 둡니다."
+sources:
+  - id: sourcegraph-pr-routing
+    title: "Keeping code moving with clearer review expectations"
+    url: https://sourcegraph.com/blog/what-we-learned-building-a-pr-approval-bot
+    author: Constantin Nicolae
+    kind: blog
+    publishedAt: 2026-11-10
+  - id: ship-show-ask
+    title: "Ship / Show / Ask"
+    url: https://martinfowler.com/articles/ship-show-ask.html
+    author: Rouan Wilsenach
+    kind: blog
+    publishedAt: 2021-09-08
+  - id: baum-review-simulation
+    title: "Comparing pre-commit reviews and post-commit reviews using process simulation"
+    url: https://research.uni-hannover.de/en/publications/comparing-pre-commit-reviews-and-post-commit-reviews-using-proces/
+    author: Tobias Baum, Fabian Kortum, Kurt Schneider, Arthur Brack, Jens Schauder
+    kind: paper
+    publishedAt: 2017-11-08
+  - id: meta-radar
+    title: "Automating Low-Risk Code Review at Meta: RADAR, Risk Calibration, and Review Efficiency"
+    url: https://arxiv.org/abs/2605.30208
+    author: Chris Adams et al.
+    kind: paper
+    publishedAt: 2026-06-12
+---
+
+2026년 11월 10일, 기업용 코드 이해 플랫폼 Sourcegraph의 작은 PR은 도장으로 움직였습니다. 누군가 도장을 부탁하면 손이 빈 동료가 찍었습니다.
+
+<Quote source="sourcegraph-pr-routing">
+Can someone stamp this?
+</Quote>
+
+도장을 찍어 달라는 부탁입니다. 그 부탁은 작은 변경을 계속 움직이게 했습니다. 다만 요청마다 사람을 찾고, 그 사람의 하던 일을 끊었습니다.
+
+## 한 승인 칸에 다른 기대가 들어간다
+
+코딩 에이전트가 코드를 더 만들자 병목은 리뷰에 생겼습니다. 변경을 쓰는 시간은 줄었습니다. 그 변경이 무엇을 하는지 이해하고, 내보내도 되는지를 정하는 시간은 그대로였습니다.
+
+Sourcegraph의 GitHub 설정은 합치기 전에 승인을 요구했습니다. 일상적인 수정과 토론이 필요한 수정이 같은 칸을 지났습니다. 리뷰에 거는 기대는 달랐고, 절차는 하나였습니다. Constantin Nicolae는 이 실험을 블로그에 적었습니다. 기대를 칸마다 분명히 적고, 일상적인 승인을 쫓는 시간을 줄이려 했습니다. 이름의 영어 표기는 PR routing 실험입니다. 기대가 다른 변경을 서로 다른 <Term id="review-routing">리뷰 경로</Term>로 보내는 일이었습니다.
+
+## 경로는 셋이고 고르는 자리가 바뀐다
+
+2021년 9월 8일 Rouan Wilsenach은 Martin Fowler 사이트에 <Term id="ship-show-ask">Ship/Show/Ask</Term>를 올렸습니다. Wilsenach은 소프트웨어 엔지니어이자 기술 리더이고, Thoughtworks 컨설턴트 경력이 있습니다. 변경을 할 때마다 작성자가 경로를 고릅니다.
+
+Ship은 메인라인에 바로 넣습니다. 코드 리뷰를 청하지 않습니다. Wilsenach의 글에서 이 경로는 지속적 통합과 가장 닮습니다. Show는 PR을 연 뒤 사람의 피드백을 기다리지 않고 합칩니다. 테스트 같은 자동 검사는 기다립니다. Ask는 피드백이 오기 전에 합치지 않습니다.
+
+<Quote source="ship-show-ask">
+People get to merge their own Pull Requests. This way they’re in control of whether their change is a “Show” or an “Ask”, and they can decide when it goes live.
+</Quote>
+
+자기 PR을 합칠 수 있어야 Show와 Ask를 작성자가 고르고, 언제 내보낼지도 작성자가 정합니다. 그 글의 규칙에는 코드 리뷰, 곧 승인을 PR 병합의 필수 조건으로 두지 않는 항목이 있습니다.
+
+Nicolae의 글은 같은 구분을 씁니다. Sourcegraph 글이 적은 뜻은 셋입니다.
+
+- Ship은 정책상 추가 리뷰가 필요 없습니다.
+- Show는 누군가가 변경을 봐야 하지만, 리뷰는 <Term id="post-merge-review">합친 뒤 리뷰</Term>여도 됩니다.
+- Ask는 합치기 전에 누군가의 리뷰가 필요합니다.
+
+<KeyIdea title="Show는 리뷰를 없애지 않는다">
+Show는 사람 리뷰를 지우는 경로가 아닙니다. 합친 뒤에 누군가가 본다는 전제로, 합치기 전의 기다림만 뺍니다.
+</KeyIdea>
+
+고르는 자리가 바뀝니다. 에이전트가 diff와 주변 코드를 보고 규칙에 비춥니다. 경로를 고를 근거는 에이전트가 내고, 경로 자체는 애플리케이션 코드의 규칙이 고릅니다.
+
+바로 승인하지 않았습니다. 처음에는 추천만 올렸고, 사람 리뷰는 그대로 이어졌습니다. 피드백으로 규칙과 친숙함의 근거를 다듬고, 영향받은 추천을 다시 대조했습니다. 이 단계는 조건에 맞는 변경의 승인을 켜기 전에, 봇의 결정을 들여다보고 반박하는 방법이었습니다.
+
+<Compare
+  before="일상 수정도 토론이 필요한 수정도 합치기 전 승인 하나를 지납니다."
+  after="추가 리뷰가 없는 Ship, 합친 뒤 보는 Show, 합치기 전 리뷰인 Ask로 나눕니다."
+/>
+
+## 친숙함은 그 컴포넌트의 최근 기록이다
+
+에이전트는 PR의 diff, 관련 코드, 작성자의 이전 기여를 봅니다. 근거가 붙은 발견을 돌려주면, 애플리케이션 코드가 규칙을 적용해 경로를 고르고 PR에 결과를 올립니다. 워크플로는 GitHub Actions에서 돕니다.
+
+컴포넌트마다 보는 현재 정책은 두 조건을 같이 요구합니다. 다른 사람이 리뷰한 뒤 합쳐진 PR이 두 개 있어야 합니다. 최근 30일 안에 코드, 테스트, 기술 문서 가운데 하나로 그 컴포넌트에 기여가 있어야 합니다.
+
+규칙은 변경의 내용과 그 컴포넌트에 대한 친숙함을 같이 봅니다. 인증 검사를 바꾸거나 민감 데이터가 드러나는 방식을 바꾸는 변경은, 경험이 있어도 리뷰가 필요합니다.
+
+사람 리뷰가 필요하면 Sourcegraph의 Compare 페이지에서 diff를 보고 주변 코드로 이동합니다. 봇은 다른 사람이 언제 봐야 하는지를 고릅니다. Compare는 그 변경을 이해하는 자리입니다.
+
+## 보이는 근거가 다음 규칙이 된다
+
+리뷰가 하는 일이 하나로 모이지 않았습니다. 문제를 잡을 수도 있고, 맥락을 나눌 수도 있고, 고객에게 말하는 내용이 맞는지 볼 수도 있습니다. 목적을 적어 두니, 다른 사람의 시간이 언제 필요한지가 갈렸습니다.
+
+친숙함에도 경계가 필요했습니다. 기여 이력은 근거가 됩니다. 그 경험이 지금 바뀌는 코드와 얼마나 가까운지는 따로 봐야 합니다.
+
+<Quote source="sourcegraph-pr-routing">
+Working in one part of a system doesn't imply familiarity with all of it.
+</Quote>
+
+한 부분을 다뤘다는 이유만으로 시스템 전체를 아는 셈 치지 않습니다. 추천의 이유가 보이자 가정이 보였습니다. 규칙이 틀린지 평가가 틀린지 가를 수 있었고, 그 피드백이 정책을 다듬는 과정에 들어갔습니다.
+
+봇도 시간을 씁니다. 댓글과 반복된 평가는 방해가 될 수 있습니다. 언제 말하고, 언제 내용을 고치고, 언제 조용히 있을지는 워크플로를 설계하는 일의 일부입니다.
+
+## 도장 요청이 줄어도 품질은 모른다
+
+빠른 도장을 부탁하는 요청은 줄었습니다. Nicolae는 그 변화를 반가운 일로 적습니다. 그래도 이 시도는 사내 실험으로 남아 있습니다. 다음에 보려는 것은, 함께 일하는 방식이 어떻게 바뀌는지입니다.
+
+Show는 기다림을 뺍니다. 그 자리는 합친 뒤에 누군가가 돌아온다는 전제입니다. 그 변경이 쓸모 있는 관심을 받는지, 작성자와 리뷰어가 지나간 뒤에도 동료가 내용을 아는지는 아직 열려 있습니다.
+
+봇이 만드는 방해도 계산에 넣어야 하고, 사람과 코드가 바뀌면 친숙함도 다시 재야 합니다.
+
+<Quote source="sourcegraph-pr-routing">
+Fewer stamp requests tell us little about review quality.
+</Quote>
+
+도장 요청이 줄었는지는 리뷰 품질과 별개입니다. Nicolae의 글은 커밋 전 리뷰와 커밋 후 리뷰를 비교한 시뮬레이션을 옆에 둡니다. 손익은 개발 맥락에 달렸다는 요약입니다. Tobias Baum 등이 2017년 11월 8일에 낸 논문의 초록은 거기에 더해, 실무적으로 차이가 없는 상황도 많다고 밝힙니다. 같은 글은 2026년 Meta의 RADAR 프리프린트도 소개합니다. 위험 검사가 넣기 전 사람 리뷰, 나중으로 미룬 리뷰, 자동 승인 가운데 하나를 고른다는 내용입니다.
+
+후속 글은 합친 뒤의 리뷰와 봇의 방해를 다루기로 남겨 두었습니다.
+
+이 변경은 합치기 전에 사람이 봐야 하는가, 본 뒤에 합쳐도 되는가. 근거를 적지 못하면 칸은 다시 하나가 됩니다. 도장이 줄었다는 소식은 그 답이 맞다는 증거가 아닙니다.
