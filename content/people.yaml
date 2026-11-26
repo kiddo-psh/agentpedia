@@ -126,3 +126,13 @@
   name: Simon Willison
   nameKo: 사이먼 윌리슨
   role: Datasette를 만들고 Django를 공동 개발한 사람
+
+- id: constantin-nicolae
+  name: Constantin Nicolae
+  nameKo: 콘스탄틴 니콜라에
+  role: Sourcegraph 블로그에 PR 라우팅 실험을 쓴 사람
+
+- id: rouan-wilsenach
+  name: Rouan Wilsenach
+  nameKo: 루안 윌서나흐
+  role: 소프트웨어 엔지니어이자 기술 리더, Ship/Show/Ask 글 저자

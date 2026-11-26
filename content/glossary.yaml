@@ -471,3 +471,17 @@
   term: 프롬프트 캐싱
   en: prompt caching
   definition: 요청의 앞부분이 이전 턴과 같으면 모델 제공자가 그 접두를 다시 계산하지 않고 재사용하는 기법입니다.
+
+- id: ship-show-ask
+  term: Ship/Show/Ask
+  definition: 변경마다 리뷰를 세 경로로 나누는 구분입니다. Ship은 리뷰 없이 메인라인에 넣고, Show는 PR을 연 뒤 바로 합치며, Ask는 피드백 전에 합치지 않습니다.
+
+- id: review-routing
+  term: 리뷰 경로
+  en: review routing
+  definition: 변경 내용과 작성자의 친숙함을 보고, 추가 리뷰 없이 둘지 합친 뒤 볼지 합치기 전에 볼지 고르는 일입니다.
+
+- id: post-merge-review
+  term: 합친 뒤 리뷰
+  en: post-merge review
+  definition: 변경을 먼저 합치고, 사람의 검토는 그 뒤에 하는 리뷰입니다.
