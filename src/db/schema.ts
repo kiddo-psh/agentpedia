@@ -177,6 +177,8 @@ export const surveyComments = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     postSlug: text("post_slug").notNull(),
+    /** Null on a top-level comment. A reply points at a top-level comment, never at another reply. */
+    parentId: uuid("parent_id").references((): AnyPgColumn => surveyComments.id, { onDelete: "cascade" }),
     visitorId: uuid("visitor_id").notNull(),
     nickname: text("nickname").notNull(),
     body: text("body").notNull(),

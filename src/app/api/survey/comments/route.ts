@@ -11,6 +11,7 @@ async function readComment(request: Request) {
       json,
       nickname: typeof raw?.nickname === "string" ? raw.nickname : "",
       body: typeof raw?.body === "string" ? raw.body : "",
+      parentId: typeof raw?.parentId === "string" ? raw.parentId : "",
       company:
         typeof raw?.survey_hp === "string" ? raw.survey_hp : typeof raw?.company === "string" ? raw.company : "",
     };
@@ -20,6 +21,7 @@ async function readComment(request: Request) {
     json,
     nickname: String(form.get("nickname") ?? ""),
     body: String(form.get("body") ?? ""),
+    parentId: String(form.get("parentId") ?? ""),
     company: String(form.get("survey_hp") ?? ""),
   };
 }
@@ -27,13 +29,14 @@ async function readComment(request: Request) {
 export async function POST(request: Request) {
   if (rejectsCrossSite(request)) return new Response(null, { status: 403 });
   const visitor = visitorId(request);
-  const { json, nickname, body, company } = await readComment(request);
+  const { json, nickname, body, company, parentId } = await readComment(request);
   try {
     const result = await createSurveyComment(await getDb(), {
       visitorId: visitor.id,
       nickname,
       body,
       company,
+      parentId,
     });
     if (!result.ok) {
       return json

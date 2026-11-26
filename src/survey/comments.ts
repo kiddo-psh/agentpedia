@@ -47,7 +47,7 @@ export function parseCommentDraft(input: { nickname: string; body: string; compa
 
 export async function createSurveyComment(
   db: Db,
-  input: { visitorId: string; nickname: string; body: string; company: string; postSlug?: string },
+  input: { visitorId: string; nickname: string; body: string; company: string; postSlug?: string; parentId?: string | null },
   now = new Date(),
 ): Promise<{ ok: true; dropped: boolean; id?: string } | { ok: false; code: CommentCode; error: string }> {
   const draft = parseCommentDraft(input);
@@ -55,6 +55,26 @@ export async function createSurveyComment(
   if (draft.dropped) return { ok: true, dropped: true };
   if ((input.postSlug ?? SURVEY_POST.slug) !== SURVEY_POST.slug) {
     return { ok: false, code: "invalid", error: "글을 찾을 수 없습니다." };
+  }
+
+  const parentId = input.parentId?.trim() || null;
+  if (parentId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(parentId)) {
+    return { ok: false, code: "invalid", error: "답글을 달 댓글을 찾을 수 없습니다." };
+  }
+  if (parentId) {
+    const [parent] = await db
+      .select({
+        id: surveyComments.id,
+        parentId: surveyComments.parentId,
+        deletedAt: surveyComments.deletedAt,
+        postSlug: surveyComments.postSlug,
+      })
+      .from(surveyComments)
+      .where(eq(surveyComments.id, parentId));
+    if (!parent || parent.deletedAt || parent.postSlug !== SURVEY_POST.slug) {
+      return { ok: false, code: "invalid", error: "답글을 달 댓글을 찾을 수 없습니다." };
+    }
+    if (parent.parentId) return { ok: false, code: "invalid", error: "답글에는 다시 답글을 달 수 없습니다." };
   }
 
   const since = new Date(now.getTime() - HOUR_MS);
@@ -71,6 +91,7 @@ export async function createSurveyComment(
     .values({
       postSlug: SURVEY_POST.slug,
       visitorId: input.visitorId,
+      parentId,
       nickname: draft.nickname,
       body: draft.body,
       createdAt: now,
@@ -82,19 +103,25 @@ export async function createSurveyComment(
 export type SurveyCommentView = {
   id: string;
   nickname: string;
-  body: string;
+  /** Null when the public page shows a placeholder instead of the body. */
+  body: string | null;
   createdAt: Date;
   hidden: boolean;
   hiddenReason: string | null;
+  /** Public stand-in for a hidden root that still has visible replies. */
+  placeholder: boolean;
 };
+
+export type SurveyThread = SurveyCommentView & { replies: SurveyCommentView[] };
 
 export async function listSurveyComments(
   db: Db,
   opts: { includeHidden: boolean },
-): Promise<SurveyCommentView[]> {
+): Promise<SurveyThread[]> {
   const rows = await db
     .select({
       id: surveyComments.id,
+      parentId: surveyComments.parentId,
       nickname: surveyComments.nickname,
       body: surveyComments.body,
       createdAt: surveyComments.createdAt,
@@ -102,23 +129,37 @@ export async function listSurveyComments(
       hiddenReason: surveyComments.hiddenReason,
     })
     .from(surveyComments)
-    .where(
-      and(
-        eq(surveyComments.postSlug, SURVEY_POST.slug),
-        isNull(surveyComments.deletedAt),
-        opts.includeHidden ? undefined : isNull(surveyComments.hiddenAt),
-      ),
-    )
+    .where(and(eq(surveyComments.postSlug, SURVEY_POST.slug), isNull(surveyComments.deletedAt)))
     .orderBy(surveyComments.createdAt);
 
-  return rows.map((row) => ({
+  const view = (row: (typeof rows)[number], placeholder: boolean): SurveyCommentView => ({
     id: row.id,
     nickname: row.nickname,
-    body: row.body,
+    body: placeholder ? null : row.body,
     createdAt: row.createdAt,
     hidden: row.hiddenAt !== null,
     hiddenReason: row.hiddenReason,
-  }));
+    placeholder,
+  });
+
+  const replies = new Map<string, SurveyCommentView[]>();
+  for (const row of rows) {
+    if (!row.parentId) continue;
+    if (!opts.includeHidden && row.hiddenAt) continue;
+    const list = replies.get(row.parentId) ?? [];
+    list.push(view(row, false));
+    replies.set(row.parentId, list);
+  }
+
+  const threads: SurveyThread[] = [];
+  for (const row of rows) {
+    if (row.parentId) continue;
+    const children = replies.get(row.id) ?? [];
+    const placeholder = !opts.includeHidden && row.hiddenAt !== null;
+    if (placeholder && children.length === 0) continue;
+    threads.push({ ...view(row, placeholder), replies: children });
+  }
+  return threads;
 }
 
 export async function reportSurveyComment(

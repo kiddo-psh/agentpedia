@@ -56,7 +56,9 @@ describe("survey comments", () => {
     );
     expect(dropped).toEqual({ ok: true, dropped: true });
     const comments = await listSurveyComments(db, { includeHidden: false });
-    expect(comments.map((comment) => [comment.nickname, comment.body])).toEqual([["익명", "<b>안녕</b>"]]);
+    expect(comments.map((comment) => [comment.nickname, comment.body, comment.replies])).toEqual([
+      ["익명", "<b>안녕</b>", []],
+    ]);
   });
 
   it("caps how many comments one visitor can post in an hour", async () => {
@@ -106,6 +108,43 @@ describe("survey comments", () => {
     const hidden = await listSurveyComments(db, { includeHidden: true });
     expect(hidden).toHaveLength(1);
     expect(hidden[0]).toMatchObject({ body: "첫 댓글", hidden: true, hiddenReason: "reports" });
+  });
+
+  it("nests one level of replies and keeps them when the parent is hidden", async () => {
+    const root = await createSurveyComment(db, { visitorId: visitor, nickname: "민수", body: "질문", company: "" }, now);
+    if (!root.ok || root.dropped || !root.id) throw new Error("expected a comment");
+    const reply = await createSurveyComment(
+      db,
+      { visitorId: visitor, nickname: "", body: "답", company: "", parentId: root.id },
+      new Date(now.getTime() + 1000),
+    );
+    expect(reply).toMatchObject({ ok: true, dropped: false });
+    if (!reply.ok || reply.dropped || !reply.id) throw new Error("expected a reply");
+    expect(
+      await createSurveyComment(db, { visitorId: visitor, nickname: "", body: "대댓글", company: "", parentId: reply.id }, now),
+    ).toMatchObject({ ok: false, code: "invalid" });
+
+    const [thread] = await listSurveyComments(db, { includeHidden: false });
+    expect(thread?.replies.map((item) => item.body)).toEqual(["답"]);
+
+    await moderateSurveyComment(db, { id: root.id, op: "hide", isAdmin: true }, now);
+    const [hidden] = await listSurveyComments(db, { includeHidden: false });
+    expect(hidden).toMatchObject({ placeholder: true, body: null });
+    expect(hidden?.replies.map((item) => item.body)).toEqual(["답"]);
+
+    const other = "dddddddd-dddd-4ddd-8ddd-dddddddddddd";
+    for (let i = 0; i < COMMENTS_PER_HOUR; i++) {
+      expect(
+        await createSurveyComment(
+          db,
+          { visitorId: other, nickname: "", body: `추가 ${i}`, company: "", parentId: root.id },
+          now,
+        ),
+      ).toMatchObject({ ok: true, dropped: false });
+    }
+    expect(
+      await createSurveyComment(db, { visitorId: other, nickname: "", body: "한도", company: "", parentId: root.id }, now),
+    ).toMatchObject({ ok: false, code: "rate" });
   });
 
   it("lets an admin hide or delete, and refuses everyone else", async () => {
