@@ -20,9 +20,12 @@ export type SurveyCatalog = {
   tenures: readonly SurveyOption[];
 };
 
-/** Highest count first. Ties keep a stable label order so a render does not shuffle. */
-export function sortedByCount<T extends { count: number; label: string }>(items: readonly T[]): T[] {
-  return [...items].sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, "ko"));
+/** Highest count first. Ties keep the catalog order so an empty chart does not reshuffle. */
+export function sortedByCount<T extends { count: number }>(items: readonly T[]): T[] {
+  return items
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) => b.item.count - a.item.count || a.index - b.index)
+    .map(({ item }) => item);
 }
 
 /** The leading row, or null when every count is zero. */

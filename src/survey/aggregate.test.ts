@@ -23,13 +23,13 @@ function answer(partial: Partial<SurveyAnswer> = {}): SurveyAnswer {
 }
 
 describe("sortedByCount", () => {
-  it("orders by count and keeps a stable label order on ties", () => {
+  it("orders by count and keeps the original order on ties", () => {
     const ranked = sortedByCount([
-      { count: 1, label: "나" },
-      { count: 3, label: "가" },
       { count: 1, label: "다" },
+      { count: 3, label: "가" },
+      { count: 1, label: "나" },
     ]);
-    expect(ranked.map((item) => item.label)).toEqual(["가", "나", "다"]);
+    expect(ranked.map((item) => item.label)).toEqual(["가", "다", "나"]);
     expect(leadingBucket(ranked)?.label).toBe("가");
     expect(leadingBucket([{ count: 0, label: "가" }])).toBeNull();
   });
