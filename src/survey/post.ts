@@ -3,8 +3,7 @@ export const SURVEY_POST = {
   slug: "agent-survey",
   title: "1분 설문: 어떤 에이전트 쓰세요?",
   authorName: "Agentpedia",
-  summary:
-    "주로 쓰는 에이전트, 모델, 용도, 사용 기간을 묻습니다. 30명이 모이면 결과를 공개합니다.",
+  summary: "주로 쓰는 에이전트, 모델, 용도, 사용 기간을 묻습니다. 응답 비율은 바로 이 글에 나옵니다.",
 } as const;
 
 /** Publication date of the post itself. Asia/Seoul midnight, the day the post shipped. */

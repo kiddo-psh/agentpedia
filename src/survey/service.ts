@@ -1,5 +1,7 @@
 import type { Db } from "@/db/client";
 import { surveyResponses } from "@/db/schema";
+import { aggregateSurvey, type SurveyCatalog, type SurveyResults } from "./aggregate";
+import { decodeModelIds, encodeModelIds } from "./codec";
 import type { SurveyAnswer } from "./validate";
 
 export type SaveSurveyInput = SurveyAnswer & {
@@ -19,7 +21,7 @@ export async function saveSurveyResponse(
       userId: input.userId ?? null,
       agents: input.agents,
       agentOther: input.agentOther,
-      model: input.model,
+      model: encodeModelIds(input.models),
       modelOther: input.modelOther,
       uses: input.uses,
       useOther: input.useOther,
@@ -42,5 +44,17 @@ export async function listSurveyAnswers(db: Db): Promise<SurveyAnswer[]> {
       tenure: surveyResponses.tenure,
     })
     .from(surveyResponses);
-  return rows;
+  return rows.map((row) => ({
+    agents: row.agents,
+    agentOther: row.agentOther,
+    models: decodeModelIds(row.model),
+    modelOther: row.modelOther,
+    uses: row.uses,
+    useOther: row.useOther,
+    tenure: row.tenure,
+  }));
+}
+
+export async function loadSurveyResults(db: Db, catalog: SurveyCatalog): Promise<SurveyResults> {
+  return aggregateSurvey(await listSurveyAnswers(db), catalog);
 }
