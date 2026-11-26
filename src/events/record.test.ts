@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { events } from "@/db/schema";
 import { createTestDb } from "@/db/testing";
-import { recordEvent, VISITOR_COOKIE_MAX_AGE, visitorHash, visitorId } from "./record";
+import { existingVisitorId, recordEvent, VISITOR_COOKIE_MAX_AGE, visitorHash, visitorId } from "./record";
 
 const h = (init: Record<string, string>) => new Headers(init);
 
@@ -30,6 +30,12 @@ describe("visitorHash", () => {
 describe("visitorId", () => {
   const id = "3f2c8a1e-4b5d-4c6e-9f70-123456789abc";
   const req = (url: string, cookie?: string) => new Request(url, { headers: cookie ? { cookie } : {} });
+
+  it("reads an existing visitor cookie without minting one", () => {
+    expect(existingVisitorId(null)).toBeNull();
+    expect(existingVisitorId("ap_vid=not-a-uuid")).toBeNull();
+    expect(existingVisitorId(`theme=dark; ap_vid=${id}`)).toBe(id);
+  });
 
   it("reuses the ID from the cookie without setting it again", () => {
     expect(visitorId(req("https://x.test/api/events", `theme=dark; ap_vid=${id}`))).toEqual({ id, setCookie: null });

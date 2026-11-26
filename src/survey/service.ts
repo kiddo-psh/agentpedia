@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import type { Db } from "@/db/client";
 import { surveyResponses } from "@/db/schema";
 import { aggregateSurvey, type SurveyCatalog, type SurveyResults } from "./aggregate";
@@ -57,4 +58,13 @@ export async function listSurveyAnswers(db: Db): Promise<SurveyAnswer[]> {
 
 export async function loadSurveyResults(db: Db, catalog: SurveyCatalog): Promise<SurveyResults> {
   return aggregateSurvey(await listSurveyAnswers(db), catalog);
+}
+
+export async function hasSurveyResponse(db: Db, visitorId: string): Promise<boolean> {
+  const [row] = await db
+    .select({ id: surveyResponses.id })
+    .from(surveyResponses)
+    .where(eq(surveyResponses.visitorId, visitorId))
+    .limit(1);
+  return Boolean(row);
 }

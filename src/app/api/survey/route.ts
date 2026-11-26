@@ -21,6 +21,12 @@ async function readFields(request: Request) {
   return { json, fields: fieldsFromForm(await request.formData()) };
 }
 
+/** Aggregate for the "응답 보기" button. Not included in the page HTML. */
+export async function GET() {
+  const results = await loadSurveyResults(await getDb(), surveyCatalog());
+  return Response.json({ results });
+}
+
 /** One anonymous response per visitor cookie. Form posts redirect; JSON posts return the result. */
 export async function POST(request: Request) {
   if (rejectsCrossSite(request)) return new Response(null, { status: 403 });
