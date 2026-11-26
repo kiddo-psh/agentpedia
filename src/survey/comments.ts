@@ -149,6 +149,19 @@ export async function reportSurveyComment(
   }
 
   return db.transaction(async (tx) => {
+    // Lock the comment so concurrent reports count each other's inserts before deciding to hide.
+    const [locked] = await tx
+      .select({
+        id: surveyComments.id,
+        hiddenAt: surveyComments.hiddenAt,
+        deletedAt: surveyComments.deletedAt,
+      })
+      .from(surveyComments)
+      .where(eq(surveyComments.id, input.commentId))
+      .for("update");
+    if (!locked || locked.deletedAt) return { ok: false as const, code: "missing" as const, error: "댓글을 찾을 수 없습니다." };
+    if (locked.hiddenAt) return { ok: true as const, hidden: true };
+
     await tx
       .insert(surveyCommentReports)
       .values({ commentId: input.commentId, visitorId: input.visitorId, createdAt: now })
