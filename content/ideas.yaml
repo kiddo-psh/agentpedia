@@ -125,20 +125,6 @@
   confidence: high
   status: idea
   note: 같은 모델에서 harness만 바꾼 수치에 집중한다.
-- slug: frontiercode-more-reasoning-can-hurt
-  topic: Cognition의 새 벤치마크에서는 reasoning effort를 올릴수록 코드를 더 건드려 오히려 실패하는 경우가 나타났다
-  category: trends
-  people:
-    - The Cognition Team (FrontierCode 2.0 연구·평가 팀)
-  sources:
-    - https://cognition.com/blog/frontier-code-2.0
-  publishedAt: 2026-10-27
-  sourceKind: blog
-  tension: 코딩 에이전트는 reasoning effort가 높을수록 최소한 나빠지지는 않을 것이라는 직관과 달리, FrontierCode 2.0은 높은 effort에서 scope를 과도하게 넓혀 점수가 떨어지는 실제 사례를 보여 준다.
-  kitIdea: 사내 에이전트 eval에 correctness뿐 아니라 '건드리면 안 되는 파일', backward compatibility, regression, inferred thoroughness를 blocker로 넣고 low·high effort를 같은 태스크에서 모두 돌려 본다.
-  primaryVerified: true
-  confidence: high
-  status: idea
 - slug: devin-security-living-threat-model
   topic: Cognition은 취약점 우선순위를 CVSS가 아니라 에이전트와 사람이 함께 유지하는 '살아 있는 threat model'로 재평가한다
   category: startup
